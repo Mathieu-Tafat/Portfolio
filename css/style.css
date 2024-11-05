@@ -1,0 +1,1082 @@
+
+/* pour faciliter les paddings... */
+*, *:before, *:after {/* * c'est TOUS les éléments de la page... */
+    box-sizing: border-box; /* règle les ennuis de padding */
+    outline:none; /* pas de cadre de sélection */
+}
+
+@font-face {
+    font-family: 'MS Reference Sans Serif';
+    src: url('../fonts/MSReferenceSansSerif.woff2') format('woff2'),
+        url('../fonts/MSReferenceSansSerif.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+/* css reset minimal */
+
+a { color:darkblue; text-decoration: none; } /* les liens */
+
+ul { padding:0; } /* listes à puce */
+li { padding:0; list-style: none; }
+
+
+/* votre style */
+
+/* 
+pour une mise en page fluide :
+1. un conteneur global fluide (width en % + max-width en px par exemple)
+2. des images fluides càd width:100%;
+*/
+main {
+	width:100%; 
+	max-width:900px;
+	margin: 0 auto; /* pour centrer le bloc principal horizontalement */
+}
+img { width:100%; }
+
+/* pour des éléments de menu horizontaux, centrés */
+/*nav { text-align:center; }
+nav li { display:inline-block; } /* écoulement de gauche à droite */
+
+/* pour rogner une image dans un format fixe */
+/*.truc img { object-fit:cover; width:200px; height:150px; }*/
+
+/* pour contenir une image dans un format fixe, sans la couper, avec des marges */
+/*.truc img { object-fit:contain; width:200px; height:150px; background:black; }*/
+
+html, body {
+    height: 100%;
+
+}
+h3, h4{
+	margin:0;
+	font-weight: normal;
+}
+
+body{
+	font-family: 'Ms Reference Sans Serif';
+	background-color: teal;
+	color: white;
+	font-size: 0.8rem;
+	cursor: default;
+	overflow: hidden;
+}
+
+
+.start-icon{
+	width:1.2rem;
+	height:auto;
+	margin-right: 0.2rem;
+}
+
+.start-text{
+	font-weight: bold;
+	
+}
+.start-bar{
+	background-color:silver;
+	position: fixed;
+	bottom:0;
+	left:0;
+	color:black;
+	padding:0.2rem;
+	border-top:0.05rem solid white;
+	border-left:0.05rem solid white;
+	border-right: 0.05rem solid black;
+	border-bottom: 0.05rem solid black;
+	width:100vw;
+	display: flex;
+	align-items: center;
+}
+.start{
+	border-top:0.05rem solid white;
+	border-left:0.05rem solid white;
+	border-right: 0.05rem solid black;
+	border-bottom: 0.05rem solid black;
+	padding:0.2rem;
+	display: flex;
+	align-items: center;
+	margin-top:0rem;
+	margin-right:0.5rem;
+}
+
+.invisible{
+	display:none;
+}
+.start-bar span{
+	margin-right:0.5rem;
+	margin-left: 0.5rem;
+	border-top:0.05rem solid black;
+	border-left:0.05rem solid black;
+	border-right: 0.05rem solid white;
+	border-bottom: 0.05rem solid white;
+	padding:0.2rem;
+
+}
+.credit{
+	position: fixed;
+	right:0;
+	margin-right:0.5rem;
+	border-top:0.05rem solid black;
+	border-left:0.05rem solid black;
+	border-right: 0.05rem solid white;
+	border-bottom: 0.05rem solid white;
+	padding:0.2rem;
+	display: flex;
+	align-items: center;
+}
+.credit h4{
+	margin-left:0.2rem;
+	color:black;
+}
+
+
+.profil, .graphisme, .projets, .contact, .logiciels, .jeux, .films{
+	text-align: center;
+	width:4rem;
+	margin-left:1rem;
+	margin-right: 1rem;
+	margin-top: 0.3rem;
+	margin-bottom: 1rem;
+}
+
+.left-aligned{
+    position: fixed;
+    left: 10px; 
+    margin:0;
+    
+}
+.right-aligned{
+    position: fixed;
+    right:10px;
+    margin:0;
+    z-index:0;
+    
+}
+.right-aligned2{
+    position: fixed;
+    right:110px;
+    margin:0;
+    z-index:0;
+    
+}
+
+.fenetre-graphisme,.fenetre-projets{
+	
+	width:1250px;	
+	height:700px;
+	background-color: silver;
+	align-content: center;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute;        
+	top: 50%;                  
+	left: 50%;                 
+	transform: translate(-50%, -50%);
+    overflow-y: none;
+    z-index: 1;
+}
+.fenetre-logiciels{
+	width:556px;	
+	height:461px;
+	background-color: silver;
+	align-content: center;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute;        
+	top: 50%;                  
+	left: 50%;                 
+	transform: translate(-50%, -50%);
+    overflow-y: none;
+    z-index: 1;
+}
+.fenetre-profil{
+	width:1250px;	
+	height:531px;
+	background-color: silver;
+	align-content: center;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute;        
+	top: 50%;                  
+	left: 50%;
+	z-index: 1;                 
+	transform: translate(-50%, -50%);
+    overflow-y: none;
+}
+.fenetre-contact{
+	width:600px;
+	z-index: 1;	
+	height:300px;
+	background-color: silver;
+	align-content: center;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute;        
+	top: 50%;                  
+	left: 50%;                 
+	transform: translate(-50%, -50%);
+	overflow-y: scroll; /* Ajoute une barre de défilement horizontal si nécessaire */
+    overflow-x: hidden;
+}
+
+.ruban-bleu{
+	margin-left:0.1rem;
+	margin-top:0.1rem;
+	width:1242px;
+	height:30px;
+	background: linear-gradient(to right, #282E69, #2A4B9B);
+	position: absolute;
+	top:0%;
+	.croix-profil,.info-profil, .croix-projets,.info-projets , .croix-graphisme,.info-graphisme , .croix-contact,.info-contact{
+		padding:0.1rem;
+		width:1.3rem;
+		height: auto;
+		background-color: silver;
+		border-top:0.11rem solid white;
+		border-left:0.11rem solid white;
+		border-right: 0.11rem solid black;
+		border-bottom: 0.11rem solid black;
+		margin-top:0.2rem;
+		position: fixed;
+		cursor:default;
+	}
+	.info-profil,.info-profil,.info-projets ,.info-graphisme ,.info-contact{margin-left:1190px;}
+	.croix-profil,.croix-profil,.croix-projets,.croix-graphisme,.croix-contact{margin-left:1213px;}
+}
+
+.croix-profil:hover,.info-profil:hover, .croix-projets:hover,.info-projets:hover , .croix-graphisme:hover,.info-graphisme:hover , .croix-contact:hover,.info-contact:hover ,.croix-logiciels:hover,.info-logiciels:hover{
+	border-top:0.11rem solid black;
+	border-left:0.11rem solid black;
+	border-right: 0.11rem solid white;
+	border-bottom: 0.11rem solid white;
+}
+.ruban-bleu h4{
+	position: absolute;
+	margin-top:0.45rem;
+    margin-left:0.8rem;
+}
+
+
+.ruban-bleu-error{
+	margin-left:0.1rem;
+	margin-top:0.1rem;
+	width:392px;
+	height:25px;
+	background: linear-gradient(to right, #282E69, #2A4B9B);
+	position: absolute;
+		
+}
+.ruban-bleu-logiciels{
+	margin-left: 0.1rem;
+	margin-top: 0.2rem;
+	width: 549px;
+	height: 29px;
+	background: linear-gradient(to right, #282E69, #2A4B9B);
+	position: absolute;
+	top: -3px;
+	display: flex;
+	align-items: center; 
+		.croix-logiciels,.info-logiciels{
+			padding:0.1rem;
+			width:1.3rem;
+			height: auto;
+			background-color: silver;
+			border-top:0.11rem solid white;
+			border-left:0.11rem solid white;
+			border-right: 0.11rem solid black;
+			border-bottom: 0.11rem solid black;
+			margin-top: 0.1px;
+			position: fixed;
+			cursor:default;
+		}
+		.croix-logiciels:hover,.info-logiciels:hover{border-top:0.11rem solid black;
+	border-left:0.11rem solid black;
+	border-right: 0.11rem solid white;
+	border-bottom: 0.11rem solid white;}
+
+		.croix-logiciels{margin-left:517px;}
+		.info-logiciels{margin-left:490px;}
+}
+
+.fatal-error{
+	width: 400px; 
+	height: 120px; 
+	background-color: silver; 
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute; 
+	top: 50%; 
+	left: 50%; 
+	z-index:50;
+	transform: translate(-50%, -50%);
+
+}
+.croix-error{
+	padding:0.1rem;
+	width:1.3rem;
+	height: auto;
+	background-color: silver;
+	border-top:0.11rem solid white;
+	border-left:0.11rem solid white;
+	border-right: 0.11rem solid black;
+	border-bottom: 0.11rem solid black;
+	margin-top:0.15rem;
+	position: fixed;
+	margin-left:367px;
+	cursor:default;
+}
+.croix-error-clicked{
+	border-top:0.11rem solid white;
+	border-left:0.11rem solid white;
+	border-right: 0.11rem solid black;
+	border-bottom: 0.11rem solid black;
+	background-color: darkgrey;
+}
+.img-error{
+	width:3rem; 
+	height: auto;
+}
+.text-error{
+	color:black;
+}
+
+.winerror{
+	padding:0.1rem;
+	width:1.5rem;
+	height: auto;
+	margin-top:0.30rem;
+	margin-left:0.30rem;
+	position: fixed;
+}
+.titlerror{
+	margin-top:0.30rem;
+	margin-left:2rem;
+	position: fixed;
+}
+.wait{
+	cursor:wait;
+}
+.croix-clicked{
+	padding:0.1rem;
+	width:1.3rem;
+	height: auto;
+	border-top:0.11rem solid white;
+	border-left:0.11rem solid white;
+	border-right: 0.11rem solid black;
+	border-bottom: 0.11rem solid black;
+	margin-top:0.2rem;
+	position: fixed;
+	cursor:default;
+	margin-left:1213px;
+}
+.contenu-profil h1 {
+    transition: color 0.5s ease, background-position 0.5s ease;
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 100%; /* Ajuste la taille pour l'animation */
+    -webkit-background-clip: text; /* Pour WebKit */
+    background-clip: text; /* Pour Firefox */
+    color: black; /* Couleur par défaut */
+    width: auto;
+}
+.contenu-profil{
+	width: 1181.2px;
+	height: fit-content;
+	border-top:0.18rem solid black;
+	border-left:0.18rem solid black;
+	border-right: 0.18rem solid white;
+	border-bottom: 0.18rem solid white;
+	position: absolute;
+	top:0;
+	margin-top:4rem;
+	margin-right:2rem;
+	margin-left:2rem;
+	padding:1rem 2rem 2rem 2rem;
+	background-color: white;
+	color:black;
+	z-index: 5;
+}
+.fontgris-profil{
+	width: 1231.2px;
+	height: 476px;
+	background-color: silver;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute;
+	top:0;
+	margin-top:2.5rem;
+	margin-left:0.5rem;
+}
+.contenu-contact{
+	width: 530px;
+	height: fit-content;
+	border-top:0.18rem solid black;
+	border-left:0.18rem solid black;
+	border-right: 0.18rem solid white;
+	border-bottom: 0.18rem solid white;
+	position: absolute;
+	top:0;
+	margin-top:4rem;
+	margin-right:2rem;
+	margin-left:2rem;
+	padding:1rem 2rem 2rem 2rem;
+	background-color: white;
+	color:black;
+	z-index: 3;
+}
+.fontgris-contact{
+	width: 580px;
+	height: 225px;
+	background-color: silver;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute;
+	top:0;
+	margin-top:2.5rem;
+	margin-left:0.5rem;
+}
+.ruban-bleu-contact{
+	margin-left:0.1rem;
+	margin-top:0.1rem;
+	width:593px;
+	height:30px;
+	background: linear-gradient(to right, #282E69, #2A4B9B);
+	position: absolute;
+	top:0%;
+	.croix-contact,.info-contact{
+		padding:0.1rem;
+		width:1.3rem;
+		height: auto;
+		background-color: silver;
+		border-top:0.11rem solid white;
+		border-left:0.11rem solid white;
+		border-right: 0.11rem solid black;
+		border-bottom: 0.11rem solid black;
+		position: fixed;
+		top:0;
+		margin-top:0.35rem;
+		cursor:default;}
+	.info-contact{margin-left:540px;}
+	.croix-contact{margin-left:565px;}
+	.croix-contact:hover,.info-contact:hover{
+	border-top:0.11rem solid black;
+	border-left:0.11rem solid black;
+	border-right: 0.11rem solid white;
+	border-bottom: 0.11rem solid white;}
+
+}
+.h4contact{
+	margin-top:0.35rem;
+	margin-left:0.35rem;
+}
+.contenu-profil h1{
+	width: fit-content
+}
+.contenu-profil h1:hover{
+    color: transparent; /* Rendre le texte transparent */
+}
+.contenu-contact h1:hover{
+    color: transparent; /* Rendre le texte transparent */
+}
+.contenu-contact h1{
+	transition: color 0.5s ease, background-position 0.5s ease;
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 25%; /* Ajuste la taille pour l'animation */
+    -webkit-background-clip: text; /* Pour WebKit */
+    background-clip: text; /* Pour Firefox */
+    color: black; /* Couleur par défaut */
+    width: auto;
+}
+.contenu-profil p{
+	font-size: 1rem;
+}
+
+
+.fondblanc2{
+	position: fixed;
+	top:0;
+	display:flex;
+	margin-top: 3rem;
+	margin-right: 1rem;
+	margin-left: 1.15rem;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	background-color: silver;
+	width: 440px;
+	height:75px;
+	z-index:9;
+}
+.fondblanc-contenu-cours{
+	background-color: white;
+	border-top:0.18rem solid black;
+	border-left:0.18rem solid black;
+	border-right: 0.18rem solid white;
+	border-bottom: 0.18rem solid white;
+	z-index:1;
+	top:0;
+	width:1150px;
+	height:500px;
+	margin-top:10rem;
+	position:absolute;
+	margin-left:2.5rem;
+	display: flex;
+	overflow-y: scroll;
+}
+.fondblanc-contenu-cours-gris{
+	background-color: silver;
+	position:absolute;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	top:0;
+	width:1200px;
+	height:550px;
+	margin-top:8.5rem;
+	margin-left:1.15rem;
+	display: flex;
+	z-index:1;
+}
+.pourhandle{
+	z-index: 10;
+}
+
+.fondblanc-contenu-cours h1{
+	transition: color 0.5s ease, background-position 0.5s ease;
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 100%; /* Ajuste la taille pour l'animation */
+    -webkit-background-clip: text; /* Pour WebKit */
+    background-clip: text; /* Pour Firefox */
+    color: black; /* Couleur par défaut */
+    width: auto;
+}
+.fondblanc-contenu-cours h1:hover{
+    color: transparent; /* Rendre le texte transparent */
+}
+.fondblanc-contenu-cours p{
+	font-size: 1rem;
+	color:black;
+}
+.fondblanc-contenu-cours{
+	padding:1rem 2rem 2rem 2rem; /*haut droite bas gauche*//
+}
+
+
+.fondblanc-contenu-cours{
+	background-color: white;
+	border-top:0.18rem solid black;
+	border-left:0.18rem solid black;
+	border-right: 0.18rem solid white;
+	border-bottom: 0.18rem solid white;
+	z-index:1;
+	top:0;
+	width:1150px;
+	height:500;
+	margin-top:10rem;
+	position:absolute;
+	margin-left:2.5rem;
+	display: flex;
+	z-index:1;
+}
+
+
+.fondblanc2-perso{
+	position: fixed;
+	top:0;
+	display:flex;
+	margin-top: 3rem;
+	margin-right: 1rem;
+	margin-left: 1.15rem;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	background-color: silver;
+	width: 440px;
+	height:75px;
+	z-index:9;
+
+}
+.fondblanc-contenu-perso{
+	background-color: white;
+	border-top:0.18rem solid black;
+	border-left:0.18rem solid black;
+	border-right: 0.18rem solid white;
+	border-bottom: 0.18rem solid white;
+	z-index:1;
+	top:0;
+	width:1150px;
+	height:500;
+	margin-top:10rem;
+	position:absolute;
+	margin-left:2.5rem;
+	display: flex;
+	overflow-y: scroll;
+	
+}
+
+.fondblanc-contenu-perso-gris{
+	background-color: silver;
+	position:absolute;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	z-index:1;
+	top:0;
+	width:1200px;
+	height:550px;
+	margin-top:8.5rem;
+	margin-left:1.15rem;
+	display: flex;
+	z-index:1;
+}
+
+
+.fondblanc-contenu-perso h1{
+	transition: color 0.5s ease, background-position 0.5s ease;
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 100%; /* Ajuste la taille pour l'animation */
+    -webkit-background-clip: text; /* Pour WebKit */
+    background-clip: text; /* Pour Firefox */
+    color: black; /* Couleur par défaut */
+    width: auto;
+}
+.fondblanc-contenu-perso h1:hover{
+    color: transparent; /* Rendre le texte transparent */
+}
+.fondblanc-contenu-perso p{
+	font-size: 1rem;
+	color:black;
+}
+.fondblanc-contenu-perso{
+	padding:1rem 2rem 2rem 2rem; /*haut droite bas gauche*//
+	z-index:1;
+}
+
+
+.fondblanc-contenu-perso{
+	background-color: white;
+	border-top:0.18rem solid black;
+	border-left:0.18rem solid black;
+	border-right: 0.18rem solid white;
+	border-bottom: 0.18rem solid white;
+	z-index:1;
+	top:0;
+	width:1150px;
+	height:500px;
+	margin-top:10rem;
+	position:absolute;
+	margin-left:2.5rem;
+	display: flex;
+	z-index:1;
+}
+
+.fondblanc-contenu-perso-gris{
+	background-color: silver;
+	position:absolute;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	z-index:1;
+	top:0;
+	width:1200px;
+	height:550px;
+	margin-top:8.5rem;
+	margin-left:1.15rem;
+	display: flex;
+	z-index:1;
+}
+.start-bar{
+	z-index:0;
+}
+.startclicked{
+	border-top:0.05rem solid black;
+	border-left:0.05rem solid black;
+	border-right: 0.05rem solid white;
+	border-bottom: 0.05rem solid white;
+	background-color:darkgrey;
+}
+.start-menu{
+	background-color:silver;
+	width:350px;
+	z-index:1;
+	position:fixed;
+	height:525px;
+	border-top:0.1rem solid white;
+	border-left:0.1rem solid white;
+	border-right: 0.1rem solid black;
+	border-bottom: 0.1rem solid black;
+	left:0;
+	bottom:28px;
+}
+.start-menu-bluebar{
+	width:40px;
+	position:fixed;
+	height:515px;
+	left:5px;
+	bottom:33px;
+	background: linear-gradient(to right, #282E69, #2A4B9B);
+}
+.fenetre24{
+	transform: rotate(-90deg);
+	font-size: 1.80rem;
+  	position: fixed;
+  	left: -52px;
+ 	bottom: 98px;
+}
+.fenetre24 span{
+	font-weight: bold;
+}
+.menu{
+	bottom:30px;
+	position:fixed;
+	color:black;
+	left:65px;
+ 	padding-top:50px;
+ 	
+ }
+.middle{
+	
+ 	font-size:1rem;
+}
+.extremite{
+	padding-top:0px;
+	padding-bottom:15px;
+	font-size:1rem;
+
+}
+.triangle{
+	left:320px;
+	position :fixed;
+	font-size:0.8rem;
+}
+.underline{
+	text-decoration: underline;
+
+}
+.separation{
+	position : fixed;
+	height:2px;
+	left:50px;
+	width:285px;
+	background-color:silver;
+	border-top:0.05rem solid black;
+	border-left:0.05rem solid black;
+	border-right: 0.05rem solid white;
+	border-bottom: 0.05rem solid white;
+}
+.menu li:hover{
+	text-decoration: underline;
+	cursor: pointer;
+}
+.menu li{
+	display: flex;
+    align-items: center; /* Aligne verticalement */
+    padding: 5px;
+}
+.menu-icon{
+	width:40px;
+	height:auto;
+	margin-right: 25px;
+
+}
+.titre-travail{
+	margin-top: 3rem;
+	padding-top: 3rem;
+	padding-bottom: 1.5rem;
+	font-size:3.5rem;
+	text-align: center;
+	color:black;
+	border-top: 2px solid black; /* Épaisseur et couleur du trait */
+}
+.sous-titre-travail{
+	margin:0;
+	font-size:2rem;
+	text-align: center;
+	color:black;
+	padding-bottom:1rem;
+
+}
+.espacepourletitre {
+	padding-bottom:2.5rem;
+}
+.entredeuxprojets{
+	padding-top:4rem;
+}
+
+a{
+	text-decoration:none;
+	color: inherit;
+}
+
+.contenu img{
+	width:25rem;
+	height: auto;
+}
+
+.categories-cours-li-clicked {
+    color: transparent !important;
+    border-top: 0.18rem solid black !important;
+    border-left: 0.18rem solid black !important;
+    border-right: 0.18rem solid white !important;
+    border-bottom: 0.18rem solid white !important;
+    cursor: pointer;
+    margin-right: 1rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    z-index: 10;
+
+}
+
+
+.categories-cours li {
+    margin-right: 1rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: black;
+    border-top: 0.18rem solid white;
+    border-left: 0.18rem solid white;
+    border-right: 0.18rem solid black;
+    border-bottom: 0.18rem solid black;
+    z-index: 10;
+}
+
+.categories-cours {
+    transition: color 0.5s ease, background-size 0.5s ease;
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 200%; /* Taille ajustée pour un effet de défilement */
+    -webkit-background-clip: text; /* Pour WebKit */
+    background-clip: text; /* Pour Firefox */
+    color: black; /* Couleur par défaut */
+    width: auto;
+    position: fixed;
+    top: 0;
+    margin-top: 3.8rem;
+    margin-right: 1rem;
+    margin-left: 1.8rem;
+    display: flex;
+    padding: 0.25rem 0;
+    z-index: 10;
+}
+
+.categories-cours:hover {
+    background-size: 300%; /* Effet d'animation au survol */
+}
+.fondblanc-contenu-cours-gris{
+	background-color: silver;
+	position:absolute;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	z-index:1;
+	top:0;
+	width:1200px;
+	height:550px;
+	margin-top:8.5rem;
+	margin-left:1.15rem;
+	display: flex;
+	z-index:1;
+}
+.pourhandle{
+	z-index: 10;
+}
+
+/**/
+.categories-perso-li-clicked {
+    color: transparent !important;
+    border-top: 0.18rem solid black !important;
+    border-left: 0.18rem solid black !important;
+    border-right: 0.18rem solid white !important;
+    border-bottom: 0.18rem solid white !important;
+    cursor: pointer;
+    margin-right: 1rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    z-index: 10;
+
+}
+
+
+.categories-perso li {
+    margin-right: 1rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: black;
+    border-top: 0.18rem solid white;
+    border-left: 0.18rem solid white;
+    border-right: 0.18rem solid black;
+    border-bottom: 0.18rem solid black;
+    z-index: 10;
+}
+
+.categories-perso {
+    transition: color 0.5s ease, background-size 0.5s ease;
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 200%; /* Taille ajustée pour un effet de défilement */
+    -webkit-background-clip: text; /* Pour WebKit */
+    background-clip: text; /* Pour Firefox */
+    color: black; /* Couleur par défaut */
+    width: auto;
+    position: fixed;
+    top: 0;
+    margin-top: 3.8rem;
+    margin-right: 1rem;
+    margin-left: 1.8rem;
+    display: flex;
+    padding: 0.25rem 0;
+    z-index: 10;
+}
+
+.categories-perso:hover {
+    background-size: 300%; /* Effet d'animation au survol */
+}
+<<<<<<< HEAD
+@media (max-width: 768px) {
+    .fenetre-graphisme, .fenetre-projets, .fenetre-logiciels {
+        width: 90%;   /* Réduit la largeur à 90% de l'écran */
+        height: auto; /* Ajuste la hauteur automatiquement */
+        max-width: 400px; /* Limite la largeur maximale pour éviter que ce soit trop large */
+        padding: 1rem; /* Ajoute un padding si nécessaire */
+    }
+
+    .fenetre-profil {
+        width: 90%;  
+        height: auto; 
+        max-width: 400px; 
+        padding: 1rem; 
+    }
+
+    .fenetre-contact {
+        width: 90%;  
+        height: auto; 
+        max-width: 400px; 
+        padding: 1rem; 
+    }
+}
+@media (max-width: 768px) {
+    .fenetre-graphisme, .fenetre-projets, .fenetre-logiciels {
+        width: 90%;   /* Réduit la largeur à 90% de l'écran */
+        height: auto; /* Ajuste la hauteur automatiquement */
+        max-width: 400px; /* Limite la largeur maximale */
+        padding: 1rem; /* Ajoute un padding si nécessaire */
+    }
+
+    .ruban-bleu {
+        height: 30px; /* Ajuste la hauteur du ruban pour mobile */
+    }
+
+    .icone-fermer, .icone-aide {
+        width: 25px; /* Ajuste la taille des icônes */
+        height: 25px; /* Ajuste la taille des icônes */
+    }
+
+    .icone-fermer {
+        margin-right: 10px; /* Espace entre les icônes */
+    }
+
+    .icone-aide {
+        margin-left: 10px; /* Espace entre les icônes */
+    }
+}
+=======
+
+
+.contenu p{
+	padding-top:1rem;
+	padding-bottom:1.5rem;
+}
+.contenu-contact a:hover{
+	text-decoration: underline;
+}
+.tvtexture {
+
+    position: fixed; /* Utilisez fixed pour que l'image reste en place même lors du défilement */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../img/tvvid.gif'); /* Image au premier plan */
+    background-size: cover; /* Couvre tout l'écran */
+    background-position: center; /* Centrer l'image */
+    opacity: 0; /* Ajustez l'opacité ici (0.0 - 1.0) */
+    z-index: 50; /* Assurez-vous que l'image est au-dessus de tout le contenu */
+    pointer-events: none; /* Permet d'interagir avec les éléments sous l'image */
+}
+.tvoui{
+	opacity: 0.25;
+	filter:blur(1.7px);
+}
+.draggable {
+    position: relative; /* Ou absolute selon les besoins */
+    z-index: 40; /* Valeur souhaitée */
+}
+.boutontv{
+	position:fixed;
+	bottom:45px;
+	right:20px;
+	border:solid 1px white;
+	padding:2px;
+}
+.boutontv:hover{
+	color:#bababa;
+	border-color: #bababa;
+}
+.enorme{
+	margin-left:30px;
+	padding-bottom:5px;
+	color:black;
+	text-align:center;
+}
+.fondblanc-contenu-logiciels-gris{
+	background-color: silver;
+	position:absolute;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	top:0;
+	width: 533px;
+	height: 411px;
+    margin-top: 2rem;
+	margin-left: 0.5rem;
+	display: flex;
+	z-index: -5;
+}
+.listelogiciels{
+	position: absolute;
+	margin-left: 30px;
+  	margin-top: 410px;
+	padding: 0;
+}
+.listelogiciels li{
+	display: flex; /* Utilise Flexbox pour aligner l'icône et le texte */
+	align-items: center; /* Aligne verticalement l'image avec le texte */
+	margin: 10px 0; /* Espace entre chaque élément */
+	font-size: 1.2rem;
+}
+.ruban-bleu-logiciels h4{
+	margin-left:9px;
+}
+>>>>>>> 5aa7e54 (changements sur le site, herbegeable)
