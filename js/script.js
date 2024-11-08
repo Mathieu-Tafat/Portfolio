@@ -18,7 +18,7 @@ $(document).ready(function() {
 
     // Gestion des double-clics pour afficher les fenêtres
     $('.profil').on('dblclick', function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         $(this).addClass("wait");
         setTimeout(() => {
         $(this).removeClass('wait');
@@ -31,7 +31,7 @@ $(document).ready(function() {
     });
 
     $('.graphisme').on('dblclick', function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         $(this).addClass("wait");
         setTimeout(() => {
         $(this).removeClass('wait');
@@ -44,7 +44,7 @@ $(document).ready(function() {
     });
 
     $('.projets').on('dblclick', function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         $(this).addClass("wait");
         setTimeout(() => {
         $(this).removeClass('wait');
@@ -57,7 +57,7 @@ $(document).ready(function() {
     });
 
     $('.contact').on('dblclick', function() {
-        window.scrollTo(0, 0);
+       $(this).scrollTop(0);
         $(this).addClass("wait");
         setTimeout(() => {
         $(this).removeClass('wait');
@@ -70,7 +70,7 @@ $(document).ready(function() {
     });
 
     $('.logiciels').on('dblclick', function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         $(this).addClass("wait");
         setTimeout(() => {
         $(this).removeClass('wait');
@@ -85,7 +85,7 @@ $(document).ready(function() {
 
     // Gestion des clics pour fermer les fenêtres
     $('.croix-profil').on("click", function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         if (!$('.folder-profil').hasClass('invisible')) {
             $('.fenetre-profil').addClass('invisible');
             $('.folder-profil').addClass('invisible');
@@ -94,7 +94,7 @@ $(document).ready(function() {
     });
 
     $('.croix-graphisme').on("click", function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         if (!$('.folder-graphisme').hasClass('invisible')) {
             $('.fenetre-graphisme').addClass('invisible');
             $('.folder-graphisme').addClass('invisible');
@@ -103,7 +103,7 @@ $(document).ready(function() {
     });
 
     $('.croix-projets').on("click", function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         if (!$('.folder-projets').hasClass('invisible')) {
             $('.fenetre-projets').addClass('invisible');
             $('.folder-projets').addClass('invisible');
@@ -112,7 +112,7 @@ $(document).ready(function() {
     });
 
     $('.croix-contact').on("click", function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         if (!$('.folder-contact').hasClass('invisible')) {
             $('.fenetre-contact').addClass('invisible');
             $('.folder-contact').addClass('invisible');
@@ -121,7 +121,7 @@ $(document).ready(function() {
     });
 
     $('.croix-logiciels').on("click", function() {
-        window.scrollTo(0, 0);
+        $(this).scrollTop(0);
         if (!$('.folder-logiciels').hasClass('invisible')) {
             $('.fenetre-logiciels').addClass('invisible');
             $('.folder-logiciels').addClass('invisible');
@@ -189,7 +189,7 @@ $(document).ready(function() {
 
 
     $('.cours-une').on("click", function() {
-        window.scrollTo(0, 0);
+        $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-une').hasClass('invisible')) {
             $('.fondblanc-contenu-cours-une').removeClass('invisible');
         }    
@@ -205,7 +205,7 @@ $(document).ready(function() {
         
     });
     $('.cours-affiches').on("click", function() {
-        window.scrollTo(0, 0);
+        $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-affiches').hasClass('invisible')) {
             $('.fondblanc-contenu-cours-affiches').removeClass('invisible');
         }
@@ -221,7 +221,7 @@ $(document).ready(function() {
         }
     });
     $('.cours-typo').on("click", function() {
-        window.scrollTo(0, 0);
+        $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-typo').hasClass('invisible')) {
             $('.fondblanc-contenu-cours-typo').removeClass('invisible');
         }
@@ -237,7 +237,7 @@ $(document).ready(function() {
         }
     });
     $('.cours-autres').on("click", function() {
-        window.scrollTo(0, 0);
+        $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-autres').hasClass('invisible')) {
         $('.fondblanc-contenu-cours-autres').removeClass('invisible');
         }
@@ -254,11 +254,8 @@ $(document).ready(function() {
     });
 
 
-///////////////////
-
-
     $('.perso-une').on("click", function() {
-        window.scrollTo(0, 0);
+        $('.fondblanc-contenu-perso').scrollTop(0);
         if ($('.fondblanc-contenu-perso-une').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-une').removeClass('invisible');
         }    
@@ -274,7 +271,7 @@ $(document).ready(function() {
         
     });
     $('.perso-affiches').on("click", function() {
-        window.scrollTo(0, 0);
+        $('.fondblanc-contenu-perso').scrollTop(0);
         if ($('.fondblanc-contenu-perso-affiches').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-affiches').removeClass('invisible');
         }
@@ -290,7 +287,7 @@ $(document).ready(function() {
         }
     });
     $('.perso-typo').on("click", function() {
-        window.scrollTo(0, 0);
+        $(".fondblanc-contenu-perso").scrollTop(0);
         if ($('.fondblanc-contenu-perso-typo').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-typo').removeClass('invisible');
         }
@@ -306,7 +303,7 @@ $(document).ready(function() {
         }
     });
     $('.perso-autres').on("click", function() {
-        window.scrollTo(0, 0);
+        $(".fondblanc-contenu-perso").scrollTop(0);
         if ($('.fondblanc-contenu-perso-autres').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-autres').removeClass('invisible');
         }
@@ -364,10 +361,7 @@ $(document).ready(function() {
         $('.boutontv').html('ON');
     }
     });
-    function openImageInNewTab(imageSrc) {
-        window.open(imageSrc, '_blank');
-    }
-    
+
 
 });
 
