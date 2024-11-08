@@ -134,13 +134,16 @@ body{
 }
 
 
-.profil, .graphisme, .projets, .contact, .logiciels, .jeux, .films{
+.profil, .graphisme, .projets, .contact, .logiciels, .jeux, .films,  .projetpro{
 	text-align: center;
 	width:4rem;
 	margin-left:1rem;
 	margin-right: 1rem;
 	margin-top: 0.3rem;
 	margin-bottom: 1rem;
+}
+.projetpro{
+	cursor: not-allowed;
 }
 
 .left-aligned{
@@ -1079,4 +1082,4 @@ a{
 .ruban-bleu-logiciels h4{
 	margin-left:9px;
 }
->>>>>>> 5aa7e54 (changements sur le site, herbegeable)
+

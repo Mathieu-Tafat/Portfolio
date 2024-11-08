@@ -364,7 +364,13 @@ $(document).ready(function() {
         $('.boutontv').html('ON');
     }
     });
+    function openImageInNewTab(imageSrc) {
+        window.open(imageSrc, '_blank');
+    }
+    
+
 });
+
 
 
  
