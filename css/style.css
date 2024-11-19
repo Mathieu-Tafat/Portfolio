@@ -812,7 +812,16 @@ body{
 	text-align: center;
 	color:black;
 	border-top: 2px solid black; /* Épaisseur et couleur du trait */
+	transition: color 0.5s ease, background-position 0.5s ease;
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    background-size: 100%; /* Ajuste la taille pour l'animation */
+    -webkit-background-clip: text; /* Pour WebKit */
+    background-clip: text; /* Pour Firefox */
 }
+.titre-travail:hover{
+	color:transparent;
+}
+
 .sous-titre-travail{
 	margin:0;
 	font-size:2rem;
@@ -1085,4 +1094,27 @@ a{
 
 .listejeuxps3{
 	color:black;
+}
+
+.cv{
+	border-top:0.15rem solid white;
+	border-left:0.15rem solid white;
+	border-right: 0.15rem solid black;
+	border-bottom: 0.15rem solid black;
+	padding:0.5rem;
+	background-color:silver;
+	font-size:1rem;
+
+}
+
+.cv:active {
+ 	border-top:0.15rem solid black;
+	border-left:0.15rem solid black;
+	border-right: 0.15rem solid white;
+	border-bottom: 0.15rem solid white;
+}
+
+.cv:hover{
+	cursor:pointer;
+	color:darkblue;
 }
