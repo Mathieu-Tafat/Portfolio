@@ -1085,9 +1085,9 @@ a{
   	overflow-y: scroll;
   }
   .info-profil,.info-projets ,.info-graphisme ,.info-contact{
-  	margin-left:342px;
+  	margin-left:301px !important;
   }
   .croix-profil,.croix-projets,.croix-graphisme,.croix-contact{
-  	margin-left:369px;
+  	margin-left:327px !important;
   }
 }
