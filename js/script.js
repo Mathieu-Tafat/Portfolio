@@ -84,7 +84,7 @@ $(document).ready(function() {
 
 
     // Gestion des clics pour fermer les fenêtres
-    $('.croix-profil').on("click", function() {
+    $('.croix-profil').on("click touchstart", function() {
         $(this).scrollTop(0);
         if (!$('.folder-profil').hasClass('invisible')) {
             $('.fenetre-profil').addClass('invisible');
@@ -93,7 +93,7 @@ $(document).ready(function() {
         }
     });
 
-    $('.croix-graphisme').on("click", function() {
+    $('.croix-graphisme').on("click touchstart", function() {
         $(this).scrollTop(0);
         if (!$('.folder-graphisme').hasClass('invisible')) {
             $('.fenetre-graphisme').addClass('invisible');
@@ -102,7 +102,7 @@ $(document).ready(function() {
         }
     });
 
-    $('.croix-projets').on("click", function() {
+    $('.croix-projets').on("click touchstart", function() {
         $(this).scrollTop(0);
         if (!$('.folder-projets').hasClass('invisible')) {
             $('.fenetre-projets').addClass('invisible');
@@ -111,7 +111,7 @@ $(document).ready(function() {
         }
     });
 
-    $('.croix-contact').on("click", function() {
+    $('.croix-contact').on("click touchstart", function() {
         $(this).scrollTop(0);
         if (!$('.folder-contact').hasClass('invisible')) {
             $('.fenetre-contact').addClass('invisible');
@@ -120,7 +120,7 @@ $(document).ready(function() {
         }
     });
 
-    $('.croix-logiciels').on("click", function() {
+    $('.croix-logiciels').on("click touchstart", function() {
         $(this).scrollTop(0);
         if (!$('.folder-logiciels').hasClass('invisible')) {
             $('.fenetre-logiciels').addClass('invisible');
@@ -130,7 +130,7 @@ $(document).ready(function() {
     });
 
 
-    $('.croix-error').on("click", function() {
+    $('.croix-error').on("click touchstart", function() {
         if (!$('.fatal-error').hasClass('invisible')) {
             location.reload();
         }
