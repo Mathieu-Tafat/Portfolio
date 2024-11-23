@@ -1073,10 +1073,14 @@ a{
   .fontgris-profil {
       width: 341.1px;
   }
-  .fenetre-profil{
+  .fenetre-profil, .fenetre-logiciels{
   	width:360px;
   }
-  .ruban-bleu{
+  .fenetre-contact{
+  	width: 360px;
+  	height:280px;
+  }
+  .ruban-bleu, .ruban-bleu-contact, .ruban-bleu-logiciels{
   	width:352.8px;
   }
   .contenu-profil{
@@ -1084,10 +1088,113 @@ a{
   	height: 450px;
   	overflow-y: scroll;
   }
+  .contenu-contact{
+  	width: 291.2px;
+  	height: 174px;
+  	overflow-y: hidden;
+  }
+
+  .fontgris-graphisme, .fontgris-contact {
+      width: 341.1px;
+  }
+  .fenetre-projets{
+  	width: 364.1px;
+  }
+  .fenetre-graphisme{
+  	width:360px;
+  }
+  .ruban-bleu{
+  	width:352.8px;
+  }
+  .contenu-graphisme{
+  	width: 291.2px;
+  	height: 450px;
+  	overflow-y: scroll;
+  }
+  .fondblanc2, .fondblanc2-perso{
+  	width: 320px;
+  }
+  .fondblanc-contenu-cours-gris{
+  	width: 320px;
+  	
+  }
+  .fondblanc-contenu-logiciels-gris{
+  	width: 337px;
+  }
+  .fondblanc-contenu-cours{
+  	width: 273px;
+  	font-size:5pt;
+  }
+  .fondblanc-contenu-cours p{
+  	font-size:8pt;
+  }
+  .fondblanc-contenu-cours-une{
+  	font-size:5pt;
+  }
+  .titre-travail{
+  	font-size:15pt;
+  }
+  .p{
+  	font-size:10pt !important;
+  }
+  .contenu img{
+  	width:150px;
+  }
+  .contenu video{
+  	width:150px;
+  }
+  .contenu p{
+  	font-size: 8pt;
+  }
+  .categories-perso li {
+    margin-right: 0.2rem;
+    padding: 0.5rem;
+    font-size:9pt;
+  }
+  .fondblanc-contenu-perso-gris{
+  	width: 320px;
+  	
+  }
+  .fondblanc-contenu-perso{
+  	width: 273px;
+  	font-size:5pt;
+  }
+  .fondblanc-contenu-perso p{
+  	font-size:8pt;
+  }
+  .fondblanc-contenu-perso-une{
+  	font-size:5pt;
+  }
+  .titre-travail{
+  	font-size:15pt;
+  }
+  .p{
+  	font-size:10pt !important;
+  }
+  .contenu img{
+  	width:150px;
+  }
+  .contenu video{
+  	width:150px;
+  }
+  .contenu p{
+  	font-size: 8pt;
+  }
+  .categories-perso li, .categories-cours li {
+    margin-right: 0.2rem;
+    padding: 0.5rem;
+    font-size:9pt;
+  }
   .info-profil,.info-projets ,.info-graphisme ,.info-contact{
   	margin-left:301px !important;
   }
   .croix-profil,.croix-projets,.croix-graphisme,.croix-contact{
+  	margin-left:327px !important;
+  }
+  .info-logiciels{
+  	margin-left:301px !important;
+  }
+  .croix-logiciels{
   	margin-left:327px !important;
   }
 }
