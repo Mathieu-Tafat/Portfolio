@@ -1071,16 +1071,16 @@ a{
 }
 @media (orientation: portrait) and (max-width: 844px) {
   .fontgris-profil {
-      width: 360.1px;
+      width: 341.1px;
   }
   .fenetre-profil{
-  	width:380px;
+  	width:360px;
   }
   .ruban-bleu{
-  	width:372.4px;
+  	width:352.8px;
   }
   .contenu-profil{
-  	width: 307.4px;
+  	width: 291.2px;
   	height: 450px;
   	overflow-y: scroll;
   }
