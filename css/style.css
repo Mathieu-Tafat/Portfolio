@@ -202,7 +202,7 @@ body{
 }
 .fenetre-profil{
 	width:1250px;	
-	height:531px;
+	height:556px;
 	background-color: silver;
 	align-content: center;
 	border-top:0.18rem solid white;
@@ -411,10 +411,11 @@ body{
 	background-color: white;
 	color:black;
 	z-index: 5;
+	overflow-y: scroll;
 }
 .fontgris-profil{
 	width: 1231.2px;
-	height: 476px;
+	height: 494px;
 	background-color: silver;
 	border-top:0.18rem solid white;
 	border-left:0.18rem solid white;
@@ -964,56 +965,6 @@ a{
 .categories-perso:hover {
     background-size: 300%; /* Effet d'animation au survol */
 }
-<<<<<<< HEAD
-@media (max-width: 768px) {
-    .fenetre-graphisme, .fenetre-projets, .fenetre-logiciels {
-        width: 90%;   /* Réduit la largeur à 90% de l'écran */
-        height: auto; /* Ajuste la hauteur automatiquement */
-        max-width: 400px; /* Limite la largeur maximale pour éviter que ce soit trop large */
-        padding: 1rem; /* Ajoute un padding si nécessaire */
-    }
-
-    .fenetre-profil {
-        width: 90%;  
-        height: auto; 
-        max-width: 400px; 
-        padding: 1rem; 
-    }
-
-    .fenetre-contact {
-        width: 90%;  
-        height: auto; 
-        max-width: 400px; 
-        padding: 1rem; 
-    }
-}
-@media (max-width: 768px) {
-    .fenetre-graphisme, .fenetre-projets, .fenetre-logiciels {
-        width: 90%;   /* Réduit la largeur à 90% de l'écran */
-        height: auto; /* Ajuste la hauteur automatiquement */
-        max-width: 400px; /* Limite la largeur maximale */
-        padding: 1rem; /* Ajoute un padding si nécessaire */
-    }
-
-    .ruban-bleu {
-        height: 30px; /* Ajuste la hauteur du ruban pour mobile */
-    }
-
-    .icone-fermer, .icone-aide {
-        width: 25px; /* Ajuste la taille des icônes */
-        height: 25px; /* Ajuste la taille des icônes */
-    }
-
-    .icone-fermer {
-        margin-right: 10px; /* Espace entre les icônes */
-    }
-
-    .icone-aide {
-        margin-left: 10px; /* Espace entre les icônes */
-    }
-}
-=======
-
 
 .contenu p{
 	padding-top:1rem;
@@ -1117,4 +1068,26 @@ a{
 .cv:hover{
 	cursor:pointer;
 	color:darkblue;
+}
+@media (orientation: portrait) and (max-width: 844px) {
+  .fontgris-profil {
+      width: 382px;
+  }
+  .fenetre-profil{
+  	width:403px;
+  }
+  .ruban-bleu{
+  	width:395px;
+  }
+  .contenu-profil{
+  	width: 326px;
+  	height: 450px;
+  	overflow-y: scroll;
+  }
+  .info-profil,.info-projets ,.info-graphisme ,.info-contact{
+  	margin-left:342px;
+  }
+  .croix-profil,.croix-projets,.croix-graphisme,.croix-contact{
+  	margin-left:369px;
+  }
 }
