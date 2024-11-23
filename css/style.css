@@ -1099,16 +1099,18 @@ a{
   }
   .fenetre-projets{
   	width: 364.1px;
+  	height: 600px;
   }
   .fenetre-graphisme{
   	width:360px;
+  	height: 600px;
   }
   .ruban-bleu{
   	width:352.8px;
   }
   .contenu-graphisme{
   	width: 291.2px;
-  	height: 450px;
+  	height: 350px;
   	overflow-y: scroll;
   }
   .fondblanc2, .fondblanc2-perso{
@@ -1116,6 +1118,7 @@ a{
   }
   .fondblanc-contenu-cours-gris{
   	width: 320px;
+  	height: 440px;
   	
   }
   .fondblanc-contenu-logiciels-gris{
@@ -1124,6 +1127,8 @@ a{
   .fondblanc-contenu-cours{
   	width: 273px;
   	font-size:5pt;
+  	height: 390px;
+
   }
   .fondblanc-contenu-cours p{
   	font-size:8pt;
@@ -1153,11 +1158,13 @@ a{
   }
   .fondblanc-contenu-perso-gris{
   	width: 320px;
+  	height: 440px;
   	
   }
   .fondblanc-contenu-perso{
   	width: 273px;
   	font-size:5pt;
+  	height: 390px;
   }
   .fondblanc-contenu-perso p{
   	font-size:8pt;
