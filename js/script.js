@@ -1,6 +1,4 @@
 $(document).ready(function() {
-    // Initialiser toutes les fenêtres à invisible
-    $('.start-menu,.folder-profil, .folder-graphisme, .folder-projets, .folder-contact, .folder-logiciels, .folder-jeux, .folder-films, .fenetre-profil, .fenetre-graphisme, .fenetre-projets, .fenetre-contact, .fenetre-logiciels, .fenetre-jeux, .fenetre-films, .fatal-error, .fondblanc-contenu-cours-affiches, .fondblanc-contenu-cours-typo, .fondblanc-contenu-cours-autres, .fondblanc-contenu-cours-typo,.fondblanc-contenu-perso-affiches, .fondblanc-contenu-perso-typo, .fondblanc-contenu-perso-autres, .fondblanc-contenu-perso-typo').addClass('invisible');
     // Vérifie si toutes les fenêtres sont ouvertes
     function checkAllWindowsOpen() {
         if (
@@ -36,6 +34,7 @@ $(document).ready(function() {
         setTimeout(() => {
         $(this).removeClass('wait');
         if ($('.folder-graphisme').hasClass('invisible')) {
+            $('.firstpage-cours').removeClass('invisible');
             $('.folder-graphisme').removeClass('invisible');
             $('.fenetre-graphisme').removeClass('invisible');
             checkAllWindowsOpen(); // Vérification après ouverture
@@ -49,6 +48,7 @@ $(document).ready(function() {
         setTimeout(() => {
         $(this).removeClass('wait');
         if ($('.folder-projets').hasClass('invisible')) {
+            $('.firstpage-perso').removeClass('invisible');
             $('.folder-projets').removeClass('invisible');
             $('.fenetre-projets').removeClass('invisible');
             checkAllWindowsOpen(); // Vérification après ouverture
@@ -189,6 +189,7 @@ $(document).ready(function() {
 
 
     $('.cours-une').on("click", function() {
+        $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-une').hasClass('invisible')) {
             $('.fondblanc-contenu-cours-une').removeClass('invisible');
@@ -205,6 +206,7 @@ $(document).ready(function() {
         
     });
     $('.cours-affiches').on("click", function() {
+        $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-affiches').hasClass('invisible')) {
             $('.fondblanc-contenu-cours-affiches').removeClass('invisible');
@@ -221,6 +223,7 @@ $(document).ready(function() {
         }
     });
     $('.cours-typo').on("click", function() {
+        $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-typo').hasClass('invisible')) {
             $('.fondblanc-contenu-cours-typo').removeClass('invisible');
@@ -237,6 +240,7 @@ $(document).ready(function() {
         }
     });
     $('.cours-autres').on("click", function() {
+        $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-autres').hasClass('invisible')) {
         $('.fondblanc-contenu-cours-autres').removeClass('invisible');
@@ -255,6 +259,7 @@ $(document).ready(function() {
 
 
     $('.perso-une').on("click", function() {
+        $('.firstpage-perso').addClass('invisible');
         $('.fondblanc-contenu-perso').scrollTop(0);
         if ($('.fondblanc-contenu-perso-une').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-une').removeClass('invisible');
@@ -271,6 +276,7 @@ $(document).ready(function() {
         
     });
     $('.perso-affiches').on("click", function() {
+        $('.firstpage-perso').addClass('invisible');
         $('.fondblanc-contenu-perso').scrollTop(0);
         if ($('.fondblanc-contenu-perso-affiches').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-affiches').removeClass('invisible');
@@ -287,6 +293,7 @@ $(document).ready(function() {
         }
     });
     $('.perso-typo').on("click", function() {
+        $('.firstpage-perso').addClass('invisible');
         $(".fondblanc-contenu-perso").scrollTop(0);
         if ($('.fondblanc-contenu-perso-typo').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-typo').removeClass('invisible');
@@ -303,6 +310,7 @@ $(document).ready(function() {
         }
     });
     $('.perso-autres').on("click", function() {
+        $('.firstpage-perso').addClass('invisible');
         $(".fondblanc-contenu-perso").scrollTop(0);
         if ($('.fondblanc-contenu-perso-autres').hasClass('invisible')) {
             $('.fondblanc-contenu-perso-autres').removeClass('invisible');
