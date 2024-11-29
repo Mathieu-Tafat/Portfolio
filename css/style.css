@@ -27,7 +27,7 @@ li { padding:0; list-style: none; }
 
 /* 
 pour une mise en page fluide :
-1. un conteneur global fluide (width en % + max-width en px par exemple)
+1. un conteneur global fluide (width en % +  en px par exemple)
 2. des images fluides càd width:100%;
 */
 main {
@@ -35,7 +35,6 @@ main {
 	max-width:900px;
 	margin: 0 auto; /* pour centrer le bloc principal horizontalement */
 }
-img { width:100%; }
 
 /* pour des éléments de menu horizontaux, centrés */
 /*nav { text-align:center; }
@@ -106,6 +105,9 @@ body{
 .invisible{
 	display:none;
 }
+.visible{
+
+}
 .start-bar span{
 	margin-right:0.5rem;
 	margin-left: 0.5rem;
@@ -134,7 +136,7 @@ body{
 }
 
 
-.profil, .graphisme, .projets, .contact, .logiciels, .jeux, .films,  .projetpro{
+.profil, .graphisme, .projets, .contact, .logiciels, .jeux, .films,.paint,  .projetpro{
 	text-align: center;
 	width:4rem;
 	margin-left:1rem;
@@ -185,7 +187,7 @@ body{
     z-index: 1;
 }
 .fenetre-logiciels{
-	width:556px;	
+	width:557px;	
 	height:461px;
 	background-color: silver;
 	align-content: center;
@@ -200,9 +202,892 @@ body{
     overflow-y: none;
     z-index: 1;
 }
+.fenetre-paint{
+	width:1250px;	
+	height:700px;
+	background-color: silver;
+	align-content: center;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	position: absolute;        
+	top: 50%;                  
+	left: 50%;                 
+	transform: translate(-50%, -50%);
+    overflow-y: none;
+    z-index: 1;
+}
+.fondblanc-contenu-paint-gris{
+	background-color: silver;
+	position:absolute;
+	border-top:0.18rem solid white;
+	border-left:0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	top:0;
+	width: 1229px;
+	height: 650px;
+    margin-top: 2.3rem;
+	margin-left: 0.5rem;
+	display: flex;
+	z-index: -5;
+}
+.ruban-bleu-paint{
+	margin-left:0.1rem;
+	margin-top:0.1rem;
+	width:1242px;
+	height:30px;
+	background: linear-gradient(to right, #282E69, #2A4B9B);
+	position: absolute;
+	top:0%;
+	 .croix-paint, .info-paint{padding:0.1rem;
+		width:1.3rem;
+		height: auto;
+		background-color: silver;
+		border-top:0.11rem solid white;
+		border-left:0.11rem solid white;
+		border-right: 0.11rem solid black;
+		border-bottom: 0.11rem solid black;
+		margin-top:-1.3rem;
+		position: fixed;
+		cursor:default;}
+	.croix-paint{margin-left:1213px;}
+	.info-paint{margin-left:1190px;}
+	.croix-paint:hover, .info-paint:hover{border-top:0.11rem solid black;
+	border-left:0.11rem solid black;
+	border-right: 0.11rem solid white;
+	border-bottom: 0.11rem solid white; }
+.titrepaint{
+	margin-top:0.4rem;
+
+}
+}
+.petite-icone{
+	width:auto;
+	height: 1.4rem;
+	margin-top:0.2rem;
+
+}
+.acote{
+	display:flex;
+}
+.barre{
+	background-color: silver;
+	width: 1231.2px;
+	border-top: 0.18rem solid white;
+	border-left: 0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	margin-left: -2px;
+	height: 33px;
+	margin-top: -1px;
+}
+.listepaint{
+	color:black;
+	display:flex;
+	margin-top:6px;
+}
+.listepaint li{
+	margin-right:20px;
+	margin-left:10px;
+}
+.listepaint li::first-letter{
+	text-decoration: underline;
+}
+.listepaint li:hover{
+	cursor: pointer;
+	text-decoration:underline;
+}
+.paintoutils{
+  background-color: silver;
+  width: 134.2px;
+  border-top: 0.18rem solid white;
+  border-left: 0.18rem solid white;
+  border-right: 0.18rem solid black;
+  border-bottom: 0.18rem solid black;
+  margin-left: -2px;
+  height: 551px;
+  margin-top: 27px;
+  position: absolute;
+}
+.paintcolor{
+  background-color: silver;
+  width: 1228.2px;
+  border-top: 0.18rem solid white;
+  border-left: 0.18rem solid white;
+  border-right: 0.18rem solid black;
+  border-bottom: 0.18rem solid black;
+  margin-left: -2px;
+  height: 78px;
+  margin-top: 570px;
+  position: absolute;
+}
+.grisfondpaint{
+  background-color: darkgrey;
+  width: 1094px;
+  border-top: 0.18rem solid black;
+  border-left: 0.18rem solid black;
+  border-right: 0.18rem solid white;
+  border-bottom: 0.18rem solid white;
+  margin-left: 131px;
+  height: 538px;
+  margin-top: 32px;
+  position: absolute;
+}
+#paintzone{
+  width: 1067.2px;
+  margin-left: 139px;
+  background-color: white;
+  height: 508px;
+  margin-top: 41px;
+  position: absolute;
+}
+#paintzone canvas {
+    display: block;     /* Evite l'effet inline qui pourrait réduire la taille du canvas */
+    width: 100%;        /* Garantir que le canvas prend toute la largeur du parent */
+    height: 100%;       /* Garantir que le canvas prend toute la hauteur du parent */
+}
+.petitcarre{
+  width: 10px;
+  height: 10px;
+  background-color: darkblue;
+  border-top: solid 1px white;
+  border-left: solid 1px white;
+  position: absolute;
+  right: 8px;
+  top: 550px;
+}
+.petitcarre2{
+	width: 10px;
+  height: 10px;
+  background-color: darkblue;
+  border-top: solid 1px white;
+  border-left: solid 1px white;
+  position: absolute;
+  right: 553px;
+  top: 550px;
+}
+.petitcarre3{
+	width: 10px;
+  height: 10px;
+  border-top: solid 1px white;
+  border-left: solid 1px white;
+  background-color: darkblue;
+  position: absolute;
+  right: 8px;
+  top: 273px;
+}
+.petitcarre4{
+	width: 8px;
+  height: 10px;
+  background-color: white;
+  border-top: solid 1px darkblue;
+  border-left: solid 1px darkblue;
+  position: absolute;
+  right: 1084px;
+  top: 273px;
+}
+.petitcarre5{
+	width: 10px;
+  height: 6px;
+  background-color: white;
+  border-top: solid 1px darkblue;
+  border-left: solid 1px darkblue;
+  position: absolute;
+  right: 8px;
+  top: 34px;
+}
+.petitcarre6{
+	width: 10px;
+  height: 8px;
+  background-color: white;
+  border-top: solid 1px darkblue;
+  border-left: solid 1px darkblue;
+  position: absolute;
+  right: 553px;
+  top: 32px;
+}
+.petitcarre7{
+	width: 6px;
+  height: 6px;
+  background-color: white;
+  border-top: solid 1px darkblue;
+  border-left: solid 1px darkblue;
+  position: absolute;
+  right: 1085px;
+  top: 35px;
+}
+.petitcarre8{
+	width: 8px;
+  height: 10px;
+  background-color: white;
+  border-top: solid 1px darkblue;
+  border-left: solid 1px darkblue;
+  position: absolute;
+  right: 1085px;
+  top: 550px;
+}
+
+/*blocs de couleurs paint*/
+.noir{
+	width: 17px;
+  height: 18px;
+  background-color: black;
+  position: absolute;
+  top: 579px;
+  right: 1096px;
+  border-top: solid 1px black;
+  border-left: solid 1px black;
+  border-bottom: solid 1px white;
+  border-right: solid 1px white;
+   z-index:1;
+}
+.gris{
+	width: 17px;
+  height: 18px;
+	background-color: grey;
+	position:absolute;
+	top: 579px;
+  right: 1073px;
+  z-index:1;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.magenta{
+	width: 17px;
+  height: 18px;
+	background-color: magenta;
+	position:absolute;
+	top: 579px;z-index:1;
+  right: 1050px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.jaunefonce{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: greenyellow;
+	position:absolute;
+	top: 579px;
+  right: 1027px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.vertpastel{
+	width: 17px;
+  height: 18px;;
+	background-color: lightseagreen;
+	position:absolute;
+	top: 579px;
+  right: 1004px;z-index:1;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.bleupastel{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: lightskyblue;
+	position:absolute;
+	top: 579px;
+  right: 981px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.bleufonce{
+width: 17px;
+  height: 18px;
+	background-color: darkblue;
+	position:absolute;
+	top:579px;z-index:1;
+	right:958px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.rosepastel{
+	width: 17px;
+  height: 18px;
+	background-color: lightpink;
+	position:absolute;
+	top:579px;z-index:1;
+	right:935px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.jaunemoche{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: #8c8231;
+	position:absolute;
+	top:579px;
+	right:912px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.grisfonce{
+width: 17px;
+  height: 18px;z-index:1;
+	background-color: darkgrey;
+	position:absolute;
+	top:579px;
+	right:889px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+
+.bleu2{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: mediumblue;
+	position:absolute;
+	top:579px;
+	right:866px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.bleu3{
+	width: 17px;z-index:1;
+  height: 18px;
+	background-color: cadetblue;
+	position:absolute;
+	top:579px;
+	right:843px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+
+.marron{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: maroon;
+	position:absolute;
+	top:579px;
+	right:820px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.bleu1{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: royalblue;
+	position:absolute;
+	top:579px;
+	right:797px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+/*deuxiemeligne*/
+.blanc{
+	width: 17px;z-index:1;
+  height: 18px;
+	background-color: white;
+	position:absolute;
+	top:602px;
+	right:1096px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.grisclair{
+	width: 17px;z-index:1;
+  height: 18px;
+	background-color: lightgrey;
+	position:absolute;
+	top:602px;
+	right:1073px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.rouge{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: red;
+	position:absolute;
+	top:602px;
+	right:1050px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.jaune{
+	width: 17px;
+  height: 18px;z-index:1;
+	background-color: yellow;
+	position:absolute;
+	top:602px;
+	right:1027px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.vertclair{
+	width: 17px;
+  height: 18px;
+	background-color: green;
+	position:absolute;
+	top:602px;z-index:1;
+	right:1004px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.bleuclair{
+	width: 17px;
+  height: 18px;
+	background-color: #5f03ff;
+	position:absolute;
+	top:602px;
+	right:981px;z-index:1;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.bleumarine{
+	width: 17px;
+  height: 18px;
+	background-color: darkslateblue;
+	position:absolute;
+	top:602px;
+	right:958px;z-index:1;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.rose{
+	width: 17px;
+  height: 18px;
+	background-color: #ff03b7;
+	position:absolute;
+	top:602px;z-index:1;
+	right:935px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.jauneclair{
+	width: 17px;
+  height: 18px;
+	background-color: #b39f09;
+	position:absolute;
+	top:602px;z-index:1;
+	right:912px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.vertclair2{
+	width: 17px;
+  height: 18px;
+	background-color: #13ff03;
+	position:absolute;
+	top:602px;z-index:1;
+	right:889px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.turquoise{
+	width: 17px;
+  height: 18px;
+	background-color: turquoise;
+	position:absolute;z-index:1;
+	top:602px;
+	right:866px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.bleu4{
+	width: 17px;
+  height: 18px;
+	background-color: darkturquoise	;
+	position:absolute;
+	top:602px;z-index:1;
+	right:843px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.saumon{
+	width: 17px;z-index:1;
+  height: 18px;
+	background-color: salmon;
+	position:absolute;
+	top:602px;
+	right:820px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.orange{
+	width: 17px;
+  height: 18px;
+	background-color: orange;
+	position:absolute;
+	top:602px;
+	z-index:1;
+	right:797px;
+	border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+.petitebar{
+	border-top: solid 1px black;
+  border-left: solid 1px black;
+  border-bottom: solid 1px white;
+  border-right: solid 1px white;
+  width: 341px;
+  height: 2px;
+  top: 635px;
+  position: absolute;
+  right: 782px;
+}
+.carrevide{
+	border-top: solid 1px black;
+  border-left: solid 1px black;
+  border-bottom: solid 1px white;
+  border-right: solid 1px white;
+  width: 332px;
+  height: 53px;
+  top: 574px;
+  position: absolute;
+  right: 787px;
+  z-index:0;
+}
+
+/*gros carré*/
+.groscarre{
+	width:40px ;
+  height: 41px;
+  background-color: white;
+  top: 579px;
+  position: absolute;
+  border-top: solid 1px black;
+  border-left: solid 1px black;
+  border-bottom: solid 1px white;
+  border-right: solid 1px white;
+  right: 1125px;
+}
+/*current*/
+.currentfill{
+	width: 17px;
+  height: 18px;
+	background-color: white;
+	position:absolute;
+	top: 585px;
+  right: 1144px;
+	border-top: solid 1px grey;
+    border-left: solid 1px grey;
+    border-bottom: solid 2.5px grey;
+    border-right: solid 2.5px grey;
+    z-index:2;
+}
+
+.currentborder{
+width: 17px;
+  height: 18px;
+	background-color: white;
+	position:absolute;
+	top: 595px;
+  right: 1131px;
+	border-top: solid 1px grey;
+    border-left: solid 1px grey;
+    border-bottom: solid 2.5px grey;
+    border-right: solid 2.5px grey;
+    z-index:1;
+
+}
+/*outils paint*/
+.outilicon{
+	width: 50px;
+  height: 50px;
+  margin-left: 8px;
+  margin-top: 5px;
+}
+.freeselection{
+	width: 63.5px;
+  height: 63.5px;
+  background-color: #737373;
+  position: absolute;
+  top: 29px;
+  right: 1161px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;	
+}
+.geometricselection{
+	width: 63.5px;
+  height: 63.5px;
+  background-color: #737373;
+  position: absolute;
+  top: 29px;
+  right: 1096.5px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;	
+}
+.gomme{
+	width: 63.5px;
+  height: 63.5px;
+  background-color: silver;
+  position: absolute;
+  top: 93.5px;
+  right: 1161px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;
+}
+.potpeinture{
+	width: 63.5px;
+  height: 63.5px;
+  background-color: #737373;
+  position: absolute;
+  top: 93.5px;
+  right: 1096.5px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;
+}
+.pipette{
+	width: 63.5px;
+  height: 63.5px;
+  background-color: #737373;
+  position: absolute;
+  top: 158px;
+  right: 1161px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;
+}
+.loupe{
+	width: 63.5px;
+  height: 63.5px;
+  background-color: #737373;
+  position: absolute;
+  top: 158px;
+  right: 1096.5px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;
+}
+.crayon{width: 63.5px;
+  height: 63.5px;
+  background-color: silver;
+  position: absolute;
+  top: 222.5px;
+  right: 1161px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.pinceau{width: 63.5px;
+  height: 63.5px;
+  background-color: silver;
+  position: absolute;
+  top: 222.5px;
+  right: 1096.5px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.spray{width: 63.5px;
+  height: 63.5px;
+  background-color: silver;
+  position: absolute;
+  top: 287px;
+  right: 1161px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.painttexte{width: 63.5px;
+  height: 63.5px;
+  background-color: silver;
+  position: absolute;
+  top: 287px;
+  right: 1096.5px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.lignedroite{width: 63.5px;
+  height: 63.5px;
+  background-color: silver;
+  position: absolute;
+  top: 351.5px;
+  right: 1161px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.lignelibre{width: 63.5px;
+  height: 63.5px;
+  background-color: #737373;
+  position: absolute;
+  top: 351.5px;
+  right: 1096.5px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.formerectangle{width: 63.5px;
+  height: 63.5px;
+  background-color: silver;
+  position: absolute;
+  top: 416px;
+  right: 1161px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.formepolygone{width: 63.5px;
+  height: 63.5px;
+  background-color: #737373;
+  position: absolute;
+  top: 416px;
+  right: 1096.5px;
+  border-top: solid 0.13rem white;
+  border-left: solid 0.13rem white;
+  border-bottom: solid 0.13rem black;
+  border-right: solid 0.13rem black;
+  z-index: 1;}
+.formeronde{
+	width: 63.5px;
+	height: 63.5px;
+	background-color: silver;
+	position: absolute;
+	top: 480.5px;
+	right: 1161px;
+	border-top: solid 0.13rem white;
+	border-left: solid 0.13rem white;
+	border-bottom: solid 0.13rem black;
+	border-right: solid 0.13rem black;
+	z-index: 1;
+}
+.formecercle{
+	width: 63.5px;
+  	height: 63.5px;
+  	background-color: silver;
+  	position: absolute;
+  	top: 480.5px;
+  	right: 1096.5px;
+  	border-top: solid 0.13rem white;
+  	border-left: solid 0.13rem white;
+  	border-bottom: solid 0.13rem black;
+  	border-right: solid 0.13rem black;
+  	z-index: 1;}
+.outilcurrent{
+	background-color: white;
+	border-top: solid 0.13rem black;
+  	border-left: solid 0.13rem black;
+  	border-bottom: solid 0.13rem white;
+  	border-right: solid 0.13rem white;
+}
+
+.fenetre-paint-fichier{
+	position:absolute;
+	top: 25px;
+  right: 957px;
+  width: 269px;
+  height: 71px;
+	background-color: silver;
+	border-top: 0.18rem solid white;
+	border-left: 0.18rem solid white;
+	border-right: 0.18rem solid black;
+	border-bottom: 0.18rem solid black;
+	z-index: 9;
+}
+.newfile{
+	position: absolute;
+  top: 36px;
+  right: 1081px;
+  z-index: 10;
+  width: 131px;
+  color:black;
+}
+.save{
+	position: absolute;
+  top: 66px;
+  right: 1118px;
+  z-index: 10;
+  color:black;
+}
+.save:hover, .newfile:hover{
+	text-decoration: underline;
+	cursor: pointer;
+
+}
+.save::first-letter, .newfile::first-letter{
+	text-decoration: underline;
+
+}
+
+
+/**/
+
 .fenetre-profil{
 	width:1250px;	
-	height:556px;
+	height:602px;
 	background-color: silver;
 	align-content: center;
 	border-top:0.18rem solid white;
@@ -242,7 +1127,7 @@ body{
 	background: linear-gradient(to right, #282E69, #2A4B9B);
 	position: absolute;
 	top:0%;
-	.croix-profil,.info-profil, .croix-projets,.info-projets , .croix-graphisme,.info-graphisme , .croix-contact,.info-contact{
+	.croix-profil, .info-profil, .croix-projets,.info-projets , .croix-graphisme,.info-graphisme , .croix-contact,.info-contact{
 		padding:0.1rem;
 		width:1.3rem;
 		height: auto;
@@ -255,8 +1140,8 @@ body{
 		position: fixed;
 		cursor:default;
 	}
-	.info-profil,.info-profil,.info-projets ,.info-graphisme ,.info-contact{margin-left:1190px;}
-	.croix-profil,.croix-profil,.croix-projets,.croix-graphisme,.croix-contact{margin-left:1213px;}
+	.info-profil, .info-profil,.info-projets ,.info-graphisme ,.info-contact{margin-left:1190px;}
+	.croix-profil , .croix-profil,.croix-projets,.croix-graphisme,.croix-contact{margin-left:1213px;}
 }
 
 .croix-profil:hover,.info-profil:hover, .croix-projets:hover,.info-projets:hover , .croix-graphisme:hover,.info-graphisme:hover , .croix-contact:hover,.info-contact:hover ,.croix-logiciels:hover,.info-logiciels:hover{
@@ -291,7 +1176,7 @@ body{
 	top: -3px;
 	display: flex;
 	align-items: center; 
-		.croix-logiciels,.info-logiciels{
+		.croix-logiciels,.info-logiciels, .croix-paint, .info-paint{
 			padding:0.1rem;
 			width:1.3rem;
 			height: auto;
@@ -304,7 +1189,7 @@ body{
 			position: fixed;
 			cursor:default;
 		}
-		.croix-logiciels:hover,.info-logiciels:hover{border-top:0.11rem solid black;
+		.croix-logiciels:hover,.info-paint:hover,.croix-paint:hover,.info-logiciels:hover{border-top:0.11rem solid black;
 	border-left:0.11rem solid black;
 	border-right: 0.11rem solid white;
 	border-bottom: 0.11rem solid white;}
@@ -529,22 +1414,7 @@ body{
 	height:75px;
 	z-index:9;
 }
-.fondblanc-contenu-cours{
-	background-color: white;
-	border-top:0.18rem solid black;
-	border-left:0.18rem solid black;
-	border-right: 0.18rem solid white;
-	border-bottom: 0.18rem solid white;
-	z-index:1;
-	top:0;
-	width:1150px;
-	height:500px;
-	margin-top:10rem;
-	position:absolute;
-	margin-left:2.5rem;
-	display: flex;
-	overflow-y: scroll;
-}
+
 .fondblanc-contenu-cours-gris{
 	background-color: silver;
 	position:absolute;
@@ -580,26 +1450,27 @@ body{
 	font-size: 1rem;
 	color:black;
 }
-.fondblanc-contenu-cours{
-	padding:1rem 2rem 2rem 2rem; /*haut droite bas gauche*//
+
+.fondblanc-contenu-cours {
+    padding: 1rem 2rem 2rem 2rem; /* haut droite bas gauche */
+    background-color: white;
+    border-top: 0.18rem solid black;
+    border-left: 0.18rem solid black;
+    border-right: 0.18rem solid white;
+    border-bottom: 0.18rem solid white;
+    z-index: 1;
+    top: 0;
+    width: 1150px;
+    height: 500px;
+    margin-top: 10rem;
+    position: absolute;
+    margin-left: 2.5rem;
+    display: flex;
+    overflow-y: scroll;
+    width: 1150px;
 }
-
-
-.fondblanc-contenu-cours{
-	background-color: white;
-	border-top:0.18rem solid black;
-	border-left:0.18rem solid black;
-	border-right: 0.18rem solid white;
-	border-bottom: 0.18rem solid white;
-	z-index:1;
-	top:0;
-	width:1150px;
-	height:500;
-	margin-top:10rem;
-	position:absolute;
-	margin-left:2.5rem;
-	display: flex;
-	z-index:1;
+.fondblanc-contenu-cours-une img{
+	width: 550px;
 }
 
 
@@ -805,6 +1676,10 @@ body{
 	margin-right: 25px;
 
 }
+.icon{
+	width: 60px;
+	height: auto;
+}
 .titre-travail{
 	margin-top: 3rem;
 	padding-top: 3rem;
@@ -915,6 +1790,7 @@ a{
 	margin-left:1.15rem;
 	display: flex;
 	z-index:1;
+
 }
 .pourhandle{
 	z-index: 10;
@@ -1034,7 +1910,7 @@ a{
 .listelogiciels{
 	position: absolute;
 	margin-left: 30px;
-  	margin-top: 410px;
+  	margin-top: -36px;
 	padding: 0;
 }
 .listelogiciels li{
@@ -1123,7 +1999,6 @@ a{
   .fondblanc-contenu-cours-gris{
   	width: 320px;
   	height: 440px;
-  	
   }
   .fondblanc-contenu-logiciels-gris{
   	width: 337px;
@@ -1152,7 +2027,7 @@ a{
   .ps3img{
 	width: 150px;
 	height: auto;
-}
+	}
 
   .contenu video{
   	width:150px;
@@ -1201,10 +2076,10 @@ a{
     padding: 0.5rem;
     font-size:9pt;
   }
-  .info-profil,.info-projets ,.info-graphisme ,.info-contact{
+  .info-profil, .info-projets , .info-graphisme , .info-contact{
   	margin-left:301px !important;
   }
-  .croix-profil,.croix-projets,.croix-graphisme,.croix-contact{
+  .croix-profil, .croix-projets, .croix-graphisme, .croix-contact{
   	margin-left:327px !important;
   }
   .info-logiciels{
@@ -1213,4 +2088,333 @@ a{
   .croix-logiciels{
   	margin-left:327px !important;
   }
+
+  .fenetre-paint{
+  	width: 360px;
+  	height: 670px;
+  }
+  .ruban-bleu-paint{
+ 	width:352.8px;
+	
+  }
+  .fondblanc-contenu-paint-gris{
+  	width: 340px;
+  	height: 611px;
+  }
+  .barre{
+  	width: 330px;	
+  }
+  .grisfondpaint{
+  	width: 194px;	
+  }
+  #defaultCanvas0{
+  	width: 245px !important;
+  	margin-left: 0px;
+
+  }
+  #paintzone{
+  	width: 245px !important;
+  	margin-left: 77px;
+  }
+  .paintoutils{
+  	width: 70px;
+  }
+  .paintcolor{
+  	height: 301px;
+    width: 69px;
+    margin-left: -2px;
+  margin-top: 279px;
+  }
+  .grisfondpaint{
+  	margin-left: 67px;
+  	width: 263px;
+  }
+  .barre li{
+  	font-size:0.6rem;
+  }
+  .listepaint li {
+  margin-right: 15px;
+ 
+	}
+	.fenetre-paint-fichier{
+			width: 228px;
+	    right: 108px;
+	}
+	.newfile{
+			font-size:0.6rem;
+			right:190px;
+	}
+	.save{
+		font-size:0.6rem;
+		right:250px;
+	}
+	.freeselection{
+		width: 30px;
+	    height: 30px;
+	  background-color: #737373;
+	  position: absolute;
+	  top: 29px;
+	    right: 307px;
+	  z-index: 1;	
+	}
+	.geometricselection{
+		width: 30px;
+	    height: 30px;
+	  background-color: #737373;
+	  position: absolute;
+	  top: 30px;
+	    right: 277px;
+
+	  z-index: 1;	
+	}
+	.gomme{
+		width: 30px;
+	    height: 30px;
+	  background-color: silver;
+	  position: absolute;
+	  top: 60px;
+	  right: 307px;
+	  
+	  z-index: 1;
+	}
+	.potpeinture{
+		width: 30px;
+	    height: 30px;
+	  background-color: #737373;
+	  position: absolute;
+	  top: 60px;
+	  right: 277px;
+
+	  z-index: 1;
+	}
+	.pipette{
+		width: 30px;
+	    height: 30px;
+	  background-color: #737373;
+	  position: absolute;
+	  top: 90px;
+	  right: 307px;
+
+	  z-index: 1;
+	}
+	.loupe{
+		width: 30px;
+	    height: 30px;
+	  background-color: #737373;
+	  position: absolute;
+	  top: 90px;
+	  right: 277px;
+	  
+	  z-index: 1;
+	}
+	.crayon{width: 30px;
+	    height: 30px;
+	  background-color: silver;
+	  position: absolute;
+	  top: 120px;
+	  right: 307px;
+	  z-index: 1;}
+	.pinceau{ width: 30px;
+	    height: 30px;
+	  background-color: silver;
+	  position: absolute;
+	  top: 120px;
+	  right: 277px;
+	  z-index: 1;}
+	.spray{ width: 30px;
+	    height: 30px;
+	  background-color: silver;
+	  position: absolute;
+	  top: 150px;
+	  right: 307px;
+
+	  z-index: 1;}
+	.painttexte{height: 30px; width: 30px;
+	    
+	  background-color: silver;
+	  position: absolute;
+	  top: 150px;
+	  right: 277px;
+	  z-index: 1;}
+	.lignedroite{width: 30px; height: 30px;
+	  background-color: silver;
+	  position: absolute;
+	  top: 180px;
+	  right: 307px;
+
+	  z-index: 1;}
+	.lignelibre{width:30px;
+	     height: 30px;
+	  background-color: #737373;
+	  position: absolute;
+	  top: 180px;
+	  right: 277px;
+	  
+	  z-index: 1;}
+	.formerectangle{
+		height: 30px;
+		width: 30px;
+	  background-color: silver;
+	  position: absolute;
+	  top: 210px;
+	  right: 307px;
+
+	  z-index: 1;}
+	.formepolygone{
+		width: 30px;
+	height: 30px;
+	  background-color: #737373;
+	  position: absolute;
+	  top: 210px;
+	  right: 277px;
+	  z-index: 1;}
+	.formeronde{
+		width: 30px;
+		height: 30px;
+		background-color: silver;
+		position: absolute;
+		top: 240px;
+		right: 307px;
+		z-index: 1;
+	}
+	.formecercle{
+		width: 30px;
+		    height: 30px;
+	  	background-color: silver;
+	  	position: absolute;
+	  	top: 240px;
+	  	right: 277px;
+	  	
+	}
+
+	.groscarre{
+	  top: 287px;
+	  right: 284px;
+	}
+	.currentfill{
+		top: 291px;
+	  right: 301px;
+	}
+	.currentborder{
+		top: 302px;
+	  right: 290px;
+	}
+
+	.outilicon{
+		width:30px;
+		height: 30px;
+		margin-left: -1px;
+	    margin-top: -1px;
+	  }
+
+	  .petitebar{
+	  	width: 46px;
+	  top: 341px;
+	  right: 280px;
+	  }
+	  .noir{
+	  	top: 353px;
+	  right: 306px;
+	  }
+	  .gris{
+	  	top: 353px;
+	  right: 282px;
+	  }
+
+	.magenta{
+		top: 377px;
+	  right: 306px;
+		
+	}
+	.jaunefonce{
+		top: 401px;
+	  right: 306px;
+		
+	}
+	.vertpastel{
+		top: 425px;
+	  right: 306px;}
+	.bleupastel{
+		top: 449px;
+	  right: 306px;
+	}
+	.bleufonce{
+		top:473px;
+	  right: 306px;
+
+	}
+	.rosepastel{
+		top:497px;
+	  right: 306px;
+
+	}
+	.jaunemoche{
+		top:521px;
+	  right: 306px;
+
+	}
+	.grisfonce{
+		top:545px;
+	  right: 306px;
+
+	}
+	//////
+	
+	/*deuxiemeligne*/
+	.blanc{
+		top:377px;
+	  right: 282px;
+		
+	}
+	.grisclair{
+		top:401px;
+	  right: 282px;
+		
+	}
+	.orange{
+		top: 377px;
+	  right: 282px;
+		
+	}
+	.rouge{
+		top:425px;
+	  right: 282px;
+
+	}
+	.jaune{
+		top:449px;
+	  right: 282px;
+	}
+	.vertclair{
+		top:473px;
+	  right: 282px;
+	}
+	.bleuclair{
+		top:497px;
+	  right: 282px;
+	}
+	.bleumarine{
+		top:521px;
+	  right: 282px;
+	}
+
+	.rose{
+		top:545px;
+	  right: 282px;
+		
+	}
+
+
+	/////
+
+
+
+	.info-paint{
+	  	margin-left:301px;
+	}
+	.croix-paint{
+	  	margin-left:327px;
+	}
+
+
 }

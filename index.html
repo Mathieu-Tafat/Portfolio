@@ -27,7 +27,10 @@ PUIS votre script qui utilise tout ça... -->
 <script type="text/javascript" src="js/jquery.easyDrag.min.js"></script>
 <script type="text/javascript" src="js/jquery.transit.min.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
+<script type="text/javascript" src="js/p5.js"></script>
+<script type="text/javascript" src="js/draw.js"></script>
 </head>
+
 <body>
 	<div class="tvtexture">
     </div>
@@ -379,8 +382,8 @@ PUIS votre script qui utilise tout ça... -->
 		<div class="ruban-bleu-logiciels">
 			<h4>Logiciels</h4>
 			<img class="croix-logiciels"src="img/x.png">
-			<img class="info-logiciels"src="img/info.png">
-			<div class="fondblanc-contenu-logiciels-gris"></div>
+			<img class="info-logiciels"src="img/info.png"></div>
+			<div class="fondblanc-contenu-logiciels-gris">
 				<ul class="listelogiciels">
 					<br><br><br>
 					<li class="enorme"><img class="menu-icon" src="img/icones/pxl/ai.png">Illustrator</li>
@@ -575,7 +578,7 @@ PUIS votre script qui utilise tout ça... -->
 		</li>
 		<li>
 			<div class="graphisme">
-				<img class="icon" src="img/projets.png"/> 
+				<img class="icon" src="img/icon/pc.png"/> 
 				<span class="icon-text">Projets Académiques</span>
 			</div>
 		</li>
@@ -619,9 +622,9 @@ PUIS votre script qui utilise tout ça... -->
 	</ul>
 	<ul class="right-aligned2">
 		<li>
-			<div class="films">
-				<img class="icon" src="img/icon/pc.png"/> 
-				<span class="icon-text">Poste de travail</span>
+			<div class="paint">
+				<img class="icon" src="img/projets.png"/> 
+				<span class="icon-text">Peinture</span>
 			</div>
 		</li>
 		<li>
@@ -642,6 +645,97 @@ PUIS votre script qui utilise tout ça... -->
 			</div>
 		</li>
 	</ul>
+
+	<div class="fenetre-paint invisible">
+		<div class="ruban-bleu-paint">
+			<div class="acote"><img src="img/projets.png" class="petite-icone"><h4 class="titrepaint">Sans-titre - Paint.exe </h4></div>
+			<img class="croix-paint" src="img/x.png">
+			<img class="info-paint" src="img/info.png">
+		</div>
+		<div class="fondblanc-contenu-paint-gris">
+			<div class="barre">
+				<ul class=listepaint>
+					<li id="fichier">Fichier</li>
+					<li>Editer</li>
+					<li>Vue</li>
+					<li>Image</li>
+					<li>Couleurs</li>
+					<li>Aide</li>
+				</ul>
+			</div>
+			<div class="fenetre-paint-fichier invisible"></div>
+			<div class="newfile invisible">
+				Nouveau fichier...
+			</div>
+			<div class="save invisible">
+				Sauvegarder... 
+			</div>
+			<div class="paintoutils"></div>
+			<div class="paintcolor"></div>
+			<div class="grisfondpaint"></div>
+			<div class="petitcarre"></div>
+			<div class="petitcarre2"></div>
+			<div class="petitcarre3"></div>
+			<div class="petitcarre4"></div>
+			<div class="petitcarre5"></div>
+			<div class="petitcarre6"></div>
+			<div class="petitcarre7"></div>
+			<div class="petitcarre8"></div>
+			<div id="paintzone"></div>
+			
+			<div class="groscarre"></div>
+			<div class="noir"></div>
+			<div class="gris"></div>
+			<div class="magenta"></div>
+			<div class="jaunefonce"></div>
+			<div class="vertpastel"></div>
+			<div class="bleupastel"></div>
+			<div class="bleufonce"></div>
+			<div class="rosepastel"></div>
+			<div class="jaunemoche"></div>
+			<div class="grisfonce"></div>
+			<div class="bleu1"></div>
+			<div class="bleu2"></div>
+			<div class="bleu3"></div>
+			<div class="marron"></div>
+			<div class="blanc"></div>
+			<div class="grisclair"></div>
+			<div class="rouge"></div>
+			<div class="jaune"></div>
+			<div class="vertclair"></div>
+			<div class="bleuclair"></div>
+			<div class="bleumarine"></div>
+			<div class="rose"></div>
+			<div class="jauneclair"></div>
+			<div class="vertclair2"></div>
+			<div class="turquoise"></div>
+			<div class="bleu4"></div>
+			<div class="saumon"></div>
+			<div class="orange"></div>
+			<div class="petitebar"></div>
+			<div class="carrevide"></div>
+			<div class="currentfill"></div>
+			<div class="currentborder"></div>
+			
+			<div class="freeselection"><img class="outilicon" src="img/outilspng/freeselection.png"></div>
+			<div class="geometricselection"><img class="outilicon" src="img/outilspng/carreselection.png"></div>
+			<div class="gomme"><img class="outilicon" src="img/outilspng/gomme.png"></div>
+			<div class="potpeinture"><img class="outilicon" src="img/outilspng/potpeinture.png"></div>
+			<div class="pipette"><img class="outilicon" src="img/outilspng/pipette.png"></div>
+			<div class="loupe"><img class="outilicon" src="img/outilspng/loupe.png"></div>
+			<div class="crayon"><img class="outilicon" src="img/outilspng/crayon.png"></div>
+			<div class="pinceau"><img class="outilicon" src="img/outilspng/pinceau.png"></div>
+			<div class="spray"><img class="outilicon" src="img/outilspng/spray.png"></div>
+			<div class="painttexte"><img class="outilicon" src="img/outilspng/txt.png"></div>
+			<div class="lignedroite"><img class="outilicon" src="img/outilspng/lignedroite.png"></div>
+			<div class="lignelibre"><img class="outilicon" src="img/outilspng/lignelibre.png"></div>
+			<div class="formerectangle"><img class="outilicon" src="img/outilspng/rectangle.png"></div>
+			<div class="formepolygone"><img class="outilicon" src="img/outilspng/polygon.png"></div>
+			<div class="formeronde"><img class="outilicon" src="img/outilspng/cercle.png"></div>
+			<div class="formecercle"><img class="outilicon" src="img/outilspng/carrecercle.png"></div>
+		</div>
+	</div>
+
 	<footer>
 		<div class="start-menu invisible">
 			<div class="start-menu-bluebar"></div>
@@ -671,6 +765,7 @@ PUIS votre script qui utilise tout ça... -->
 			<span class="folder-logiciels invisible">Logiciels</span>
 			<span class="folder-jeux invisible">Jeux</span>
 			<span class="folder-films invisible">Films</span>
+			<span class="folder-paint invisible">Peinture</span>
 			<span class="credit">Mathieu Tafat- 2024</span>
 		</div>
 		

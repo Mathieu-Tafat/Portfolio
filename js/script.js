@@ -81,7 +81,19 @@ $(document).ready(function() {
         }
         }, 400); 
     });
-
+    $('.paint').on('dblclick', function() {
+        $(this).scrollTop(0);
+        $(this).addClass("wait");
+        setTimeout(() => {
+        $(this).removeClass('wait');
+        if ($('.folder-paint').hasClass('invisible')) {
+            $('.fenetre-paint').addClass('visible');
+            $('.folder-paint').removeClass('invisible');
+            $('.fenetre-paint').removeClass('invisible');
+            checkAllWindowsOpen(); // Vérification après ouverture
+        }
+        }, 400); 
+    });
 
     // Gestion des clics pour fermer les fenêtres
     $('.croix-profil').on("click touchstart", function() {
@@ -128,6 +140,14 @@ $(document).ready(function() {
             checkAllWindowsOpen(); // Vérification après fermeture
         }
     });
+    $('.croix-paint').on("click touchstart", function() {
+        $(this).scrollTop(0);
+        if (!$('.folder-paint').hasClass('invisible')) {
+            $('.fenetre-paint').addClass('invisible');
+            $('.folder-paint').addClass('invisible');
+            checkAllWindowsOpen(); // Vérification après fermeture
+        }
+    });
 
 
     $('.croix-error').on("click touchstart", function() {
@@ -135,7 +155,6 @@ $(document).ready(function() {
             location.reload();
         }
     });
-    $(document).ready(function() {
     function preventZIndexChange(selector) {
         $(selector).on('mousedown', function() {
             $(this).css('z-index', '10'); // Fixe le z-index à une valeur constante
@@ -146,7 +165,7 @@ $(document).ready(function() {
         let startPosition = null;
 
         $(element).easyDrag({
-            'handle': $(element).find('.ruban-bleu'),
+            'handle': $(element).find('.ruban-bleu, .ruban-bleu-contact, .ruban-bleu-paint, .ruban-bleu-logiciels'),
             onStart: function(event) {
                 // Verrouille le z-index au début du drag
                 $(this).css('z-index', '10');
@@ -179,12 +198,12 @@ $(document).ready(function() {
     }
 
     // Appliquer le verrouillage du z-index et le drag limité à chaque élément
-    const elements = ['.fenetre-projets', '.fenetre-graphisme', '.fenetre-contact', '.fenetre-logiciels', '.fatal-error', '.fenetre-profil'];
+    const elements = ['.fenetre-projets','.fenetre-paint', '.fenetre-graphisme', '.fenetre-contact', '.fenetre-logiciels', '.fatal-error', '.fenetre-profil'];
     elements.forEach(selector => {
         preventZIndexChange(selector);
         limitDrag(selector);
     });
-});
+
 
 
 
@@ -369,7 +388,45 @@ $(document).ready(function() {
         $('.boutontv').html('ON');
     }
     });
+    $('.freeselection, .geometricselection, .gomme, .potpeinture, .pipette, .loupe, .crayon, .pinceau, .spray, .painttexte, .lignedroite, .lignelibre, .formerectangle, .formepolygone, .formeronde, .formecercle').on("click", function() {
+    // Supprime la classe outilcurrent de tous les éléments
+    $('.freeselection, .geometricselection, .gomme, .potpeinture, .pipette, .loupe, .crayon, .pinceau, .spray, .painttexte, .lignedroite, .lignelibre, .formerectangle, .formepolygone, .formeronde, .formecercle').removeClass('outilcurrent');
     
+    // Ajoute la classe uniquement à l'élément cliqué
+    $(this).addClass('outilcurrent');
+    });
+
+
+
+    $('.noir, .gris, .magenta, .jaunefonce, .vertpastel, .bleupastel, .bleufonce, .rosepastel, .jaunemoche, .grisfonce, .bleu1, .bleu2, .bleu3, .marron, .blanc, .grisclair, .rouge, .jaune, .vertclair, .bleuclair, .bleumarine, .rose, .jauneclair, .vertclair2, .turquoise, .bleu4, .saumon, .orange').on("click", function() {
+    // Récupère la couleur de fond de l'élément cliqué et met à jour selectedColor
+        selectedColor = $(this).css('background-color');
+        console.log(selectedColor);
+    
+    // Applique cette couleur à l'élément avec la classe currentfill
+    $('.currentfill').css('background-color', selectedColor);
+});
+    $(document).on("click", function (event) {
+    // Vérifie si le clic est à l'extérieur de la fenêtre
+    if (!$(event.target).closest('.fenetre-paint-fichier, #fichier').length) {
+        // Si oui, on masque la fenêtre
+        $('.fenetre-paint-fichier').addClass('invisible');
+        $('.save').addClass('invisible');
+        $('.newfile').addClass('invisible');
+    }
+});
+     $('#fichier').on("click", function () {
+    if ($('.fenetre-paint-fichier').hasClass('invisible')) {
+        $('.fenetre-paint-fichier').removeClass('invisible');
+        $('.save').removeClass('invisible');
+        $('.newfile').removeClass('invisible');
+    } else {
+        $('.fenetre-paint-fichier').addClass('invisible');
+        $('.save').addClass('invisible');
+        $('.newfile').addClass('invisible');
+    }
+});
+
 
 
 });
