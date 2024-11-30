@@ -2403,17 +2403,11 @@ a{
 	  right: 282px;
 		
 	}
-
-
-	/////
-
-
-
 	.info-paint{
-	  	margin-left:301px;
+	  	margin-left:301px !important;
 	}
 	.croix-paint{
-	  	margin-left:327px;
+	  	margin-left:327px !important;
 	}
 
 
