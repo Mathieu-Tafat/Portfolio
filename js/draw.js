@@ -4,6 +4,7 @@ let isDrawing = false;
 let inputText = ""; 
 let sprayRadius = 10; 
 let sprayDensity = 3;
+
 function observePaintWindow() {
     let paintWindow = document.querySelector('.fenetre-paint');
     if (!paintWindow) {
@@ -129,43 +130,26 @@ function mousePressed() {
 function mouseDragged() {
     // Vérifie si le clic droit est enfoncé
     if ($('.pinceau').hasClass('outilcurrent')) {
-            noErase()
-            fill(selectedColor);
+     noErase()
+     fill(selectedColor);
+     stroke(selectedColor);
+     strokeWeight(10);
+     circle(mouseX, mouseY, 10);
 
-            if (previousX !== null && previousY !== null) {
-                stroke(selectedColor);
-                strokeWeight(10);
-                line(previousX, previousY, mouseX, mouseY);
-            }
-
-            previousX = mouseX;
-            previousY = mouseY;
     }
     
     if ($('.crayon').hasClass('outilcurrent')) {
-            noErase()
-            fill(selectedColor);
-
-            if (previousX !== null && previousY !== null) {
-                stroke(selectedColor);
-                strokeWeight(3);
-                line(previousX, previousY, mouseX, mouseY);
-            }
-
-            previousX = mouseX;
-            previousY = mouseY;
+     noErase()
+     fill(selectedColor);
+     stroke(selectedColor);
+     strokeWeight(3);
+     circle(mouseX, mouseY, 3);
     }
 
     if ($('.gomme').hasClass('outilcurrent')) {
-      erase(50,50);
-      if (previousX !== null && previousY !== null) {
-          stroke(selectedColor);
-          strokeWeight(10);
-          line(previousX, previousY, mouseX, mouseY);
-      }
-
-        previousX = mouseX;
-        previousY = mouseY;
+      erase(200,200);
+     strokeWeight(10);
+     circle(mouseX, mouseY, 10);
        }
        
     
