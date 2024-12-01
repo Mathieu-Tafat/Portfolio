@@ -1311,6 +1311,9 @@ width: 17px;
 	margin-top:2.5rem;
 	margin-left:0.5rem;
 }
+.flechesperso, .flechescours{
+	margin-right:92px;
+}
 .contenu-contact{
 	width: 530px;
 	height: fit-content;

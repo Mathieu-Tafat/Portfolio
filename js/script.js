@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    $('.flechescours').removeClass('invisible');
+    $('.flechesperso').removeClass('invisible');
+
     // Vérifie si toutes les fenêtres sont ouvertes
     function checkAllWindowsOpen() {
         if (
@@ -208,6 +211,7 @@ $(document).ready(function() {
 
 
     $('.cours-une').on("click", function() {
+        $('.flechescours').addClass('invisible');
         $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-une').hasClass('invisible')) {
@@ -225,6 +229,7 @@ $(document).ready(function() {
         
     });
     $('.cours-affiches').on("click", function() {
+        $('.flechescours').addClass('invisible');
         $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-affiches').hasClass('invisible')) {
@@ -242,6 +247,7 @@ $(document).ready(function() {
         }
     });
     $('.cours-typo').on("click", function() {
+        $('.flechescours').addClass('invisible');
         $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-typo').hasClass('invisible')) {
@@ -259,6 +265,7 @@ $(document).ready(function() {
         }
     });
     $('.cours-autres').on("click", function() {
+        $('.flechescours').addClass('invisible');
         $('.firstpage-cours').addClass('invisible');
         $('.fondblanc-contenu-cours').scrollTop(0);
         if ($('.fondblanc-contenu-cours-autres').hasClass('invisible')) {
@@ -278,6 +285,7 @@ $(document).ready(function() {
 
 
     $('.perso-une').on("click", function() {
+        $('.flechesperso').addClass('invisible');
         $('.firstpage-perso').addClass('invisible');
         $('.fondblanc-contenu-perso').scrollTop(0);
         if ($('.fondblanc-contenu-perso-une').hasClass('invisible')) {
@@ -295,6 +303,7 @@ $(document).ready(function() {
         
     });
     $('.perso-affiches').on("click", function() {
+        $('.flechesperso').addClass('invisible');
         $('.firstpage-perso').addClass('invisible');
         $('.fondblanc-contenu-perso').scrollTop(0);
         if ($('.fondblanc-contenu-perso-affiches').hasClass('invisible')) {
@@ -312,6 +321,7 @@ $(document).ready(function() {
         }
     });
     $('.perso-typo').on("click", function() {
+        $('.flechesperso').addClass('invisible');
         $('.firstpage-perso').addClass('invisible');
         $(".fondblanc-contenu-perso").scrollTop(0);
         if ($('.fondblanc-contenu-perso-typo').hasClass('invisible')) {
@@ -329,6 +339,7 @@ $(document).ready(function() {
         }
     });
     $('.perso-autres').on("click", function() {
+        $('.flechesperso').addClass('invisible');
         $('.firstpage-perso').addClass('invisible');
         $(".fondblanc-contenu-perso").scrollTop(0);
         if ($('.fondblanc-contenu-perso-autres').hasClass('invisible')) {
