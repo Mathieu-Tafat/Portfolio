@@ -1952,6 +1952,7 @@ a{
 	cursor:pointer;
 	color:darkblue;
 }
+
 @media (orientation: portrait) and (max-width: 844px) {
   .fontgris-profil {
       width: 341.1px;
