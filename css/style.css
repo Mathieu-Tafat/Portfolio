@@ -1964,7 +1964,9 @@ a{
 
 
 @media (orientation: portrait) and (max-width: 844px) {
-
+	.start-text{
+		font-size: 0.7rem;
+	}
   .fontgris-profil {
       width: 341.1px;
   }
