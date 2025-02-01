@@ -1964,6 +1964,10 @@ a{
 
 
 @media (orientation: portrait) and (max-width: 844px) {
+	.fondblanc-contenu-cours-une img{
+		width: 188px;
+		height: auto;
+	}
 	.start-text{
 		font-size: 0.7rem;
 	}
