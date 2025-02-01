@@ -1953,6 +1953,16 @@ a{
 	color:darkblue;
 }
 
+#div_horloge{
+	position: relative;
+	right:-1074px;
+}
+#date{
+	position: relative;
+	right:-1083px;
+}
+
+
 @media (orientation: portrait) and (max-width: 844px) {
   .fontgris-profil {
       width: 341.1px;

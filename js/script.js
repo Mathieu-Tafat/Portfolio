@@ -1,7 +1,25 @@
 $(document).ready(function() {
     $('.flechescours').removeClass('invisible');
     $('.flechesperso').removeClass('invisible');
-
+    window.onload=function() {
+  horloge('div_horloge');
+};
+ let today = new Date();
+    let options = { year: 'numeric', month: 'long', day: 'numeric' };
+    let formattedDate = today.toLocaleDateString('fr-FR', options);
+    $("#date").text(formattedDate);
+function horloge(el) {
+  if(typeof el=="string") { el = document.getElementById(el); }
+  function actualiser() {
+    var date = new Date();
+    var str = date.getHours();
+    str += ':'+(date.getMinutes()<10?'0':'')+date.getMinutes();
+    str += ':'+(date.getSeconds()<10?'0':'')+date.getSeconds();
+    el.innerHTML = str;
+  }
+  actualiser();
+  setInterval(actualiser,1000);
+}
     // Vérifie si toutes les fenêtres sont ouvertes
     function checkAllWindowsOpen() {
         if (
