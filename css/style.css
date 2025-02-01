@@ -1961,7 +1961,66 @@ a{
 	position: fixed;
 	right:24.5vh;
 }
+.darksoulsbleu {
+    position: relative;
+    display: block;
+    width: 240px;
+    height: 339px;
+}
 
+.darksoulsbleu::before, 
+.darksoulsbleu::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    transition: opacity 0.5s ease;
+}
+
+.darksoulsbleu::before {
+    background-image: url(../img/sansbleu.png);
+    opacity: 1;
+}
+
+.darksoulsbleu::after {
+    background-image: url(../img/avecbleu.png);
+    opacity: 0;
+}
+
+.darksoulsbleu:hover::after {
+    opacity: 1;
+}
+
+
+.darksoulsbleu {
+    position: relative;
+    width: 240px;
+    height: 339px;
+}
+
+.darksoulsbleu img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 1s ease;
+}
+
+.img-hover {
+    opacity: 0;
+}
+
+.darksoulsbleu:hover .img-hover {
+    opacity: 1;
+}
+
+.darksoulsbleu:hover .img-default {
+    opacity: 0;
+}
 
 @media (orientation: portrait) and (max-width: 844px) {
 	#date, #div_horloge, .credit{
