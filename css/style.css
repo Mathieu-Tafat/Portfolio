@@ -1964,6 +1964,9 @@ a{
 
 
 @media (orientation: portrait) and (max-width: 844px) {
+	#date, #div_horloge, .credit{
+		font-size:0.5rem;
+	}
 	.fondblanc-contenu-perso-une img{
 		width: 188px;
 		height: auto;
