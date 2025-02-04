@@ -57,7 +57,7 @@ h3, h4{
 
 body{
 	font-family: 'Ms Reference Sans Serif';
-	background-color: teal;
+	background-color: #4a85a8;
 	color: white;
 	font-size: 0.8rem;
 	cursor: default;
@@ -1620,7 +1620,7 @@ width: 17px;
 	transform: rotate(-90deg);
 	font-size: 1.80rem;
   	position: fixed;
-  	left: -52px;
+  	left: -33px;
  	bottom: 98px;
 }
 .fenetre24 span{
@@ -1680,7 +1680,7 @@ width: 17px;
 
 }
 .icon{
-	width: 60px;
+	width: 75px;
 	height: auto;
 }
 .titre-travail{
