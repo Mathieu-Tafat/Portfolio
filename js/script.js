@@ -1,9 +1,8 @@
 $(document).ready(function() {
     $('.flechescours').removeClass('invisible');
     $('.flechesperso').removeClass('invisible');
-    window.onload=function() {
-  horloge('div_horloge');
-};
+    
+    horloge('div_horloge');
  let today = new Date();
     let options = { year: 'numeric', month: 'long', day: 'numeric' };
     let formattedDate = today.toLocaleDateString('fr-FR', options);
