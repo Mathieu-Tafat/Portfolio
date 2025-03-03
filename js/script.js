@@ -1,6 +1,12 @@
 $(document).ready(function() {
     $('.flechescours').removeClass('invisible');
     $('.flechesperso').removeClass('invisible');
+    $('.start').on('click', function() {
+    let img = $('.start-icon'); // Sélectionne l'image
+    let src = img.attr('src'); // Récupère le src
+    img.attr('src', src.includes("herbe.png") ? "img/nouvelles_icones/herbe2.png" : "img/nouvelles_icones/herbe.png");
+});
+
     
     horloge('div_horloge');
  let today = new Date();
@@ -19,6 +25,9 @@ function horloge(el) {
   actualiser();
   setInterval(actualiser,1000);
 }
+
+
+
     // Vérifie si toutes les fenêtres sont ouvertes
     function checkAllWindowsOpen() {
         if (
