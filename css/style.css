@@ -10,6 +10,7 @@ body {
   margin: 0;
   padding: 0;
   position: relative;
+  zoom: 0.9;
 }
 
 /* =====================
@@ -136,6 +137,7 @@ body {
   z-index: 2;
 }
 .splide__arrow { display: none !important; }
+
 
 /* =====================
    SLIDES BACKGROUNDS
