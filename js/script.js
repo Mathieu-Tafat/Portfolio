@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {
       title: "Profil",
       profile: true,
-      text: "Créer c'est top. Passer du temps du le développement créatif d'un projet c'est super. Diplômé en 2025 d'une licence profesionnelle de Design Graphique, créer dans le contexte profesionnel est pour moi un prétexte pour créer, peu importe le moyen. Imaginez un moyen de créer. Ouais ok je veux bien essayer. Merci "
+      text: "Créer, c'est tout ce qui m'importe. Diplômé en 2025 d'une Licence Professionnelle de Design Graphique, le contexte professionnel est pour moi une excuse de plus pour faire ce que je ferais de toute façon : construire des choses, peu importe le médium.Proposez-moi un moyen de créer. Je suis partant. "
     },
     {
       title: "Service Communication Université Rennes 2",
