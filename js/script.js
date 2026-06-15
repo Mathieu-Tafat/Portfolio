@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   const intro = document.createElement('div');
   intro.id = 'intro';
-  intro.innerHTML = '<span id="intro-name">Mathieu Tafat</span>';
+  intro.innerHTML = '<img id="intro-name" src="img/blaze.png">';
   document.body.appendChild(intro);
 
   const splideElIntro = document.querySelector('.splide');
@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
     type: 'slide',
     perPage: 6,
     focus: '0',
-    gap: '-4.7em',
-    fixedWidth: '17em',
-    fixedHeight: '22em',
+    gap: '-3.5em',
+    fixedWidth: '14em',
+    fixedHeight: '18em',
     keyboard: false,
     drag: false,
     speed: 120,
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // =====================
-  // ACTIVER LE SON D'UNE VIDÉO (coupe les autres)
+  // ACTIVER LE SON D'UNE VIDÉO
   // =====================
   function toggleVideoSound(video) {
     if (!video) return;
@@ -328,7 +328,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const isLastCol = (idx % COLS) === (COLS - 1);
     let textIdx     = isLastCol ? idx - 1 : idx + 1;
 
-    // Ligne incomplète : cellule de droite inexistante → on prend celle de gauche
     if (textIdx >= cells.length) textIdx = idx - 1;
     if (textIdx < 0) return;
 
@@ -399,13 +398,12 @@ document.addEventListener('DOMContentLoaded', function () {
   overlayHint.addEventListener("click", closeOverlayFn);
 
   // =====================
-  // CLIC SUR SLIDE (image ou btn-start) → OUVRE L'OVERLAY
+  // CLIC SUR SLIDE → OUVRE L'OVERLAY
   // =====================
   document.querySelector('.splide__list').addEventListener('click', function(e) {
     if (overlayOpen) return;
     const slide = e.target.closest('.splide__slide');
     if (!slide || !slide.classList.contains('is-active')) return;
-    // Clic sur le btn-start OU directement sur le slide (image)
     openOverlay();
   });
 
@@ -484,6 +482,12 @@ document.addEventListener('DOMContentLoaded', function () {
   updateClock();
   setInterval(updateClock, 1000);
 
+  document.getElementById('pdp').addEventListener('click', function() {
+  window.open('img/cv.png', '_blank');
+  });
+  document.getElementById('pseudo').addEventListener('click', function() {
+    window.open('img/cv.png', '_blank');
+  });
   // =====================
   // TITRES ACTIFS
   // =====================
@@ -497,83 +501,124 @@ document.addEventListener('DOMContentLoaded', function () {
   if (h1s[0]) h1s[0].classList.add('isactive');
 
   // =====================
-  // FOND ANIMÉ
-  // =====================
-  const canvas = document.getElementById('bg-canvas');
-  const ctx    = canvas.getContext('2d');
+// FOND ANIMÉ — snapshots pré-bakés
+// =====================
+const canvas = document.getElementById('bg-canvas');
+const ctx    = canvas.getContext('2d');
 
-  function resizeCanvas() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+const RES = 0.3;
 
-  const LAYERS = [
-    { amp: 45, freq: 0.007, speed: 0.0028, y: 0.52, color: 'rgba(160,0,0,',   alpha: 0.60 },
-    { amp: 30, freq: 0.011, speed: 0.0018, y: 0.60, color: 'rgba(210,15,15,', alpha: 0.45 },
-    { amp: 22, freq: 0.009, speed: 0.0022, y: 0.68, color: 'rgba(240,35,35,', alpha: 0.35 },
-    { amp: 38, freq: 0.005, speed: 0.0014, y: 0.42, color: 'rgba(120,0,0,',   alpha: 0.55 },
-    { amp: 18, freq: 0.014, speed: 0.0032, y: 0.74, color: 'rgba(255,70,70,', alpha: 0.22 },
-    { amp: 50, freq: 0.004, speed: 0.0010, y: 0.34, color: 'rgba(90,0,0,',    alpha: 0.65 },
-  ];
+function resizeCanvas() {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  canvas.width  = Math.floor(W * RES);
+  canvas.height = Math.floor(H * RES);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  canvas.style.imageRendering = 'auto';
+}
+resizeCanvas();
+window.addEventListener('resize', () => { resizeCanvas(); bakeAll(); });
 
-  let t = 0;
+const PALETTES = [
+  { bg: '#12000a', blobs: ['#8b0030', '#c4002a', '#ff1a3a'] },
+  { bg: '#200004', blobs: ['#cc0020', '#ff2200', '#e8003a'] },
+  { bg: '#0a0006', blobs: ['#990030', '#cc0040', '#aa0025'] },
+  { bg: '#180008', blobs: ['#b50045', '#e8003a', '#cc1100'] },
+  { bg: '#040001', blobs: ['#7a0028', '#bb0030', '#dd001a'] },
+];
 
-  function drawBg() {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
+function hexRgb(h) {
+  return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+}
 
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0,   '#5a0000');
-    grad.addColorStop(0.5, '#350000');
-    grad.addColorStop(1,   '#160000');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
+const NUM_SNAPSHOTS = 12;
+const snapshots = [];
 
-    for (let i = 0; i < 3; i++) {
-      const gx = ctx.createRadialGradient(W*(0.2+i*0.3), H*0.3, 0, W*(0.2+i*0.3), H*0.3, 180);
-      gx.addColorStop(0, 'rgba(255,50,50,0.06)');
-      gx.addColorStop(1, 'rgba(255,0,0,0)');
-      ctx.fillStyle = gx;
-      ctx.fillRect(0, 0, W, H);
-    }
+function bakeSnapshot(offscreen) {
+  const W = offscreen.width, H = offscreen.height;
+  const c = offscreen.getContext('2d');
+  const pal = PALETTES[Math.floor(Math.random() * PALETTES.length)];
 
-    LAYERS.forEach(l => {
-      ctx.beginPath();
-      const baseY = l.y * H;
-      ctx.moveTo(0, H);
-      for (let x = 0; x <= W; x += 3) {
-        const y = baseY
-          + Math.sin(x * l.freq + t * l.speed * 60) * l.amp
-          + Math.sin(x * l.freq * 1.6 + t * l.speed * 35 + 2.1) * l.amp * 0.35
-          + Math.sin(x * l.freq * 0.5 + t * l.speed * 20 + 0.8) * l.amp * 0.2;
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(W, H);
-      ctx.closePath();
-      ctx.fillStyle = l.color + l.alpha + ')';
-      ctx.fill();
-    });
+  const [br, bg2, bb] = hexRgb(pal.bg);
+  c.fillStyle = `rgb(${br},${bg2},${bb})`;
+  c.fillRect(0, 0, W, H);
 
-    LAYERS.slice(0, 4).forEach(l => {
-      ctx.beginPath();
-      for (let x = 0; x <= W; x += 3) {
-        const y = l.y * H
-          + Math.sin(x * l.freq + t * l.speed * 60) * l.amp
-          + Math.sin(x * l.freq * 1.6 + t * l.speed * 35 + 2.1) * l.amp * 0.35
-          + Math.sin(x * l.freq * 0.5 + t * l.speed * 20 + 0.8) * l.amp * 0.2;
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = 'rgba(255,100,100,0.12)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    });
+  // blobs placés en grille pour vraie dispersion
+  const NUM_BLOBS = 7;
+  for (let i = 0; i < NUM_BLOBS; i++) {
+    const x = ((i % 3) / 3 + Math.random() * 0.33) * W;
+    const y = (Math.floor(i / 3) / 3 + Math.random() * 0.33) * H;
+    const r = (0.35 + Math.random() * 0.35) * Math.min(W, H);
+    const alpha = 0.7 + Math.random() * 0.3;
+    const col = hexRgb(pal.blobs[i % 3]);
 
-    t += 0.016;
-    requestAnimationFrame(drawBg);
+    const gr = c.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0,    `rgba(${col[0]},${col[1]},${col[2]},${alpha})`);
+    gr.addColorStop(0.15, `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.7})`);
+    gr.addColorStop(0.5,  `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.2})`);
+    gr.addColorStop(0.8,  `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.05})`);
+    gr.addColorStop(1,    `rgba(${col[0]},${col[1]},${col[2]},0)`);
+    c.fillStyle = gr;
+    c.fillRect(0, 0, W, H);
   }
 
-  drawBg();
+ // grain
+const grainOff = document.createElement('canvas');
+grainOff.width = W; grainOff.height = H;
+const gc = grainOff.getContext('2d');
+const id = gc.createImageData(W, H);
+const d  = id.data;
+for (let i = 0; i < d.length; i += 4) {
+  const v = Math.random() * 255 | 0;
+  d[i] = v; d[i+1] = v; d[i+2] = v;
+  d[i+3] = Math.random() * 28 | 0;
+}
+gc.putImageData(id, 0, 0);
+c.drawImage(grainOff, 0, 0);
+
+  // vignette
+  const vig = c.createRadialGradient(W*.5, H*.5, H*.06, W*.5, H*.5, H*.88);
+  vig.addColorStop(0, 'rgba(0,0,0,0)');
+  vig.addColorStop(1, 'rgba(0,0,0,0.75)');
+  c.fillStyle = vig;
+  c.fillRect(0, 0, W, H);
+
+  return offscreen;
+}
+
+function bakeAll() {
+  const W = canvas.width, H = canvas.height;
+  snapshots.length = 0;
+  for (let i = 0; i < NUM_SNAPSHOTS; i++) {
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    snapshots.push(bakeSnapshot(off));
+  }
+}
+bakeAll();
+
+let snapIdx = 0;
+let holdFrames = 10;
+let frameCount = 0;
+let frame = 0;
+
+function drawBg() {
+  ctx.drawImage(snapshots[snapIdx], 0, 0);
+
+  frameCount++;
+  if (frameCount >= holdFrames) {
+    frameCount = 0;
+    holdFrames = 10;
+    snapIdx = (snapIdx + 1) % snapshots.length;
+  }
+}
+
+function loop() {
+  frame++;
+  if (frame % 2 === 0) drawBg();
+  requestAnimationFrame(loop);
+}
+loop();
 
 });
