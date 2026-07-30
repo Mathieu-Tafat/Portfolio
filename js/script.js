@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {
       title: "Profil",
       profile: true,
-      text: "Créer, c'est tout ce qui m'importe. Diplômé en 2025 d'une Licence Professionnelle de Design Graphique, le contexte professionnel est pour moi une excuse de plus pour faire ce que je ferais de toute façon : construire des choses, peu importe le médium.Proposez-moi un moyen de créer. Je suis partant. "
+      text: "Créer, c'est tout ce qui m'importe. Diplômé en 2025 d'une Licence Professionnelle de Design Graphique, le contexte professionnel est pour moi une excuse de plus pour faire ce que je ferais de toute façon : créer. "
     },
     {
       title: "Service Communication Université Rennes 2",
