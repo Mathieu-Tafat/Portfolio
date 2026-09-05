@@ -44,7 +44,14 @@ document.addEventListener('DOMContentLoaded', function () {
         perPage: 3,
         fixedWidth: '9em',
         fixedHeight: '12em',
-        gap: '-1.5em',
+        gap: '1em',       // positif au lieu de négatif, voir point 2
+        drag: true,
+      },
+      480: {
+        perPage: 2,
+        fixedWidth: '7em',
+        fixedHeight: '9.5em',
+        gap: '0.5em',
         drag: true,
       }
     }
