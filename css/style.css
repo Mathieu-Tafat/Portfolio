@@ -457,26 +457,12 @@ body {
 }
 
 /* =====================
-   RESPONSIVE MOBILE (Splide en vertical)
+   RESPONSIVE MOBILE
    ===================== */
 @media (max-width: 768px) {
   .splide {
     margin-top: 90px;
-    margin-left: 0;
-    width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
-  }
-  .splide__list {
-    height: auto !important; /* la hauteur est gérée en JS via height: '70vh' */
-  }
-  .splide__slide {
-    width: 100% !important;
-    transform: none;
-  }
-  .splide__slide.is-active {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin-left: 20px;
   }
   #overlay-box {
     padding: 20px 20px;
