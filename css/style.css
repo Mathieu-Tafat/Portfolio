@@ -114,6 +114,7 @@ body {
   height: 1000px !important;
 }
 .splide__slide {
+  position: relative;
   transform: scale(0.7);
   transform-origin: top left;
   background-color: rgba(255, 255, 255, 0);
@@ -154,15 +155,17 @@ body {
 
 
 /* =====================
-   SLIDES BACKGROUNDS
+   SLIDES BACKGROUNDS (vidéo)
    ===================== */
-#splide01-slide01 { background-image: url(../img/icone/1.png); background-size: cover; }
-#splide01-slide02 { background-image: url(../img/icone/2.png); background-size: cover; }
-#splide01-slide03 { background-image: url(../img/icone/3.png); background-size: cover; }
-#splide01-slide04 { background-image: url(../img/icone/4.png); background-size: cover; }
-#splide01-slide05 { background-image: url(../img/icone/5.png); background-size: cover; }
-#splide01-slide06 { background-image: url(../img/icone/6.png); background-size: cover; }
-#splide01-slide07 { background-image: url(../img/icone/7.png); background-size: cover; }
+.splide-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
 .splide__slide::after {
   content: '';
   position: absolute;
@@ -451,4 +454,25 @@ body {
 }
 .og-profile-contact a:hover {
   color: rgba(255, 255, 255, 0.95);
+}
+
+/* =====================
+   RESPONSIVE MOBILE
+   ===================== */
+@media (max-width: 768px) {
+  .splide {
+    margin-top: 90px;
+    margin-left: 20px;
+  }
+  #overlay-box {
+    padding: 20px 20px;
+  }
+  .og-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .titre {
+    left: 40px !important;
+    top: 200px !important;
+    font-size: 14px;
+  }
 }

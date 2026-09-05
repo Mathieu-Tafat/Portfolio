@@ -11,39 +11,52 @@
   <script src="js/script.js" defer></script>
 </head>
 <body>
-
   <canvas id="bg-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;"></canvas>
   <canvas id="grain-canvas"></canvas>
-
   <div id="topbar">
     <div id="pdp"></div>
     <span id="pseudo">Mathieu</span>
     <span id="clock"></span>
   </div>
-
   <section class="splide">
     <div class="splide__track">
       <ul class="splide__list">
-        <li class="splide__slide"><h1 class="titre isactive">Profil</h1></li>
-        <li class="splide__slide"><h1 class="titre">Service Communication Université Rennes 2</h1></li>
-        <li class="splide__slide"><h1 class="titre">Edition</h1></li>
-        <li class="splide__slide"><h1 class="titre">Motion Design</h1></li>
-        <li class="splide__slide"><h1 class="titre">Animations 3D</h1></li>
-        <li class="splide__slide"><h1 class="titre">Jeux-vidéo</h1></li>
-        <li class="splide__slide"><h1 class="titre">Peintures</h1></li>
+        <li class="splide__slide" id="splide01-slide01">
+          <video class="splide-bg-video" src="img/icones/terebi.mp4" autoplay loop muted playsinline></video>
+          <h1 class="titre isactive">Profil</h1>
+        </li>
+        <li class="splide__slide" id="splide01-slide02">
+          <video class="splide-bg-video" src="img/icones/batte.mp4" autoplay loop muted playsinline></video>
+          <h1 class="titre">Service Communication Université Rennes 2</h1>
+        </li>
+        <li class="splide__slide" id="splide01-slide03">
+          <video class="splide-bg-video" src="img/icones/edition.mp4" autoplay loop muted playsinline></video>
+          <h1 class="titre">Edition</h1>
+        </li>
+        <li class="splide__slide" id="splide01-slide04">
+          <video class="splide-bg-video" src="img/icones/kare.mp4" autoplay loop muted playsinline></video>
+          <h1 class="titre">Motion Design</h1>
+        </li>
+        <li class="splide__slide" id="splide01-slide05">
+          <video class="splide-bg-video" src="img/icones/drapo.mp4" autoplay loop muted playsinline></video>
+          <h1 class="titre">Animations 3D</h1>
+        </li>
+        <li class="splide__slide" id="splide01-slide06">
+          <video class="splide-bg-video" src="img/icones/gbasp.mp4" autoplay loop muted playsinline></video>
+          <h1 class="titre">Jeux-vidéo</h1>
+        </li>
+        <li class="splide__slide" id="splide01-slide07">
+          <video class="splide-bg-video" src="img/icones/sax.mp4" autoplay loop muted playsinline></video>
+          <h1 class="titre">Peintures</h1>
+        </li>
       </ul>
     </div>
   </section>
-
   <div id="overlay">
     <div id="overlay-box">
       <div id="overlay-content"></div>
     </div>
   </div>
-
   <div id="overlay-hint">X</div>
-
 </body>
 </html>
-
-

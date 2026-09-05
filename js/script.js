@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   // =====================
+  // DETECTION TACTILE
+  // =====================
+  const isTouch = window.matchMedia('(hover: none)').matches;
+
+  // =====================
   // INTRO
   // =====================
   const intro = document.createElement('div');
@@ -34,6 +39,15 @@ document.addEventListener('DOMContentLoaded', function () {
     keyboard: false,
     drag: false,
     speed: 120,
+    breakpoints: {
+      768: {
+        perPage: 3,
+        fixedWidth: '9em',
+        fixedHeight: '12em',
+        gap: '-1.5em',
+        drag: true,
+      }
+    }
   }).mount();
 
   // =====================
@@ -51,6 +65,22 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   attacherStart();
   splide.on('move', function() { setTimeout(attacherStart, 10); });
+
+  // =====================
+  // ACCELERATION VIDEOS DES SLIDES (hover desktop / tap mobile)
+  // =====================
+  document.querySelectorAll('.splide__slide').forEach(function(slide) {
+    const vid = slide.querySelector('video.splide-bg-video');
+    if (!vid) return;
+
+    if (isTouch) {
+      slide.addEventListener('touchstart', function() { vid.playbackRate = 3; }, { passive: true });
+      slide.addEventListener('touchend', function() { vid.playbackRate = 1; }, { passive: true });
+    } else {
+      slide.addEventListener('mouseenter', function() { vid.playbackRate = 3; });
+      slide.addEventListener('mouseleave', function() { vid.playbackRate = 1; });
+    }
+  });
 
   // =====================
   // DONNÉES PAR SLIDE
@@ -130,7 +160,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   ];
 
-  const COLS = 3;
+  // =====================
+  // NOMBRE DE COLONNES DE LA GRILLE (adapté au mobile)
+  // =====================
+  const COLS = window.matchMedia('(max-width: 768px)').matches ? 2 : 3;
 
   // =====================
   // STATE
@@ -278,7 +311,13 @@ document.addEventListener('DOMContentLoaded', function () {
       if (cell.classList.contains('og-cell--text')) return;
       const idx = parseInt(cell.dataset.index);
 
-      if (idx === gridFocusIdx) {
+      if (isTouch) {
+        // sur mobile, un tap sélectionne et ouvre le texte en un seul geste
+        moveFocusTo(idx);
+        gridFocusIdx = idx;
+        updateFocusClass();
+        toggleText();
+      } else if (idx === gridFocusIdx) {
         const video = cell.querySelector('video');
         if (video) toggleVideoSound(video);
         toggleText();
@@ -403,8 +442,19 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('.splide__list').addEventListener('click', function(e) {
     if (overlayOpen) return;
     const slide = e.target.closest('.splide__slide');
-    if (!slide || !slide.classList.contains('is-active')) return;
-    openOverlay();
+    if (!slide) return;
+
+    if (isTouch) {
+      if (!slide.classList.contains('is-active')) {
+        const slides = Array.from(document.querySelectorAll('.splide__slide'));
+        splide.go(slides.indexOf(slide));
+        return; // premier tap = juste sélectionner la slide
+      }
+      openOverlay(); // second tap sur la slide déjà active
+    } else {
+      if (!slide.classList.contains('is-active')) return;
+      openOverlay();
+    }
   });
 
   // =====================
