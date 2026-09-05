@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   // =====================
-  // DETECTION TACTILE
+  // DETECTION TACTILE / MOBILE
   // =====================
-  const isTouch = window.matchMedia('(hover: none)').matches;
+  const isTouch  = window.matchMedia('(hover: none)').matches;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
   // =====================
   // INTRO
@@ -27,9 +28,19 @@ document.addEventListener('DOMContentLoaded', function () {
   setTimeout(() => { intro.remove(); }, 3200);
 
   // =====================
-  // SPLIDE INIT
+  // SPLIDE INIT (horizontal desktop / vertical mobile)
   // =====================
-  var splide = new Splide('.splide', {
+  var splide = new Splide('.splide', isMobile ? {
+    type: 'slide',
+    direction: 'ttb',
+    height: '70vh',
+    perPage: 1,
+    focus: 'center',
+    gap: '1em',
+    keyboard: false,
+    drag: true,
+    speed: 120,
+  } : {
     type: 'slide',
     perPage: 6,
     focus: '0',
@@ -39,22 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
     keyboard: false,
     drag: false,
     speed: 120,
-    breakpoints: {
-      768: {
-        perPage: 3,
-        fixedWidth: '9em',
-        fixedHeight: '12em',
-        gap: '1em',       // positif au lieu de négatif, voir point 2
-        drag: true,
-      },
-      480: {
-        perPage: 2,
-        fixedWidth: '7em',
-        fixedHeight: '9.5em',
-        gap: '0.5em',
-        drag: true,
-      }
-    }
   }).mount();
 
   // =====================
@@ -170,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   // NOMBRE DE COLONNES DE LA GRILLE (adapté au mobile)
   // =====================
-  const COLS = window.matchMedia('(max-width: 768px)').matches ? 2 : 3;
+  const COLS = isMobile ? 2 : 3;
 
   // =====================
   // STATE
