@@ -140,9 +140,16 @@ document.addEventListener('DOMContentLoaded', function () {
         { src: "img/3d/clerbar.mp4",   caption: "CLEBART",                 text: "" },
         { src: "img/3d/loubart.mp4",   caption: "LOUBART",                 text: "" },
         { src: "img/3d/surplace.mp4",  caption: "SUR PLACE OU A EMPORTER", text: "", vertical: true },
-        { src: "img/3d/bombe.mp4",     caption: "BOMBE",                   text: "Inspirée par la musique 'Bombe' de Yoa de l'album 'La Favorite.'" },
+        { src: "img/3d/backroom.mp4",  caption: "PERDU",                   text: "" },
         { src: "img/3d/chambre.mp4",   caption: "DESERTEUR",               text: "" },
-        { src: "img/3d/backroom.mp4",  caption: "PERDU",                   text: "" }
+        { src: "img/3d/finalmente.mp4",  caption: "*", text: "" },
+        { src: "img/3d/bombe.mp4",     caption: "BOMBE",                   text: "Inspirée par la musique 'Bombe' de Yoa." },
+        { src: "img/3d/rue.mp4",  caption: "UN PEU DE RETENUE", text: "Inspirée par la musique 'Un peu de retenue' de Théodort." },
+        { src: "img/3d/cuir.mp4",  caption: "どこか", text: "" },        
+        { src: "img/3d/foret.mp4",  caption: "Dans les bois", text: "" },
+        { src: "img/3d/electromenager.mp4",  caption: "Se lever aux aurores", text: "" },
+        { src: "img/3d/skelet.mp4",  caption: "Un lancer vaut mieux que deux tu l'auras", text: "" },
+        { src: "img/3d/spider.mp4",  caption: "Spider-man in Japan", text: "" }
       ]
     },
     {
@@ -246,17 +253,17 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   // CELL HTML helper
   // =====================
-  function cellHTML(img) {
-    const isVideo = /\.(mp4|webm|ogg)$/i.test(img.src);
-    if (isVideo) {
-      return `<video src="${img.src}" class="og-img" autoplay loop muted playsinline></video>
-              <div class="og-cell-label">${img.caption}</div>
-              <div class="og-cell-dim"></div>`;
-    }
-    return `<img src="${img.src}" alt="${img.caption}" class="og-img" />
+function cellHTML(img) {
+  const isVideo = /\.(mp4|webm|ogg)$/i.test(img.src);
+  if (isVideo) {
+    return `<video src="${img.src}" class="og-img" autoplay loop muted playsinline></video>
             <div class="og-cell-label">${img.caption}</div>
             <div class="og-cell-dim"></div>`;
   }
+  return `<img src="${img.src}" alt="${img.caption}" class="og-img" />
+          <div class="og-cell-label">${img.caption}</div>
+          <div class="og-cell-dim"></div>`;
+}
 
   // =====================
   // BUILD PROFILE (slide 0)
@@ -285,10 +292,41 @@ document.addEventListener('DOMContentLoaded', function () {
       </div>
     `;
   }
+  function layoutMasonryCell(cell) {
+  const grid = document.getElementById('og-grid');
+  if (!grid) return;
+  const media = cell.querySelector('video, img');
+  if (!media) return;
 
+  let ratio;
+  if (media.tagName === 'VIDEO') {
+    if (!media.videoWidth || !media.videoHeight) return;
+    ratio = media.videoHeight / media.videoWidth;
+  } else {
+    if (!media.naturalWidth || !media.naturalHeight) return;
+    ratio = media.naturalHeight / media.naturalWidth;
+  }
+
+  const cellWidth = cell.getBoundingClientRect().width;
+  const targetHeight = cellWidth * ratio;
+
+  const styles   = window.getComputedStyle(grid);
+  const rowHeight = parseFloat(styles.getPropertyValue('grid-auto-rows'));
+  const rowGap    = parseFloat(styles.getPropertyValue('gap')) || 0;
+
+  const rowSpan = Math.ceil((targetHeight + rowGap) / (rowHeight + rowGap));
+  cell.style.gridRowEnd = 'span ' + rowSpan;
+}
+
+function layoutMasonry() {
+  const grid = document.getElementById('og-grid');
+  if (!grid) return;
+  grid.querySelectorAll('.og-cell').forEach(layoutMasonryCell);
+}
   // =====================
   // BUILD GRID
   // =====================
+ 
   function buildGrid(slideIdx) {
     const data = SLIDE_DATA[slideIdx];
     if (!data) return;
@@ -309,8 +347,18 @@ document.addEventListener('DOMContentLoaded', function () {
     updateFocusClass();
 
     overlayContent.querySelectorAll('.og-cell').forEach(cell => {
-      attachCellHover(cell);
-    });
+  attachCellHover(cell);
+  const media = cell.querySelector('video, img');
+  if (!media) return;
+  if (media.tagName === 'VIDEO') {
+    if (media.readyState >= 1) layoutMasonryCell(cell);
+    else media.addEventListener('loadedmetadata', () => layoutMasonryCell(cell));
+  } else {
+    if (media.complete) layoutMasonryCell(cell);
+    else media.addEventListener('load', () => layoutMasonryCell(cell));
+  }
+});
+    
 
     document.getElementById('og-grid').addEventListener('click', function(e) {
       const cell = e.target.closest('.og-cell');
@@ -576,6 +624,7 @@ function resizeCanvas() {
 }
 resizeCanvas();
 window.addEventListener('resize', () => { resizeCanvas(); bakeAll(); });
+window.addEventListener('resize', () => { if (overlayOpen) layoutMasonry(); });
 
 const PALETTES = [
   { bg: '#12000a', blobs: ['#8b0030', '#c4002a', '#ff1a3a'] },

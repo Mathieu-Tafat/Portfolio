@@ -291,19 +291,27 @@ body {
 .og-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-auto-rows: 1px;      /* unité minuscule, le span fait le vrai travail */
   gap: 4px;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  align-content: start;
 }
 
-/* Cellule — fond noir pour les bandes */
 .og-cell {
   position: relative;
   overflow: hidden;
-  min-height: 0;
   cursor: pointer;
   background: #000;
+  /* plus d'aspect-ratio ici, c'est le JS qui gère la hauteur via grid-row-end */
+}
+
+.og-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* filet de sécu pour l'arrondi, ne recadre rien puisque le ratio colle déjà */
+  display: block;
 }
 
 /* Label toujours visible */
@@ -325,13 +333,7 @@ body {
   z-index: 2;
 }
 
-/* Contenu en contain → bandes noires, pas de rognage */
-.og-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
+
 
 /* Assombrissement : visible par défaut */
 .og-cell-dim {
