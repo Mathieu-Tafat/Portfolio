@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         perPage: 3,
         fixedWidth: '9em',
         fixedHeight: '12em',
-        gap: '1em',       // positif au lieu de négatif, voir point 2
+        gap: '1em',
         drag: true,
       },
       480: {
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fixedWidth: '7em',
         fixedHeight: '9.5em',
         gap: '0.5em',
-        drag: true,
+        drag: true
       }
     }
   }).mount();
@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnStart.parentElement) btnStart.parentElement.removeChild(btnStart);
     activeSlide.appendChild(btnStart);
   }
+
   attacherStart();
   splide.on('move', function() { setTimeout(attacherStart, 10); });
 
@@ -195,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
         v.muted = true;
         v.src = src;
         v.addEventListener('canplaythrough', itemDone, { once: true });
-        v.addEventListener('error', itemDone, { once: true }); // ne bloque pas si une vidéo échoue
+        v.addEventListener('error', itemDone, { once: true });
         v.load();
       } else {
         const i = new Image();
@@ -206,8 +207,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  const MIN_INTRO_TIME = 2200; // durée mini d'affichage du nom, même si tout charge plus vite
-  const MAX_INTRO_TIME = 8000; // filet de sécu : on ne bloque jamais plus de 8s
+  const MIN_INTRO_TIME = 2200;
+  const MAX_INTRO_TIME = 8000;
 
   const introStart = Date.now();
   let introEnded = false;
@@ -324,67 +325,67 @@ document.addEventListener('DOMContentLoaded', function () {
   // BUILD PROFILE (slide 0)
   // =====================
   function buildProfile() {
-  const data = SLIDE_DATA[0];
-  currentData = null;
+    const data = SLIDE_DATA[0];
+    currentData = null;
 
-  const paragraphs = data.text
-    .split('\n\n')
-    .filter(p => p.trim())
-    .map(p => `<p class="og-profile-p">${p.trim()}</p>`)
-    .join('');
+    const paragraphs = data.text
+      .split('\n\n')
+      .filter(p => p.trim())
+      .map(p => `<p class="og-profile-p">${p.trim()}</p>`)
+      .join('');
 
-  overlayContent.innerHTML = `
-    <div class="og-header">${data.title}</div>
-    <div class="og-profile">
-      <div class="og-profile-text">
-        ${paragraphs}
-        <div class="og-profile-contact">
-          <span class="og-profile-contact-label">Contact</span>
-          
+    overlayContent.innerHTML = `
+      <div class="og-header">${data.title}</div>
+      <div class="og-profile">
+        <div class="og-profile-text">
+          ${paragraphs}
+          <div class="og-profile-contact">
+            <span class="og-profile-contact-label">Contact</span>
+          </div>
+          <form id="og-contact-form" class="og-contact-form">
+            <input type="email" name="email" placeholder="Votre email" required>
+            <input type="text" name="subject" placeholder="Sujet" required>
+            <textarea name="message" placeholder="Votre message" rows="4" required></textarea>
+            <button type="submit">Envoyer</button>
+            <p class="og-contact-status"></p>
+          </form>
+          <div class="og-profile-contact">
+            <a href="mailto:contact.tmdesignstudio@gmail.com">contact.tmdesignstudio@gmail.com</a>
+            <a href="https://fr.linkedin.com/in/mathieu-tafat-031518261" target="_blank">LinkedIn</a>
+          </div>
         </div>
-        <form id="og-contact-form" class="og-contact-form">
-          <input type="email" name="email" placeholder="Votre email" required>
-          <input type="text" name="subject" placeholder="Sujet" required>
-          <textarea name="message" placeholder="Votre message" rows="4" required></textarea>
-          <button type="submit">Envoyer</button>
-          <p class="og-contact-status"></p>
-        </form>
-    <div class="og-profile-contact">
-      <a href="mailto:contact.tmdesignstudio@gmail.com">contact.tmdesignstudio@gmail.com</a>
-          <a href="https://fr.linkedin.com/in/mathieu-tafat-031518261" target="_blank">LinkedIn</a>
-     </div>
       </div>
-    </div>
-  `;
+    `;
 
-  const form   = document.getElementById('og-contact-form');
-  const status = form.querySelector('.og-contact-status');
+    const form   = document.getElementById('og-contact-form');
+    const status = form.querySelector('.og-contact-status');
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    status.textContent = 'Envoi en cours...';
-    status.className = 'og-contact-status';
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      status.textContent = 'Envoi en cours...';
+      status.className = 'og-contact-status';
 
-    try {
-      const res = await fetch('https://formspree.io/f/https://formspree.io/f/mvkolzod', {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: new FormData(form)
-      });
-      if (res.ok) {
-        status.textContent = 'Message envoyé, merci !';
-        status.classList.add('og-contact-status--ok');
-        form.reset();
-      } else {
+      try {
+        const res = await fetch('https://formspree.io/f/mvkolzod', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(form)
+        });
+
+        if (res.ok) {
+          status.textContent = 'Message envoyé, merci !';
+          status.classList.add('og-contact-status--ok');
+          form.reset();
+        } else {
+          status.textContent = "Une erreur est survenue, réessayez ou écrivez-moi directement par mail.";
+          status.classList.add('og-contact-status--err');
+        }
+      } catch (err) {
         status.textContent = "Une erreur est survenue, réessayez ou écrivez-moi directement par mail.";
         status.classList.add('og-contact-status--err');
       }
-    } catch (err) {
-      status.textContent = "Une erreur est survenue, réessayez ou écrivez-moi directement par mail.";
-      status.classList.add('og-contact-status--err');
-    }
-  });
-}
+    });
+  }
 
   function layoutMasonryCell(cell) {
     const grid = document.getElementById('og-grid');
@@ -596,9 +597,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!slide.classList.contains('is-active')) {
         const slides = Array.from(document.querySelectorAll('.splide__slide'));
         splide.go(slides.indexOf(slide));
-        return; // premier tap = juste sélectionner la slide
+        return;
       }
-      openOverlay(); // second tap sur la slide déjà active
+      openOverlay();
     } else {
       if (!slide.classList.contains('is-active')) return;
       openOverlay();
@@ -610,6 +611,16 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   document.addEventListener("keydown", function(e) {
     if (overlayOpen) {
+
+      // MODIFICATION 1 : laisser les champs du formulaire recevoir le clavier
+      if (
+        e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'TEXTAREA' ||
+        e.target.isContentEditable
+      ) {
+        return;
+      }
+
       e.preventDefault();
 
       if (e.code === "Escape") {
@@ -628,6 +639,7 @@ document.addEventListener('DOMContentLoaded', function () {
           setTimeout(() => { gridFocusIdx = next; textVisible = false; updateFocusClass(); }, textVisible ? 290 : 0);
         }
       }
+
       if (e.code === "ArrowLeft") {
         const prev = gridFocusIdx - 1;
         if (prev >= 0) {
@@ -635,6 +647,7 @@ document.addEventListener('DOMContentLoaded', function () {
           setTimeout(() => { gridFocusIdx = prev; textVisible = false; updateFocusClass(); }, textVisible ? 290 : 0);
         }
       }
+
       if (e.code === "ArrowDown") {
         const next = gridFocusIdx + COLS;
         if (next < total) {
@@ -642,6 +655,7 @@ document.addEventListener('DOMContentLoaded', function () {
           setTimeout(() => { gridFocusIdx = next; textVisible = false; updateFocusClass(); }, textVisible ? 290 : 0);
         }
       }
+
       if (e.code === "ArrowUp") {
         const prev = gridFocusIdx - COLS;
         if (prev >= 0) {
@@ -677,15 +691,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const m = now.getMinutes().toString().padStart(2, '0');
     $('#clock').text(`${h}:${m}`);
   }
+
   updateClock();
   setInterval(updateClock, 1000);
 
   document.getElementById('pdp').addEventListener('click', function() {
-  window.open('img/cv.png', '_blank');
+    window.open('img/cv.png', '_blank');
   });
+
   document.getElementById('pseudo').addEventListener('click', function() {
     window.open('img/cv.png', '_blank');
   });
+
   // =====================
   // TITRES ACTIFS
   // =====================
@@ -695,129 +712,133 @@ document.addEventListener('DOMContentLoaded', function () {
       h1.classList.toggle('isactive', index === newIndex);
     });
   });
+
   const h1s = document.querySelectorAll('h1');
   if (h1s[0]) h1s[0].classList.add('isactive');
 
   // =====================
-// FOND ANIMÉ — snapshots pré-bakés
-// =====================
-const canvas = document.getElementById('bg-canvas');
-const ctx    = canvas.getContext('2d');
+  // FOND ANIMÉ — snapshots pré-bakés
+  // =====================
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
 
-const RES = 0.3;
+  const RES = 0.3;
 
-function resizeCanvas() {
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-  canvas.width  = Math.floor(W * RES);
-  canvas.height = Math.floor(H * RES);
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
-  canvas.style.imageRendering = 'auto';
-}
-resizeCanvas();
-window.addEventListener('resize', () => { resizeCanvas(); bakeAll(); });
-window.addEventListener('resize', () => { if (overlayOpen) layoutMasonry(); });
+  function resizeCanvas() {
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    canvas.width  = Math.floor(W * RES);
+    canvas.height = Math.floor(H * RES);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.style.imageRendering = 'auto';
+  }
 
-const PALETTES = [
-  { bg: '#12000a', blobs: ['#8b0030', '#c4002a', '#ff1a3a'] },
-  { bg: '#200004', blobs: ['#cc0020', '#ff2200', '#e8003a'] },
-  { bg: '#0a0006', blobs: ['#990030', '#cc0040', '#aa0025'] },
-  { bg: '#180008', blobs: ['#b50045', '#e8003a', '#cc1100'] },
-  { bg: '#040001', blobs: ['#7a0028', '#bb0030', '#dd001a'] },
-];
+  resizeCanvas();
+  window.addEventListener('resize', () => { resizeCanvas(); bakeAll(); });
+  window.addEventListener('resize', () => { if (overlayOpen) layoutMasonry(); });
 
-function hexRgb(h) {
-  return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
-}
+  const PALETTES = [
+    { bg: '#12000a', blobs: ['#8b0030', '#c4002a', '#ff1a3a'] },
+    { bg: '#200004', blobs: ['#cc0020', '#ff2200', '#e8003a'] },
+    { bg: '#0a0006', blobs: ['#990030', '#cc0040', '#aa0025'] },
+    { bg: '#180008', blobs: ['#b50045', '#e8003a', '#cc1100'] },
+    { bg: '#040001', blobs: ['#7a0028', '#bb0030', '#dd001a'] },
+  ];
 
-const NUM_SNAPSHOTS = 12;
-const snapshots = [];
+  function hexRgb(h) {
+    return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+  }
 
-function bakeSnapshot(offscreen) {
-  const W = offscreen.width, H = offscreen.height;
-  const c = offscreen.getContext('2d');
-  const pal = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+  const NUM_SNAPSHOTS = 12;
+  const snapshots = [];
 
-  const [br, bg2, bb] = hexRgb(pal.bg);
-  c.fillStyle = `rgb(${br},${bg2},${bb})`;
-  c.fillRect(0, 0, W, H);
+  function bakeSnapshot(offscreen) {
+    const W = offscreen.width, H = offscreen.height;
+    const c = offscreen.getContext('2d');
+    const pal = PALETTES[Math.floor(Math.random() * PALETTES.length)];
 
-  // blobs placés en grille pour vraie dispersion
-  const NUM_BLOBS = 7;
-  for (let i = 0; i < NUM_BLOBS; i++) {
-    const x = ((i % 3) / 3 + Math.random() * 0.33) * W;
-    const y = (Math.floor(i / 3) / 3 + Math.random() * 0.33) * H;
-    const r = (0.35 + Math.random() * 0.35) * Math.min(W, H);
-    const alpha = 0.7 + Math.random() * 0.3;
-    const col = hexRgb(pal.blobs[i % 3]);
-
-    const gr = c.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0,    `rgba(${col[0]},${col[1]},${col[2]},${alpha})`);
-    gr.addColorStop(0.15, `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.7})`);
-    gr.addColorStop(0.5,  `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.2})`);
-    gr.addColorStop(0.8,  `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.05})`);
-    gr.addColorStop(1,    `rgba(${col[0]},${col[1]},${col[2]},0)`);
-    c.fillStyle = gr;
+    const [br, bg2, bb] = hexRgb(pal.bg);
+    c.fillStyle = `rgb(${br},${bg2},${bb})`;
     c.fillRect(0, 0, W, H);
+
+    // blobs placés en grille pour vraie dispersion
+    const NUM_BLOBS = 7;
+    for (let i = 0; i < NUM_BLOBS; i++) {
+      const x = ((i % 3) / 3 + Math.random() * 0.33) * W;
+      const y = (Math.floor(i / 3) / 3 + Math.random() * 0.33) * H;
+      const r = (0.35 + Math.random() * 0.35) * Math.min(W, H);
+      const alpha = 0.7 + Math.random() * 0.3;
+      const col = hexRgb(pal.blobs[i % 3]);
+
+      const gr = c.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0,    `rgba(${col[0]},${col[1]},${col[2]},${alpha})`);
+      gr.addColorStop(0.15, `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.7})`);
+      gr.addColorStop(0.5,  `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.2})`);
+      gr.addColorStop(0.8,  `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.05})`);
+      gr.addColorStop(1,    `rgba(${col[0]},${col[1]},${col[2]},0)`);
+      c.fillStyle = gr;
+      c.fillRect(0, 0, W, H);
+    }
+
+    // grain
+    const grainOff = document.createElement('canvas');
+    grainOff.width = W; grainOff.height = H;
+    const gc = grainOff.getContext('2d');
+    const id = gc.createImageData(W, H);
+    const d  = id.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const v = Math.random() * 255 | 0;
+      d[i] = v; d[i+1] = v; d[i+2] = v;
+      d[i+3] = Math.random() * 28 | 0;
+    }
+    gc.putImageData(id, 0, 0);
+    c.drawImage(grainOff, 0, 0);
+
+    // vignette
+    const vig = c.createRadialGradient(W*.5, H*.5, H*.06, W*.5, H*.5, H*.88);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.75)');
+    c.fillStyle = vig;
+    c.fillRect(0, 0, W, H);
+
+    return offscreen;
   }
 
- // grain
-const grainOff = document.createElement('canvas');
-grainOff.width = W; grainOff.height = H;
-const gc = grainOff.getContext('2d');
-const id = gc.createImageData(W, H);
-const d  = id.data;
-for (let i = 0; i < d.length; i += 4) {
-  const v = Math.random() * 255 | 0;
-  d[i] = v; d[i+1] = v; d[i+2] = v;
-  d[i+3] = Math.random() * 28 | 0;
-}
-gc.putImageData(id, 0, 0);
-c.drawImage(grainOff, 0, 0);
-
-  // vignette
-  const vig = c.createRadialGradient(W*.5, H*.5, H*.06, W*.5, H*.5, H*.88);
-  vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(1, 'rgba(0,0,0,0.75)');
-  c.fillStyle = vig;
-  c.fillRect(0, 0, W, H);
-
-  return offscreen;
-}
-
-function bakeAll() {
-  const W = canvas.width, H = canvas.height;
-  snapshots.length = 0;
-  for (let i = 0; i < NUM_SNAPSHOTS; i++) {
-    const off = document.createElement('canvas');
-    off.width = W; off.height = H;
-    snapshots.push(bakeSnapshot(off));
+  function bakeAll() {
+    const W = canvas.width, H = canvas.height;
+    snapshots.length = 0;
+    for (let i = 0; i < NUM_SNAPSHOTS; i++) {
+      const off = document.createElement('canvas');
+      off.width = W; off.height = H;
+      snapshots.push(bakeSnapshot(off));
+    }
   }
-}
-bakeAll();
 
-let snapIdx = 0;
-let holdFrames = 10;
-let frameCount = 0;
-let frame = 0;
+  bakeAll();
 
-function drawBg() {
-  ctx.drawImage(snapshots[snapIdx], 0, 0);
+  let snapIdx = 0;
+  let holdFrames = 10;
+  let frameCount = 0;
+  let frame = 0;
 
-  frameCount++;
-  if (frameCount >= holdFrames) {
-    frameCount = 0;
-    holdFrames = 10;
-    snapIdx = (snapIdx + 1) % snapshots.length;
+  function drawBg() {
+    ctx.drawImage(snapshots[snapIdx], 0, 0);
+
+    frameCount++;
+    if (frameCount >= holdFrames) {
+      frameCount = 0;
+      holdFrames = 10;
+      snapIdx = (snapIdx + 1) % snapshots.length;
+    }
   }
-}
 
-function loop() {
-  frame++;
-  if (frame % 2 === 0) drawBg();
-  requestAnimationFrame(loop);
-}
-loop();
+  function loop() {
+    frame++;
+    if (frame % 2 === 0) drawBg();
+    requestAnimationFrame(loop);
+  }
+
+  loop();
 
 });
