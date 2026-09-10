@@ -478,3 +478,45 @@ body {
     font-size: 14px;
   }
 }
+.og-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  max-width: 480px;
+}
+.og-contact-form input,
+.og-contact-form textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 2px;
+  outline: none;
+  resize: vertical;
+}
+.og-contact-form input:focus,
+.og-contact-form textarea:focus {
+  border-color: rgba(255,255,255,0.4);
+}
+.og-contact-form button {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.og-contact-form button:hover {
+  background: rgba(255,255,255,0.2);
+}
+.og-contact-status { font-size: 12px; margin: 0; min-height: 14px; }
+.og-contact-status--ok  { color: #7ee787; }
+.og-contact-status--err { color: #ff7b7b; }

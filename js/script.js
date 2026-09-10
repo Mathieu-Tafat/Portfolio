@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const isTouch = window.matchMedia('(hover: none)').matches;
 
   // =====================
-  // INTRO
+  // INTRO (création + affichage, le vrai chargement se fait plus bas
+  // une fois SLIDE_DATA connu)
   // =====================
   const intro = document.createElement('div');
   intro.id = 'intro';
@@ -19,12 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (topbarIntro)   topbarIntro.style.opacity   = '0';
 
   setTimeout(() => { intro.classList.add('intro-visible'); }, 100);
-  setTimeout(() => {
-    intro.classList.add('intro-out');
-    if (splideElIntro) { splideElIntro.style.transition = 'opacity 0.8s ease'; splideElIntro.style.opacity = '1'; }
-    if (topbarIntro)   { topbarIntro.style.transition   = 'opacity 0.8s ease'; topbarIntro.style.opacity   = '1'; }
-  }, 2200);
-  setTimeout(() => { intro.remove(); }, 3200);
 
   // =====================
   // SPLIDE INIT
@@ -96,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {
       title: "Profil",
       profile: true,
-      text: "Créer, c'est tout ce qui m'importe. Diplômé en 2025 d'une Licence Professionnelle de Design Graphique, le contexte professionnel est pour moi une excuse de plus pour faire ce que je ferais de toute façon : créer."
+      text: "Créer, c’est ce qui me motive au quotidien. Diplômé en 2025 d’une Licence Professionnelle en Design Graphique, je conçois des projets visuels en mêlant réflexion, créativité et maîtrise des outils numériques comme des techniques plus traditionnelles. J’aime surtout donner une identité cohérente aux projets et trouver la manière la plus juste de les faire exister visuellement."
     },
     {
       title: "Service Communication Université Rennes 2",
@@ -145,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { src: "img/3d/finalmente.mp4",  caption: "*", text: "" },
         { src: "img/3d/bombe.mp4",     caption: "BOMBE",                   text: "Inspirée par la musique 'Bombe' de Yoa." },
         { src: "img/3d/rue.mp4",  caption: "UN PEU DE RETENUE", text: "Inspirée par la musique 'Un peu de retenue' de Théodort." },
-        { src: "img/3d/cuir.mp4",  caption: "どこか", text: "" },        
+        { src: "img/3d/cuir.mp4",  caption: "どこか", text: "" },
         { src: "img/3d/foret.mp4",  caption: "Dans les bois", text: "" },
         { src: "img/3d/electromenager.mp4",  caption: "Se lever aux aurores", text: "" },
         { src: "img/3d/skelet.mp4",  caption: "Un lancer vaut mieux que deux tu l'auras", text: "" },
@@ -173,6 +168,66 @@ document.addEventListener('DOMContentLoaded', function () {
       ]
     }
   ];
+
+  // =====================
+  // PRECHARGEMENT DE TOUS LES MEDIAS (pendant l'intro)
+  // =====================
+  function preloadAllMedia(dataList, onDone) {
+    const srcs = [];
+    dataList.forEach(slide => {
+      if (!slide.images) return;
+      slide.images.forEach(img => srcs.push(img.src));
+    });
+
+    let remaining = srcs.length;
+    if (remaining === 0) { onDone(); return; }
+
+    function itemDone() {
+      remaining--;
+      if (remaining <= 0) onDone();
+    }
+
+    srcs.forEach(src => {
+      const isVideo = /\.(mp4|webm|ogg)$/i.test(src);
+      if (isVideo) {
+        const v = document.createElement('video');
+        v.preload = 'auto';
+        v.muted = true;
+        v.src = src;
+        v.addEventListener('canplaythrough', itemDone, { once: true });
+        v.addEventListener('error', itemDone, { once: true }); // ne bloque pas si une vidéo échoue
+        v.load();
+      } else {
+        const i = new Image();
+        i.onload  = itemDone;
+        i.onerror = itemDone;
+        i.src = src;
+      }
+    });
+  }
+
+  const MIN_INTRO_TIME = 2200; // durée mini d'affichage du nom, même si tout charge plus vite
+  const MAX_INTRO_TIME = 8000; // filet de sécu : on ne bloque jamais plus de 8s
+
+  const introStart = Date.now();
+  let introEnded = false;
+
+  function endIntro() {
+    if (introEnded) return;
+    introEnded = true;
+    intro.classList.add('intro-out');
+    if (splideElIntro) { splideElIntro.style.transition = 'opacity 0.8s ease'; splideElIntro.style.opacity = '1'; }
+    if (topbarIntro)   { topbarIntro.style.transition   = 'opacity 0.8s ease'; topbarIntro.style.opacity   = '1'; }
+    setTimeout(() => { intro.remove(); }, 1000);
+  }
+
+  const maxTimer = setTimeout(endIntro, MAX_INTRO_TIME);
+
+  preloadAllMedia(SLIDE_DATA, () => {
+    const elapsed = Date.now() - introStart;
+    const wait = Math.max(0, MIN_INTRO_TIME - elapsed);
+    setTimeout(() => { clearTimeout(maxTimer); endIntro(); }, wait);
+  });
 
   // =====================
   // NOMBRE DE COLONNES DE LA GRILLE (adapté au mobile)
@@ -253,80 +308,119 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   // CELL HTML helper
   // =====================
-function cellHTML(img) {
-  const isVideo = /\.(mp4|webm|ogg)$/i.test(img.src);
-  if (isVideo) {
-    return `<video src="${img.src}" class="og-img" autoplay loop muted playsinline></video>
+  function cellHTML(img) {
+    const isVideo = /\.(mp4|webm|ogg)$/i.test(img.src);
+    if (isVideo) {
+      return `<video src="${img.src}" class="og-img" autoplay loop muted playsinline></video>
+              <div class="og-cell-label">${img.caption}</div>
+              <div class="og-cell-dim"></div>`;
+    }
+    return `<img src="${img.src}" alt="${img.caption}" class="og-img" />
             <div class="og-cell-label">${img.caption}</div>
             <div class="og-cell-dim"></div>`;
   }
-  return `<img src="${img.src}" alt="${img.caption}" class="og-img" />
-          <div class="og-cell-label">${img.caption}</div>
-          <div class="og-cell-dim"></div>`;
-}
 
   // =====================
   // BUILD PROFILE (slide 0)
   // =====================
   function buildProfile() {
-    const data = SLIDE_DATA[0];
-    currentData = null;
+  const data = SLIDE_DATA[0];
+  currentData = null;
 
-    const paragraphs = data.text
-      .split('\n\n')
-      .filter(p => p.trim())
-      .map(p => `<p class="og-profile-p">${p.trim()}</p>`)
-      .join('');
+  const paragraphs = data.text
+    .split('\n\n')
+    .filter(p => p.trim())
+    .map(p => `<p class="og-profile-p">${p.trim()}</p>`)
+    .join('');
 
-    overlayContent.innerHTML = `
-      <div class="og-header">${data.title}</div>
-      <div class="og-profile">
-        <div class="og-profile-text">
-          ${paragraphs}
-          <div class="og-profile-contact">
-            <span class="og-profile-contact-label">Contact</span>
-            <a href="mailto:contact.tmdesignstudio@gmail.com">contact.tmdesignstudio@gmail.com</a>
-            <a href="https://fr.linkedin.com/in/mathieu-tafat-031518261" target="_blank">LinkedIn</a>
-          </div>
+  overlayContent.innerHTML = `
+    <div class="og-header">${data.title}</div>
+    <div class="og-profile">
+      <div class="og-profile-text">
+        ${paragraphs}
+        <div class="og-profile-contact">
+          <span class="og-profile-contact-label">Contact</span>
+          
         </div>
+        <form id="og-contact-form" class="og-contact-form">
+          <input type="email" name="email" placeholder="Votre email" required>
+          <input type="text" name="subject" placeholder="Sujet" required>
+          <textarea name="message" placeholder="Votre message" rows="4" required></textarea>
+          <button type="submit">Envoyer</button>
+          <p class="og-contact-status"></p>
+        </form>
+    <div class="og-profile-contact">
+      <a href="mailto:contact.tmdesignstudio@gmail.com">contact.tmdesignstudio@gmail.com</a>
+          <a href="https://fr.linkedin.com/in/mathieu-tafat-031518261" target="_blank">LinkedIn</a>
+     </div>
       </div>
-    `;
-  }
+    </div>
+  `;
+
+  const form   = document.getElementById('og-contact-form');
+  const status = form.querySelector('.og-contact-status');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    status.textContent = 'Envoi en cours...';
+    status.className = 'og-contact-status';
+
+    try {
+      const res = await fetch('https://formspree.io/f/https://formspree.io/f/mvkolzod', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(form)
+      });
+      if (res.ok) {
+        status.textContent = 'Message envoyé, merci !';
+        status.classList.add('og-contact-status--ok');
+        form.reset();
+      } else {
+        status.textContent = "Une erreur est survenue, réessayez ou écrivez-moi directement par mail.";
+        status.classList.add('og-contact-status--err');
+      }
+    } catch (err) {
+      status.textContent = "Une erreur est survenue, réessayez ou écrivez-moi directement par mail.";
+      status.classList.add('og-contact-status--err');
+    }
+  });
+}
+
   function layoutMasonryCell(cell) {
-  const grid = document.getElementById('og-grid');
-  if (!grid) return;
-  const media = cell.querySelector('video, img');
-  if (!media) return;
+    const grid = document.getElementById('og-grid');
+    if (!grid) return;
+    const media = cell.querySelector('video, img');
+    if (!media) return;
 
-  let ratio;
-  if (media.tagName === 'VIDEO') {
-    if (!media.videoWidth || !media.videoHeight) return;
-    ratio = media.videoHeight / media.videoWidth;
-  } else {
-    if (!media.naturalWidth || !media.naturalHeight) return;
-    ratio = media.naturalHeight / media.naturalWidth;
+    let ratio;
+    if (media.tagName === 'VIDEO') {
+      if (!media.videoWidth || !media.videoHeight) return;
+      ratio = media.videoHeight / media.videoWidth;
+    } else {
+      if (!media.naturalWidth || !media.naturalHeight) return;
+      ratio = media.naturalHeight / media.naturalWidth;
+    }
+
+    const cellWidth = cell.getBoundingClientRect().width;
+    const targetHeight = cellWidth * ratio;
+
+    const styles   = window.getComputedStyle(grid);
+    const rowHeight = parseFloat(styles.getPropertyValue('grid-auto-rows'));
+    const rowGap    = parseFloat(styles.getPropertyValue('gap')) || 0;
+
+    const rowSpan = Math.ceil((targetHeight + rowGap) / (rowHeight + rowGap));
+    cell.style.gridRowEnd = 'span ' + rowSpan;
   }
 
-  const cellWidth = cell.getBoundingClientRect().width;
-  const targetHeight = cellWidth * ratio;
+  function layoutMasonry() {
+    const grid = document.getElementById('og-grid');
+    if (!grid) return;
+    grid.querySelectorAll('.og-cell').forEach(layoutMasonryCell);
+  }
 
-  const styles   = window.getComputedStyle(grid);
-  const rowHeight = parseFloat(styles.getPropertyValue('grid-auto-rows'));
-  const rowGap    = parseFloat(styles.getPropertyValue('gap')) || 0;
-
-  const rowSpan = Math.ceil((targetHeight + rowGap) / (rowHeight + rowGap));
-  cell.style.gridRowEnd = 'span ' + rowSpan;
-}
-
-function layoutMasonry() {
-  const grid = document.getElementById('og-grid');
-  if (!grid) return;
-  grid.querySelectorAll('.og-cell').forEach(layoutMasonryCell);
-}
   // =====================
   // BUILD GRID
   // =====================
- 
   function buildGrid(slideIdx) {
     const data = SLIDE_DATA[slideIdx];
     if (!data) return;
@@ -347,18 +441,17 @@ function layoutMasonry() {
     updateFocusClass();
 
     overlayContent.querySelectorAll('.og-cell').forEach(cell => {
-  attachCellHover(cell);
-  const media = cell.querySelector('video, img');
-  if (!media) return;
-  if (media.tagName === 'VIDEO') {
-    if (media.readyState >= 1) layoutMasonryCell(cell);
-    else media.addEventListener('loadedmetadata', () => layoutMasonryCell(cell));
-  } else {
-    if (media.complete) layoutMasonryCell(cell);
-    else media.addEventListener('load', () => layoutMasonryCell(cell));
-  }
-});
-    
+      attachCellHover(cell);
+      const media = cell.querySelector('video, img');
+      if (!media) return;
+      if (media.tagName === 'VIDEO') {
+        if (media.readyState >= 1) layoutMasonryCell(cell);
+        else media.addEventListener('loadedmetadata', () => layoutMasonryCell(cell));
+      } else {
+        if (media.complete) layoutMasonryCell(cell);
+        else media.addEventListener('load', () => layoutMasonryCell(cell));
+      }
+    });
 
     document.getElementById('og-grid').addEventListener('click', function(e) {
       const cell = e.target.closest('.og-cell');
