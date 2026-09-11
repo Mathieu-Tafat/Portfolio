@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setTimeout(() => { intro.classList.add('intro-visible'); }, 100);
 
   // =====================
-  // SPLIDE INIT
+  // SPLIDE INIT - CORRIGÉ
   // =====================
   var splide = new Splide('.splide', {
     type: 'slide',
@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', function () {
         drag: true,
       },
       480: {
-        perPage: 2,
-        fixedWidth: '7em',
-        fixedHeight: '9.5em',
-        gap: '0.5em',
+        perPage: 1,
+        fixedWidth: '100vw',
+        fixedHeight: '70vh',
+        gap: '0',
         drag: true
       }
     }
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {
       title: "Profil",
       profile: true,
-      text: "Créer, c’est ce qui me motive au quotidien. Diplômé en 2025 d’une Licence Professionnelle en Design Graphique, je conçois des projets visuels en mêlant réflexion, créativité et maîtrise des outils numériques comme des techniques plus traditionnelles. J’aime surtout donner une identité cohérente aux projets et trouver la manière la plus juste de les faire exister visuellement."
+      text: "Créer, c'est ce qui me motive au quotidien. Diplômé en 2025 d'une Licence Professionnelle en Design Graphique, je conçois des projets visuels en mêlant réflexion, créativité et maîtrise des outils numériques comme des techniques plus traditionnelles. J'aime surtout donner une identité cohérente aux projets et trouver la manière la plus juste de les faire exister visuellement."
     },
     {
       title: "Service Communication Université Rennes 2",
