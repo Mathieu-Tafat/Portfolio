@@ -13,6 +13,16 @@ body {
 }
 
 /* =====================
+   FONTS
+   ===================== */
+@font-face {
+  font-family: 'Quintessential';
+  src: url('../fonts/Quintessential-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* =====================
    INTRO
    ===================== */
 #intro {
@@ -58,22 +68,22 @@ body {
   z-index: 10;
 }
 #pdp {
-  height: 44px;
-  width: 44px;
+  height: 54px;
+  width: 54px;
   background-image: url(../img/pdp.jpg);
   background-size: cover;
   flex-shrink: 0;
 }
 #pseudo {
-  font-family: "Inter", sans-serif;
-  font-size: 18px;
+  font-family: "Quintessential", serif;
+  font-size: 22px;
   font-weight: 500;
   color: white;
   white-space: nowrap;
 }
 #clock {
-  font-family: "Inter", sans-serif;
-  font-size: 18px;
+  font-family: "Quintessential", serif;
+  font-size: 22px;
   font-weight: 500;
   color: white;
   letter-spacing: 1px;
@@ -135,16 +145,16 @@ body {
 
 #btn-start {
   position: absolute;
-  bottom: -49px;
+  bottom: -52px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: "Inter", sans-serif;
-  font-size: 19.4px;
+  font-family: "Quintessential", serif;
+  font-size: 23px;
   font-weight: 500;
   color: white;
   letter-spacing: 2px;
   border: 2px solid white;
-  padding: 0.56em 4.3em;
+  padding: 0.3em 3.56em;
   background-color: rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   pointer-events: auto;
@@ -176,19 +186,20 @@ body {
   pointer-events: none;
   mix-blend-mode: overlay;
 }
+
 /* =====================
    TITRES
    ===================== */
 .titre {
-  font-family: "Inter", sans-serif;
-  font-size: 18px;
+  font-family: "Quintessential", serif;
+  font-size: 25px;
   font-weight: 400;
   color: white;
   letter-spacing: 2px;
   opacity: 0;
   position: fixed;
   left: 240px !important;
-  top: 286px !important;
+  top: 273px !important;
   white-space: nowrap;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -236,29 +247,30 @@ body {
 }
 
 /* =====================
-   BOUTON EXIT
+   BOUTON EXIT (X stylisé)
    ===================== */
 #overlay-hint {
   position: fixed;
   top: 24px;
-  right: 57px;
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+  right: 40px;
+  font-family: "Quintessential", serif;
+  font-size: 48px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.45);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: none;
   z-index: 1000;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease, color 0.2s ease;
   cursor: pointer;
-  padding: 6px 10px;
-  border: 1px solid rgba(255,255,255,0.2);
+  padding: 0;
+  border: none;
+  background: none;
   user-select: none;
+  line-height: 1;
+  letter-spacing: 0;
 }
 #overlay-hint:hover {
-  color: rgba(255,255,255,0.8);
-  border-color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.85);
 }
 #overlay-hint.show { opacity: 1; }
 
@@ -266,8 +278,8 @@ body {
    HEADER + DESC
    ===================== */
 .og-header {
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+  font-family: "Quintessential", serif;
+  font-size: 20px;
   font-weight: 400;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -275,8 +287,8 @@ body {
   margin-bottom: 8px;
 }
 .og-desc {
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+  font-family: "Quintessential", serif;
+  font-size: 16px;
   font-weight: 300;
   line-height: 1.8;
   color: rgba(255,255,255,0.5);
@@ -291,7 +303,7 @@ body {
 .og-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 1px;      /* unité minuscule, le span fait le vrai travail */
+  grid-auto-rows: 1px;
   gap: 4px;
   flex: 1;
   min-height: 0;
@@ -304,13 +316,12 @@ body {
   overflow: hidden;
   cursor: pointer;
   background: #000;
-  /* plus d'aspect-ratio ici, c'est le JS qui gère la hauteur via grid-row-end */
 }
 
 .og-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;   /* filet de sécu pour l'arrondi, ne recadre rien puisque le ratio colle déjà */
+  object-fit: cover;
   display: block;
 }
 
@@ -321,8 +332,8 @@ body {
   left: 0;
   right: 0;
   padding: 10px 14px;
-  font-family: "Inter", sans-serif;
-  font-size: 12px;
+  font-family: "Quintessential", serif;
+  font-size: 15px;
   font-weight: 400;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -332,8 +343,6 @@ body {
   pointer-events: none;
   z-index: 2;
 }
-
-
 
 /* Assombrissement : visible par défaut */
 .og-cell-dim {
@@ -349,7 +358,6 @@ body {
 .og-cell--focused .og-cell-dim {
   opacity: 0;
 }
-
 
 /* =====================
    CELLULE FOCUS (bordure)
@@ -387,8 +395,8 @@ body {
   box-sizing: border-box;
 }
 .og-text-caption {
-  font-family: "Inter", sans-serif;
-  font-size: 10px;
+  font-family: "Quintessential", serif;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -396,8 +404,8 @@ body {
   margin-bottom: 14px;
 }
 .og-text-body {
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+  font-family: "Quintessential", serif;
+  font-size: 16px;
   font-weight: 300;
   line-height: 1.8;
   color: rgba(255,255,255,0.65);
@@ -420,12 +428,12 @@ body {
   width: 100%;
 }
 .og-profile-p {
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
+  font-family: "Quintessential", serif;
+  font-size: 20px;
   font-weight: 300;
-  line-height: 1.9;
+  line-height: 1.5;
   color: rgba(255, 255, 255, 0.65);
-  letter-spacing: 0.2px;
+  letter-spacing: 0.35px;
   margin: 0 0 20px 0;
 }
 .og-profile-contact {
@@ -437,8 +445,8 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .og-profile-contact-label {
-  font-family: "Inter", sans-serif;
-  font-size: 10px;
+  font-family: "Quintessential", serif;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -446,8 +454,8 @@ body {
   margin-bottom: 6px;
 }
 .og-profile-contact a {
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+  font-family: "Quintessential", serif;
+  font-size: 16px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
@@ -473,8 +481,8 @@ body {
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.15);
   color: white;
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+  font-family: "Quintessential", serif;
+  font-size: 16px;
   padding: 10px 12px;
   border-radius: 2px;
   outline: none;
@@ -489,8 +497,8 @@ body {
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.3);
   color: white;
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+  font-family: "Quintessential", serif;
+  font-size: 16px;
   letter-spacing: 1px;
   text-transform: uppercase;
   padding: 8px 20px;
@@ -509,7 +517,7 @@ body {
    ===================== */
 @media (max-width: 768px) {
   .splide {
-    margin-top: 100px;
+    margin-top: 60px;
     margin-left: 50%;
     transform: translateX(-50%);
     width: 90vw;
@@ -553,50 +561,3 @@ body {
     font-size: 14px;
   }
 }
-
-
-/* =====================
-   FORMULAIRE DE CONTACT
-   ===================== */
-.og-contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 24px;
-  max-width: 480px;
-}
-.og-contact-form input,
-.og-contact-form textarea {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: white;
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
-  padding: 10px 12px;
-  border-radius: 2px;
-  outline: none;
-  resize: vertical;
-}
-.og-contact-form input:focus,
-.og-contact-form textarea:focus {
-  border-color: rgba(255,255,255,0.4);
-}
-.og-contact-form button {
-  align-self: flex-start;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 8px 20px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.og-contact-form button:hover {
-  background: rgba(255,255,255,0.2);
-}
-.og-contact-status { font-size: 12px; margin: 0; min-height: 14px; }
-.og-contact-status--ok  { color: #7ee787; }
-.og-contact-status--err { color: #ff7b7b; }
