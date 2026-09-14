@@ -696,11 +696,11 @@ document.addEventListener('DOMContentLoaded', function () {
   setInterval(updateClock, 1000);
 
   document.getElementById('pdp').addEventListener('click', function() {
-    window.open('img/cv.png', '_blank');
+    window.open('img/cv_.png', '_blank');
   });
 
   document.getElementById('pseudo').addEventListener('click', function() {
-    window.open('img/cv.png', '_blank');
+    window.open('img/cv_.png', '_blank');
   });
 
   // =====================
