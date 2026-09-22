@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   // SPLIDE INIT - CORRIGÉ
   // =====================
+  
   var splide = new Splide('.splide', {
     type: 'slide',
     perPage: 6,
@@ -145,7 +146,9 @@ document.addEventListener('DOMContentLoaded', function () {
         { src: "img/3d/foret.mp4",  caption: "Dans les bois", text: "" },
         { src: "img/3d/electromenager.mp4",  caption: "Se lever aux aurores", text: "" },
         { src: "img/3d/skelet.mp4",  caption: "Un lancer vaut mieux que deux tu l'auras", text: "" },
-        { src: "img/3d/spider.mp4",  caption: "Spider-man in Japan", text: "" }
+        { src: "img/3d/spider.mp4",  caption: "Spider-man in Japan", text: "Incrustation d'un modèle dans des vidéos prises au caméscope." },
+        { src: "img/3d/apaisant.mp4",  caption: "Apaisant", text: "Concept 3D d'un Menu principal de jeu" },
+        { src: "img/3d/toisondor.mp4",  caption: "Toison d'Or", text: "Concept 3D d'un Menu principal de jeu" }
       ]
     },
     {
@@ -696,10 +699,6 @@ document.addEventListener('DOMContentLoaded', function () {
   setInterval(updateClock, 1000);
 
   document.getElementById('pdp').addEventListener('click', function() {
-    window.open('img/cv_.png', '_blank');
-  });
-
-  document.getElementById('pseudo').addEventListener('click', function() {
     window.open('img/cv_.png', '_blank');
   });
 

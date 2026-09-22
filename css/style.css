@@ -13,6 +13,28 @@ body {
 }
 
 /* =====================
+   CURSEUR GLOBAL
+   ===================== */
+* {
+  cursor: url('../img/pointer1.png') 16 16, auto;
+}
+.splide__slide:hover,
+.splide__slide.is-active:hover,
+.og-cell:hover,.og-img:hover,
+#btn-start:hover,
+#overlay-hint:hover,
+.og-contact-form button:hover,
+a:hover,
+#pdp:hover {
+  cursor: url('../img/pointer2.png') 16 16, auto;
+}
+/* Curseur texte pour les inputs */
+.og-contact-form input,
+.og-contact-form textarea {
+  cursor: text;
+}
+
+/* =====================
    FONTS
    ===================== */
 @font-face {
@@ -74,6 +96,7 @@ body {
   background-size: cover;
   flex-shrink: 0;
 }
+
 #pseudo {
   font-family: "Quintessential", serif;
   font-size: 16px;
@@ -129,14 +152,12 @@ body {
   transform-origin: top left;
   background-color: rgba(255, 255, 255, 0);
   transition: transform 0.2s ease, opacity 0.15s ease;
-  cursor: pointer;
 }
 .splide__slide.is-active {
   border: solid white;
   transform: scale(0.9);
   margin-left: 1.3em !important;
   margin-right: -1.3em !important;
-  cursor: pointer;
 }
 .splide__slide:not(.is-active):hover {
   opacity: 0.85;
@@ -158,7 +179,6 @@ body {
   background-color: rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   pointer-events: auto;
-  cursor: pointer;
   z-index: 2;
 }
 .splide__arrow { display: none !important; }
@@ -216,7 +236,6 @@ body {
   z-index: 999;
   opacity: 0;
   transition: opacity 0.4s ease;
-  cursor: default;
 }
 #overlay.show { opacity: 1; }
 #overlay-box {
@@ -261,7 +280,6 @@ body {
   z-index: 1000;
   opacity: 0;
   transition: opacity 0.4s ease, color 0.2s ease;
-  cursor: pointer;
   padding: 0;
   border: none;
   background: none;
@@ -314,7 +332,6 @@ body {
 .og-cell {
   position: relative;
   overflow: hidden;
-  cursor: pointer;
   background: #000;
 }
 
@@ -375,7 +392,6 @@ body {
    CELLULE TEXTE
    ===================== */
 .og-cell--text {
-  cursor: default;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
   opacity: 0;
@@ -519,7 +535,6 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
   padding: 8px 20px;
-  cursor: pointer;
   transition: background 0.2s ease;
 }
 .og-contact-form button:hover {
