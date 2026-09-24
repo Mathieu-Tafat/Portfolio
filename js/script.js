@@ -108,6 +108,21 @@ document.addEventListener('DOMContentLoaded', function () {
       ]
     },
     {
+      title: "Jeux-vidéo",
+      desc: "Construct 2, Unity",
+      images: [
+        { src: "img/jeuvideo/MUR.mp4",      caption: "MUR",                                   text: "Projet de diplôme dans lequel le joueur doit finir un niveau de plateforme en s'adaptant aux changements d'interfaces. Celles-ci suivent l'évolution des interfaces et évoluent au cours du temps." },
+        { src: "img/jeuvideo/course.mp4",   caption: "-faire les courses",                    text: "Prototype de jeu où le joueur doit faire face à une série de défis." },
+        { src: "img/3d/apaisant.mp4",  caption: "Apaisant", text: "Concept 3D d'un Menu principal de jeu" },
+        { src: "img/3d/toisondor.mp4",  caption: "Toison d'Or", text: "Concept 3D d'un Menu principal de jeu" },
+        { src: "img/jeuvideo/pokemon.png",  caption: "Identité Pokemon Emeraude alternatifs",  text: "Création d'une petite identité pour des jeux alternatifs à Pokemon Emeraude de 2004." },
+        { src: "img/jeuvideo/meute.png",    caption: "Meute",                                  text: "Prototype de jeu de stratégie en grille, dans lequel il faut guider une famille de loups pour s'échapper d'un zoo." },
+        { src: "img/jeuvideo/finelame.mp4", caption: "Fine Lame",                              text: "Première version de mon projet de diplôme, plus axé action plateforme, qui est donc resté au stade de brouillon." },
+        { src: "img/motiondesign/fullanimdelta.mp4",           caption: "Pokemon Emeraude Delta", text: "Animation de lancement d'une version alternative du jeu original Pokemon Emeraude de 2004." },
+        { src: "img/motiondesign/pokemon-alpha-maintitle.mp4", caption: "Pokemon Emeraude Alpha", text: "Animation de lancement d'une version alternative du jeu original Pokemon Emeraude de 2004." }
+      ]
+    },
+    {
       title: "Edition",
       desc: "Huile de coude, suite Adobe",
       images: [
@@ -124,8 +139,6 @@ document.addEventListener('DOMContentLoaded', function () {
       desc: "Suite Adobe",
       images: [
         { src: "img/motiondesign/themachinist_final.mp4",      caption: "The Machinist",          text: "Inspirée par le film The Machinist de Brad Anderson, 2004." },
-        { src: "img/motiondesign/fullanimdelta.mp4",           caption: "Pokemon Emeraude Delta", text: "Animation de lancement d'une version alternative du jeu original Pokemon Emeraude de 2004." },
-        { src: "img/motiondesign/pokemon-alpha-maintitle.mp4", caption: "Pokemon Emeraude Alpha", text: "Animation de lancement d'une version alternative du jeu original Pokemon Emeraude de 2004." },
         { src: "img/motiondesign/load.mp4",                    caption: "FC Loading",             text: "Recréation de la loop de chargement des derniers jeux EA FC, avec une version alternative." },
         { src: "img/motiondesign/crossed.mp4",                 caption: "Crossed",                text: "Générique du programme Crossed de Karim Debbache de 2013, création de fan." }
       ]
@@ -146,20 +159,8 @@ document.addEventListener('DOMContentLoaded', function () {
         { src: "img/3d/foret.mp4",  caption: "Dans les bois", text: "" },
         { src: "img/3d/electromenager.mp4",  caption: "Se lever aux aurores", text: "" },
         { src: "img/3d/skelet.mp4",  caption: "Un lancer vaut mieux que deux tu l'auras", text: "" },
-        { src: "img/3d/spider.mp4",  caption: "Spider-man in Japan", text: "Incrustation d'un modèle dans des vidéos prises au caméscope." },
-        { src: "img/3d/apaisant.mp4",  caption: "Apaisant", text: "Concept 3D d'un Menu principal de jeu" },
-        { src: "img/3d/toisondor.mp4",  caption: "Toison d'Or", text: "Concept 3D d'un Menu principal de jeu" }
-      ]
-    },
-    {
-      title: "Jeux-vidéo",
-      desc: "Construct 2, Unity",
-      images: [
-        { src: "img/jeuvideo/MUR.mp4",      caption: "MUR",                                   text: "Projet de diplôme dans lequel le joueur doit finir un niveau de plateforme en s'adaptant aux changements d'interfaces. Celles-ci suivent l'évolution des interfaces et évoluent au cours du temps." },
-        { src: "img/jeuvideo/course.mp4",   caption: "-faire les courses",                    text: "Prototype de jeu où le joueur doit faire face à une série de défis." },
-        { src: "img/jeuvideo/pokemon.png",  caption: "Identité Pokemon Emeraude alternatifs",  text: "Création d'une petite identité pour des jeux alternatifs à Pokemon Emeraude de 2004." },
-        { src: "img/jeuvideo/meute.png",    caption: "Meute",                                  text: "Prototype de jeu de stratégie en grille, dans lequel il faut guider une famille de loups pour s'échapper d'un zoo." },
-        { src: "img/jeuvideo/finelame.mp4", caption: "Fine Lame",                              text: "Première version de mon projet de diplôme, plus axé action plateforme, qui est donc resté au stade de brouillon." }
+        { src: "img/3d/spider.mp4",  caption: "Spider-man in Japan", text: "Incrustation d'un modèle dans des vidéos prises au caméscope." }
+        
       ]
     },
     {
@@ -446,6 +447,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     overlayContent.querySelectorAll('.og-cell').forEach(cell => {
       attachCellHover(cell);
+      
       const media = cell.querySelector('video, img');
       if (!media) return;
       if (media.tagName === 'VIDEO') {
