@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { src: "img/jeuvideo/course.mp4",   caption: "-faire les courses",                    text: "Prototype de jeu où le joueur doit faire face à une série de défis." },
         { src: "img/3d/apaisant.mp4",  caption: "Apaisant", text: "Concept 3D d'un Menu principal de jeu" },
         { src: "img/3d/toisondor.mp4",  caption: "Toison d'Or", text: "Concept 3D d'un Menu principal de jeu" },
+        { src: "img/3d/class.mp4",  caption: "αιεαRELICTAεςτ", text: "Concept 3D d'un Menu principal de jeu" },
         { src: "img/jeuvideo/pokemon.png",  caption: "Identité Pokemon Emeraude alternatifs",  text: "Création d'une petite identité pour des jeux alternatifs à Pokemon Emeraude de 2004." },
         { src: "img/jeuvideo/meute.png",    caption: "Meute",                                  text: "Prototype de jeu de stratégie en grille, dans lequel il faut guider une famille de loups pour s'échapper d'un zoo." },
         { src: "img/jeuvideo/finelame.mp4", caption: "Fine Lame",                              text: "Première version de mon projet de diplôme, plus axé action plateforme, qui est donc resté au stade de brouillon." },
@@ -159,8 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { src: "img/3d/foret.mp4",  caption: "Dans les bois", text: "" },
         { src: "img/3d/electromenager.mp4",  caption: "Se lever aux aurores", text: "" },
         { src: "img/3d/skelet.mp4",  caption: "Un lancer vaut mieux que deux tu l'auras", text: "" },
-        { src: "img/3d/spider.mp4",  caption: "Spider-man in Japan", text: "Incrustation d'un modèle dans des vidéos prises au caméscope." }
-        
+        { src: "img/3d/spider.mp4",  caption: "Spider-man in Japan", text: "Incrustation d'un modèle dans des vidéos prises au caméscope." }        
       ]
     },
     {
