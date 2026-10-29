@@ -9,12 +9,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const PROJECT_PLACEHOLDER_COUNT = 1;
 
   // Flottement des slides (desktop uniquement) : petite simulation "dans l'espace"
-  const FLOAT_ROAM_X        = 1;     // part de l'écran explorable en largeur (1 = tout l'écran, 0 = reste en place)
-  const FLOAT_ROAM_Y        = 1;     // part de l'écran explorable en hauteur
-  const FLOAT_SPEED_X       = 0.35;  // vitesse de croisière horizontale (px par image)
-  const FLOAT_SPEED_Y       = 0.30;  // vitesse de croisière verticale
-  const FLOAT_GOAL_MIN      = 4000;  // ms mini avant de choisir une nouvelle destination
-  const FLOAT_GOAL_MAX      = 11000; // ms maxi
+  const FLOAT_CELL_ROAM     = 0.5;   // part de sa case que chaque slide explore (0 = immobile, 1 = toute la case)
+  const FLOAT_SPEED_X       = 0.10;  // vitesse de croisière horizontale (px par image) : faible = les slides bougent peu d'elles-mêmes
+  const FLOAT_SPEED_Y       = 0.09;  // vitesse de croisière verticale
+  const FLOAT_GOAL_MIN      = 8000;  // ms mini avant de choisir une nouvelle destination
+  const FLOAT_GOAL_MAX      = 20000; // ms maxi
+  const FLOAT_HOME_PULL     = 0.0008;// rappel vers sa case quand une slide s'en éloigne trop (pour rester bien répartie)
+  const FLOAT_HOME_DAMP     = 0.03;  // freinage pendant ce rappel
   const FLOAT_MOUSE_RANGE   = 520;   // px, distance à laquelle le mouvement de la souris remue les slides
   const FLOAT_STIR          = 0.02;  // force avec laquelle la souris remue les slides (dans leur propre direction, sans les suivre)
   const FLOAT_DAMP          = 0.008; // frottement : très faible = les slides gardent leur élan, comme en apesanteur
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Cibles qui se baladent (img/cible.png) : un clic les fait tomber, d'autres clics les relancent
   const TARGET_IMG         = 'img/cible.png';
-  const TARGET_COUNT       = 3;
+  const TARGET_COUNT       = 1;     // nombre de cibles à la fois (une seule : quand elle sort de l'écran, une autre tombe)
   const TARGET_SIZE_MIN    = 44;    // px
   const TARGET_SIZE_MAX    = 84;    // px
   const TARGET_GRAVITY     = 0.5;   // chute
@@ -45,8 +46,21 @@ document.addEventListener('DOMContentLoaded', function () {
   const TARGET_BOUNCE      = 0.55;  // rebond sur le sol (bandeau du bas)
   const TARGET_REST_MS     = 3500;  // au sol sans bouger : elle se remet à flotter
 
+  // Intro : taille de "graphiste 2d et 3d" par rapport au nom (son espacement s'ajuste pour faire la même largeur)
+  const INTRO_SUB_RATIO    = 0.4;
+
+  // Chauffe des vidéos en arrière-plan pendant la question du prénom : nombre de vidéos téléchargées en même temps
+  const WARM_CONCURRENCY   = 2;
+
+  // Grille des projets : hauteur maximale d'une cellule par rapport à sa largeur (1 = carré).
+  // Les images/vidéos verticales plus hautes que ça sont recadrées au centre dans la grille
+  // (elles restent entières dans la vue projet).
+  const GRID_MAX_RATIO = 1.1;
+
   // Vidéos des slides : cadence affichée (images par seconde). 0 = fluide / désactivé.
   const ICON_VIDEO_FPS = 15;
+  // true : seule la slide active joue sa vidéo, les autres restent figées (beaucoup plus léger)
+  const ICON_ONLY_ACTIVE = true;
 
   // Fond animé
   const BG_DARKEN        = 0.3;  // assombrissement du fond (0 = aucun, 0.6 = très sombre)
@@ -71,6 +85,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const lite         = isTouch || reduceMotion;
 
+  // "Site optimisé" (bouton en haut) : version sobre, sans animation ni effet, qui ne rame pas.
+  // Le choix est mémorisé entre les visites.
+  let liteMode = false;
+  try { liteMode = localStorage.getItem('lite') === '1'; } catch (err) {}
+  document.documentElement.classList.toggle('lite-mode', liteMode);
+
   const rand = (a, b) => a + Math.random() * (b - a);
 
   function esc(s) {
@@ -83,8 +103,36 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   const intro = document.createElement('div');
   intro.id = 'intro';
-  intro.innerHTML = '<div id="intro-name"><span class="intro-big">Mathieu TAFAT</span><span class="intro-sub">graphiste 2d &amp; 3d</span></div>';
+  intro.innerHTML = '<div id="intro-name"><span class="intro-big">Mathieu Tafat</span><span class="intro-sub">graphiste 2d et 3d</span></div>';
   document.body.appendChild(intro);
+
+  // Nom = 86 % de la largeur d'écran ; la ligne du dessous est étalée pour faire exactement la même largeur
+  function fitIntro() {
+    if (!intro.isConnected) return;
+    const big = intro.querySelector('.intro-big'), sub = intro.querySelector('.intro-sub');
+    if (!big || !sub) return;
+    const target = Math.min(window.innerWidth * 0.86, 1500);
+    big.style.fontSize = '100px';
+    big.style.fontSize = (100 * target / big.getBoundingClientRect().width).toFixed(2) + 'px';
+    const nameW = big.getBoundingClientRect().width;
+    sub.style.letterSpacing = '0px';
+    sub.style.marginRight = '0px';
+    sub.style.fontSize = (parseFloat(big.style.fontSize) * INTRO_SUB_RATIO).toFixed(2) + 'px';
+    let natural = sub.getBoundingClientRect().width;
+    if (natural > nameW * 0.9) {   // police plus large que prévu : on la réduit pour garder de l'espace entre les lettres
+      sub.style.fontSize = (parseFloat(sub.style.fontSize) * nameW * 0.9 / natural).toFixed(2) + 'px';
+      natural = sub.getBoundingClientRect().width;
+    }
+    const ls = (nameW - natural) / (sub.textContent.length - 1);
+    sub.style.letterSpacing = ls.toFixed(2) + 'px';
+    sub.style.marginRight = (-ls).toFixed(2) + 'px';   // le dernier espacement ne compte pas
+  }
+  fitIntro();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitIntro);
+  if (document.fonts && document.fonts.load) {   // on réajuste dès que les deux polices sont réellement chargées
+    Promise.all([document.fonts.load('800 20px Jost'), document.fonts.load('20px Quintessential')]).then(fitIntro).catch(() => {});
+  }
+  window.addEventListener('resize', fitIntro);
 
   const splideElIntro = document.querySelector('.splide');
   const topbarIntro   = document.getElementById('topbar');
@@ -189,10 +237,19 @@ document.addEventListener('DOMContentLoaded', function () {
       }, { threshold: 0.25 })
     : null;
 
-  function watchVideo(v) { if (videoObserver) videoObserver.observe(v); }
+  function watchVideo(v) { if (liteMode) return; if (videoObserver) videoObserver.observe(v); }
 
   const splideVideos = Array.from(document.querySelectorAll('video.splide-bg-video'));
-  splideVideos.forEach(watchVideo);
+
+  // seule la slide active joue sa vidéo (ou toutes si ICON_ONLY_ACTIVE = false) ; rien en mode optimisé
+  function syncIconVideos() {
+    if (liteMode || overlayOpen) { splideVideos.forEach(v => v.pause()); return; }
+    splideVideos.forEach(v => {
+      const on = !ICON_ONLY_ACTIVE || v.parentElement.classList.contains('is-active');
+      if (on) { const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); } else v.pause();
+    });
+  }
+  splide.on('move', function() { setTimeout(syncIconVideos, 30); });
 
   // =====================
   // VIDÉOS DES SLIDES : vitesse (barre globale × accélération au survol)
@@ -231,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
       requestAnimationFrame(drawIcons);
       if (ts - lastIcon < 1000 / ICON_VIDEO_FPS) return;
       lastIcon = ts;
-      if (overlayOpen || document.hidden) return;
+      if (overlayOpen || liteMode || document.hidden) return;
       iconPairs.forEach(p => {
         const v = p.v;
         if (v.readyState < 2 || v.paused || !v.videoWidth) return;
@@ -251,291 +308,290 @@ document.addEventListener('DOMContentLoaded', function () {
   // (affichés dans la vue "projet en grand", suivis de la slide de texte).
   // Sans "medias", on utilise le média principal (src) répété PROJECT_PLACEHOLDER_COUNT fois.
   // =====================
-
-const SLIDE_DATA = [
-  {
-    title: "Profil",
-    navLabel: "Profil & Contact",
-    jp: "プロフィール",
-    profile: true,
-    text: "Graphiste 2D et 3D, diplômé en 2025 d'une Licence Professionnelle en Design Graphique. Je m'intéresse à des domaines variés, de l'identité visuelle à l'édition, en passant par le motion design, l'animation 3D et le jeu vidéo. J'aime explorer de nouvelles techniques et apprendre à utiliser les outils adaptés à chaque projet.\n\nLa culture, le cinéma et le jeu vidéo nourrissent mon travail, mais j'apprécie aussi de découvrir de nouveaux univers et de sortir de mes habitudes.\n\nJe suis ouvert aux projets et aux collaborations : n'hésitez pas à me contacter."
-  },
-  {
-    title: "Service Communication Université Rennes 2",
-    navLabel: "Service communication",
-    jp: "レンヌ2",
-    desc: "Suite Adobe",
-    images: [
-      {
-        src: "img/stagerennes2/recherche/recherche.png",
-        caption: "Journée de la Recherche 2025",
-        text: "Après plusieurs années sans édition, la Journée de la Recherche faisait son retour autour du thème « Recherche en société ». Le brief consistait à proposer une identité qui rende la recherche plus accessible, sans reprendre les codes scientifiques habituels. J'ai travaillé sur une ligature typographique reliant les mots et sur un fond bleu animé par des ondes multicolores, pour évoquer les échanges entre recherche et société. J'ai également posé un principe pour les éditions suivantes : renouveler le travail typographique chaque année tout en conservant une identité reconnaissable. J'ai réalisé les déclinaisons sur différents supports : affiches, réseaux sociaux, diaporama et brochure."
-      },
-      {
-        src: "img/stagerennes2/campusweek/campus.png",
-        caption: "Campus Week 2025",
-        text: "La Campus Week est une semaine de rentrée consacrée à la vie étudiante de Rennes 2. Je voulais représenter cette communauté à travers une multitude de petits personnages, inspirés des dessins que je réalisais plus jeune, vivant ensemble sur l'affiche. Plutôt que de contourner le cartouche « Campus Week », contrainte importante de la composition, j'ai choisi de l'intégrer au visuel. Le projet a ensuite été décliné sur de nombreux supports : brochure, plan, réseaux sociaux, site internet et goodies."
-      },
-      {
-        src: "img/stagerennes2/olympe/olymp.png",
-        caption: "Olymp'in Fac 2025",
-        text: "À partir du logo existant et d'une direction graphique définie avec le graphiste du service, j'ai conçu une affiche pour cet événement sportif étudiant. Je me suis orienté vers une esthétique inspirée du mouvement Memphis, avec des motifs simples associés aux différentes disciplines et des espaces dédiés aux informations pratiques. J'ai réalisé une affiche classique ainsi qu'une version au format pantalon."
-      },
-      {
-        src: "img/stagerennes2/anim.mp4",
-        caption: "Congrès SFSIC 2025",
-        text: "Animation réalisée pour le congrès de la SFSIC à partir des totems graphiques conçus par le graphiste du service. J'ai animé les motifs image par image dans Illustrator, en déplaçant progressivement leurs éléments d'une frame à l'autre. Un exercice de mise en mouvement d'une identité existante, que je réaliserais aujourd'hui différemment, notamment avec Blender."
-      },
-      {
-        src: "img/stagerennes2/cartel.png",
-        caption: "Cartels SFSIC 2025",
-        text: "Conception de plusieurs gabarits de cartels destinés à accompagner les contenus présentés lors du congrès de la SFSIC. Le travail consistait à reprendre les couleurs, les typographies et les totems de l'identité de l'événement pour créer des supports lisibles et cohérents avec l'ensemble de la communication."
-      },
-      {
-        src: "img/stagerennes2/planegalite.png",
-        caption: "Plan Action Égalité 2025-2028",
-        text: "Mise en page de verbatims rapportant des propos problématiques entendus sur le campus, dans le cadre du plan d'action Égalité de Rennes 2. L'objectif était de faire ressortir la violence de ces paroles par une disposition dynamique des textes. J'ai réalisé la structure de mise en page à partir d'une sélection de typographies, tandis que le graphiste responsable du document a défini le traitement esthétique final."
-      }
-    ]
-  },
-  {
-    title: "Jeux-vidéo",
-    jp: "ビデオゲーム",
-    desc: "Construct 2, Unity",
-    images: [
-      {
-        src: "img/jeuvideo/MUR.mp4",
-        caption: "MUR",
-        text: "Développé en parallèle de mon mémoire « Barre de vie », MUR est un jeu de plateforme en 2D qui explore l'évolution des interfaces de jeu vidéo. Au cours d'une même partie, l'interface se transforme et devient une composante du gameplay. Le projet interroge la place de ces éléments : jusqu'où peut-on alléger une interface sans perdre les informations nécessaires au jeu ? À l'inverse, que se passe-t-il lorsqu'elle devient envahissante ? J'ai voulu en faire un terrain d'expérimentation, où l'on peut explorer ces extrêmes tout en jouant."
-      },
-      {
-        src: "img/jeuvideo/course.mp4",
-        caption: "-faire les courses",
-        text: "Mon premier jeu en 3D réalisé avec Unity. Le joueur se lève et part faire les courses, mais croise en chemin un personnage qui le met au défi. Le jeu enchaîne alors plusieurs mini-jeux imaginés autour de cette situation quotidienne. Le projet est resté court et expérimental, mais m'a permis d'explorer différentes idées de gameplay et de m'amuser à créer des défis originaux."
-      },
-      {
-        src: "img/3d/apaisant.mp4",
-        caption: "Apaisant",
-        text: "Concept de menu principal en 3D pour un jeu d'exploration à l'atmosphère sombre et calme. Dans un environnement à mi-chemin entre forêt et zone industrielle abandonnée, le joueur doit trouver une issue après être tombé en panne d'essence. L'idée est de créer une tension par l'absence de menace visible : les sons de la nature, le silence et la possibilité qu'une présence se rapproche suffisent à installer le doute."
-      },
-      {
-        src: "img/3d/toisondor.mp4",
-        caption: "Toison d'Or",
-        text: "Concept de menu principal en 3D pour un jeu inspiré de la mythologie et des lieux sacrés. Dans un environnement très lumineux, épuré et mystique, le joueur aurait pour objectif de récupérer un objet légendaire en surmontant différentes épreuves, à travers des mécaniques de plateforme ou d'énigmes. Une ambiance musicale douce, ponctuée d'éléments étranges, viendrait troubler cette apparente sérénité."
-      },
-      {
-        src: "img/3d/class.mp4",
-        caption: "αιεαRELICTAεςτ",
-        text: "Concept de menu principal en 3D pour un jeu de rôle inspiré du quotidien en milieu scolaire. Derrière cette apparence familière, tout semble jouer contre le personnage : gestion des relations, temps d'étude et événements imprévus compliquent progressivement sa progression vers l'obtention du diplôme. J'imagine un mélange de RPG et de roguelite dans lequel chaque choix compte et où les obstacles deviennent de plus en plus difficiles à surmonter."
-      },
-      {
-        src: "img/jeuvideo/pokemon.png",
-        caption: "Identités Pokémon Émeraude alternatives",
-        text: "Projet personnel imaginant deux éditions alternatives de Pokémon Émeraude (2004), sur le principe de versions d'un même jeu présentant des différences graphiques et thématiques. Émeraude Delta s'inspire des ruines, de l'archéologie et des légendes anciennes, tandis qu'Émeraude Alpha explore un univers plus lumineux, idéal et presque divin. J'ai décliné ces deux directions à travers les jaquettes, les cartouches, les animations de lancement et une page de magazine inspirée des publications de l'époque."
-      },
-      {
-        src: "img/jeuvideo/meute.png",
-        caption: "Meute",
-        text: "Projet personnel de jeu de stratégie sur grille. Le joueur contrôle une famille de loups vivant dans un zoo-refuge et qui cherche à s'en échapper pour partir en vacances. Chaque membre de la meute possède ses propres caractéristiques et capacités, ce qui permet d'imaginer différentes manières de franchir les obstacles et d'éviter les gardes. J'ai choisi une palette bleu et jaune, inspirée de la vision des loups, et exploré plusieurs écrans de jeu ainsi qu'une boîte imprimée et assemblée à la main. Le projet est resté au stade de l'expérimentation, avec l'envie d'imaginer un jeu de stratégie accessible à plusieurs personnes."
-      },
-      {
-        src: "img/jeuvideo/finelame.mp4",
-        caption: "Fine Lame",
-        text: "Première version de mon projet de diplôme, Fine Lame était un jeu de plateforme dans lequel on incarnait un samouraï cherchant à devenir le plus fort, avec une inspiration tirée du livre Musashi. J'ai développé les dessins, les animations, une typographie et un système d'éclairage sous Construct 2, avec la musique composée par un ami. Malgré le travail engagé sur ce projet, j'ai finalement choisi de m'orienter vers une approche plus expérimentale avec MUR, davantage en lien avec mon sujet de recherche."
-      },
-      {
-        src: "img/motiondesign/fullanimdelta.mp4",
-        caption: "Pokémon Émeraude Delta",
-        text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). Cette version explore un univers tourné vers les ruines, l'archéologie et les légendes anciennes, avec une identité inspirée des vestiges d'un monde oublié."
-      },
-      {
-        src: "img/motiondesign/pokemon-alpha-maintitle.mp4",
-        caption: "Pokémon Émeraude Alpha",
-        text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). À l'opposé de Delta, cette version explore une esthétique lumineuse et idéale, entre nature, perfection et imagerie divine."
-      }
-    ]
-  },
-  {
-    title: "Edition",
-    jp: "エディトリアル",
-    desc: "Huile de coude, suite Adobe",
-    images: [
-      {
-        src: "img/edition/barre2vie.png",
-        caption: "Barre de vie",
-        text: "Mémoire de recherche consacré aux interfaces utilisateur des jeux vidéo japonais des années 1980 et 1990, jusqu'à l'arrivée de la 3D. J'y étudie leur définition, les contraintes techniques de l'époque, les typographies employées et l'évolution des codes graphiques à travers de nombreux jeux auxquels j'ai joué et dont j'ai analysé les interfaces. Une étude de cas sur la saga The Legend of Zelda permet d'approfondir cette évolution. J'aborde également les changements liés à l'arrivée de la 3D et les attentes actuelles en matière d'interface, notamment à travers un sondage mené auprès d'étudiant·es en arts, de la licence au master, et de membres du corps enseignant de Rennes 2. Pour l'édition, j'ai conçu une bichromie cyan et rouge ainsi qu'un système de lecture à deux niveaux : les images de jeu sont visibles au premier abord, tandis que le texte apparaît lorsque l'on soulève la page de droite. J'ai réalisé une version classique et une version à couverture rigide accompagnée d'un CD regroupant des émulateurs et les jeux testés. Un PDF du mémoire peut être fourni sur demande."
-      },
-      {
-        src: "img/edition/mur.png",
-        caption: "MUR - livret",
-        text: "Livret conçu en complément de mon jeu MUR, inspiré des livrets fournis avec les jeux Nintendo DS. Je voulais retrouver le plaisir de découvrir un jeu en lisant son livret, en présentant son fonctionnement, ses commandes et son univers. J'ai également créé les éléments typographiques et graphiques du document. Pour rester cohérent avec le jeu, le livret suit la même logique d'évolution de l'interface : plus on avance, moins celle-ci occupe de place."
-      },
-      {
-        src: "img/edition/lyber.png",
-        caption: "Lyber & CSS",
-        text: "Workshop de Licence Professionnelle mené avec le collectif Luuse. À partir d'un lyber, une version gratuite d'un livre diffusée en ligne sans mise en page, nous devions concevoir une édition en utilisant le codage HTML/CSS. J'ai pris en charge l'essentiel du développement, étant le plus à l'aise avec le code, tout en participant à une réflexion collective sur la direction graphique et en répartissant les rôles au sein du groupe. Le livre portant sur Emmanuel Macron et sa politique, nous avons développé une esthétique inspirée de la communication politique et de la polarisation entre droite et gauche."
-      },
-      {
-        src: "img/edition/reggae.png",
-        caption: "Reggaeton & Fin du Monde",
-        text: "Fanzine réalisé en binôme autour du thème « Reggaeton & Fin du Monde », avec des contraintes de photocopie et de collage. Nos approches étaient différentes mais complémentaires : je développais les idées autour de la fin du monde, tandis que mon binôme apportait davantage de références au reggaeton. Le résultat cherche un équilibre entre ces deux univers. Ce projet a surtout été une expérience de collaboration, qui m'a appris à confronter des idées différentes, à partager mes doutes et à construire une proposition commune."
-      },
-      {
-        src: "img/edition/1173.png",
-        caption: "117³ - Exposition",
-        text: "Affiche et supports de communication réalisés dans le cadre d'un workshop de Licence 2 Arts Plastiques consacré à la curation et à l'exposition collective des travaux des étudiant·es. Chargé de l'affiche après avoir exprimé mon intérêt pour le graphisme, j'ai travaillé avec le groupe pour construire une proposition commune. Le titre 117³ faisait référence au temps passé dans notre atelier durant une semaine, et j'ai choisi de représenter ce nombre par une photographie de la porte de l'atelier, vidée de son contenu. Le délai très court et la diversité des avis ont imposé de faire des choix pour aboutir à une composition cohérente. J'ai également réalisé des supports de promotion, notamment un flyer et des visuels pour les réseaux sociaux."
-      },
-      {
-        src: "img/edition/flipbook/flipe.mp4",
-        caption: "E - Flipbook",
-        text: "Flipbook explorant l'évolution de la lettre « E » à travers différentes grandes catégories typographiques. Le projet m'a amené à concevoir un objet éditorial à la fois robuste et suffisamment souple pour permettre une manipulation répétée. La principale contrainte était de garantir le bon fonctionnement du feuilletage et la lisibilité des transformations. Le flipbook a été exposé au Cabinet du livre d'artiste de Rennes 2."
-      }
-    ]
-  },
-  {
-    title: "Animation 2D",
-    jp: "2Dアニメーション",
-    desc: "Suite Adobe",
-    images: [
-      {
-        src: "img/motiondesign/themachinist_final.mp4",
-        caption: "The Machinist",
-        text: "Animation inspirée du film The Machinist de Brad Anderson (2004). Je voulais retrouver cette impression que quelque chose ne tourne pas rond, dans un quotidien sombre et nihiliste où une présence mystérieuse semble perturber la vie du personnage. Je me suis notamment appuyé sur l'atmosphère de certaines scènes du film, dont celle de la salle de bain, pour construire un univers visuel inquiétant."
-      },
-      {
-        src: "img/motiondesign/load.mp4",
-        caption: "FC Loading",
-        text: "Recréation de l'animation de chargement des jeux EA SPORTS FC, que je croise régulièrement en jouant. Le projet était un défi personnel : reproduire cette boucle tout en imaginant une variante du logo dans un style inspiré des jeux vidéo rétro, à partir de petites versions alternatives que j'avais déjà explorées."
-      },
-      {
-        src: "img/motiondesign/crossed.mp4",
-        caption: "Crossed",
-        text: "Générique de fan imaginé pour Crossed, l'émission de Karim Debbache consacrée aux adaptations de jeux vidéo au cinéma. Après avoir revu l'émission, j'ai voulu proposer ma propre animation autour de son titre. J'ai choisi une interprétation littérale du mot « Crossed », sans chercher à développer une signification supplémentaire, en m'appuyant sur une musique existante qui n'a pas été composée pour ce projet."
-      }
-    ]
-  },
-  {
-    title: "Animations 3D",
-    jp: "3Dアニメーション",
-    desc: "Blender, Suite Adobe",
-    images: [
-      {
-        src: "img/3d/clerbar.mp4",
-        caption: "CLEBART",
-        text: "Première animation réalisée sur Blender. J'ai construit une scène nocturne à partir de quelques images utilisées comme éléments de décor et d'un travail d'éclairage pour installer une ambiance sombre, dans un coin de village. L'arrivée d'un personnage, le clebard, vient soudainement rompre cette atmosphère et créer un décalage."
-      },
-      {
-        src: "img/3d/loubart.mp4",
-        caption: "LOUBART",
-        text: "Dans la continuité de CLEBART, cette animation joue sur le contraste entre un décor nocturne inquiétant et l'arrivée inattendue d'un personnage, Loubart. Je voulais retrouver cette ambiance sombre et mystérieuse, puis la désamorcer par l'apparition de cet élément décalé."
-      },
-      {
-        src: "img/3d/surplace.mp4",
-        caption: "SUR PLACE OU À EMPORTER",
-        text: "Animation construite autour d'un contraste entre décor et personnage. J'ai imaginé un diner américain vide, froid et presque entièrement blanc, avant d'y introduire un iguane qui parle. Le décalage entre l'environnement et cette apparition constitue le point de départ de la scène.",
-        vertical: true
-      },
-      {
-        src: "img/3d/backroom.mp4",
-        caption: "PERDU",
-        text: "Inspirée des Backrooms, cette animation explore un environnement vide et dérangeant, dans lequel j'ai choisi d'introduire un T-Rex. Plutôt que d'en faire une menace, je voulais jouer sur le contraste entre l'imaginaire inquiétant des lieux et la présence presque anodine du dinosaure."
-      },
-      {
-        src: "img/3d/chambre.mp4",
-        caption: "DESERTEUR",
-        text: "Avec cette animation, j'ai voulu aller au-delà de mes premières scènes en vue subjective en travaillant plusieurs angles de caméra. De petits soldats y préparent leur évasion, mais l'un d'eux finit par être considéré comme un déserteur. Le projet détourne l'imaginaire des jouets et des films comme Toy Story pour raconter une petite histoire à travers la mise en scène."
-      },
-      {
-        src: "img/3d/finalmente.mp4",
-        caption: "*",
-        text: "Animation mettant en scène un personnage qui part faire ses courses dans un univers étrange et peu rassurant. Il traverse des lieux lugubres et une maison en désordre, sans jamais sembler acheter quoi que ce soit d'essentiel. Le contraste entre le calme apparent du personnage et l'atmosphère tendue des décors laisse volontairement une part d'incertitude sur ce qui se passe."
-      },
-      {
-        src: "img/3d/bombe.mp4",
-        caption: "BOMBE",
-        text: "Clip 3D imaginé à partir du morceau « Bombe » de Yoa. J'avais envie de mettre cette musique en images en reprenant littéralement ses paroles. La mise en scène s'organise ainsi autour de la représentation d'un larguage de bombe."
-      },
-      {
-        src: "img/3d/rue.mp4",
-        caption: "UN PEU DE RETENUE",
-        text: "Animation 3D inspirée du morceau « Un peu de retenue » de Théodort. Plutôt que d'illustrer directement les paroles, j'ai imaginé une ambiance nocturne et froide : une rue traversée en boucle par un chat, tandis que l'on entend des personnes rire derrière les fenêtres. Le contraste entre l'extérieur solitaire et la chaleur suggérée des intérieurs donne son atmosphère à la scène."
-      },
-      {
-        src: "img/3d/cuir.mp4",
-        caption: "どこか",
-        text: "Animation d'exploration inspirée des Backrooms. La caméra avance dans des espaces vides, contrainte de suivre un chemin dont chaque angle pourrait dissimuler quelque chose. Pourtant, rien n'apparaît. Je voulais travailler sur cette peur de l'inconnu et sur l'absence de menace visible, en laissant le vide et l'anticipation créer l'inquiétude."
-      },
-      {
-        src: "img/3d/foret.mp4",
-        caption: "Dans les bois",
-        text: "Exploration 3D d'une forêt lumineuse et mystique, pensée comme un lieu dans lequel on aurait envie de se promener. Le personnage y ramasse progressivement des objets, comme dans un jeu de survie ou un RPG. Mon objectif était de créer un environnement forestier crédible et accueillant, en travaillant l'atmosphère et l'envie d'explorer."
-      },
-      {
-        src: "img/3d/electromenager.mp4",
-        caption: "Se lever aux aurores",
-        text: "À l'origine, je voulais recréer l'atmosphère d'un grand magasin de meubles vide, en m'inspirant de mon expérience de travail dans ce type de magasin. Le projet s'est finalement concentré sur une seule pièce dans laquelle un personnage se réveille. L'ambiance devient progressivement angoissante, sans explication claire, dans la continuité de l'univers étrange développé dans mon animation « * »."
-      },
-      {
-        src: "img/3d/skelet.mp4",
-        caption: "Un lancer vaut mieux que deux tu l'auras",
-        text: "Courte animation 3D mettant en scène un squelette qui jongle avec une seule balle."
-      },
-      {
-        src: "img/3d/spider.mp4",
-        caption: "Spider-man in Japan",
-        text: "À partir de mes propres vidéos tournées au caméscope au Japon, j'ai voulu imaginer que Spider-Man s'était invité dans mes images de voyage. Le projet était un défi technique autour de l'animation et de l'incrustation d'un personnage 3D dans des prises de vues réelles. Les résultats varient selon les plans, mais l'ensemble m'a permis d'expérimenter l'intégration d'un élément virtuel dans des images filmées."
-      },
-      {
-        src: "img/3d/mouche.mp4",
-        caption: "MOUCHE",
-        text: "Animation suivant le périple nocturne d'une mouche dans une chambre."
-      }
-    ]
-  },
-  {
-    title: "Illustrations",
-    jp: "イラストレーション",
-    desc: "Huile, aquarelle et illustrations",
-    images: [
-       {
-        src: "img/mechanoid.png",
-        caption: "mechanoid",
-        text: "Cover d'une musique du compositeur Papri-K. Illustration digitale réalisée à partir des envies de l'artiste."
-      },
-      {
-        src: "img/ctrl.png",
-        caption: "CTRL",
-        text: "Cover d'une musique du compositeur Papri-K. Scène 3D rendue comme une illustrration, réalisée à partir des envies de l'artiste."
-      },
-      {
-        src: "img/avatar.png",
-        caption: "I See You, Son",
-        text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
-      },
-      {
-        src: "img/darthvader.png",
-        caption: "Anakin",
-        text: "Illustration digitale à partir d'une scène de la série Star Wars : Obi-Wan"
-      },
-      {
-        src: "img/aquarelles/1.png",
-        caption: "Aquarelles Normandes",
-        text: "Série d'aquarelles réalisées à partir de lieux visités en Normandie. Ces peintures sont une manière de conserver une trace de ces endroits et d'en retranscrire les paysages à travers la couleur et l'aquarelle."
-      },
-      {
-        src: "img/aquarelles/video.mp4",
-        caption: "Exposition",
-        text: "Exposition personnelle d'un mois consacrée à mes aquarelles, présentées en grand format A3 à l'espace La Passerelle de Theix-Noyalo, en juin 2024. Ce projet m'a permis de présenter mon travail pictural dans un espace d'exposition.",
-        vertical: true
-      },
-      {
-        src: "img/aquarelles/huile.png",
-        caption: "Huile sur toile",
-        text: "Peinture à l'huile représentant un paysage. Il s'agit de ma première expérimentation avec cette technique, une occasion de découvrir les possibilités de la peinture à l'huile et son approche différente de la couleur et de la matière."
-      }
-    ]
-  }
-];
+  const SLIDE_DATA = [
+    {
+      title: "Profil",
+      navLabel: "Profil & Contact",
+      jp: "プロフィール",
+      profile: true,
+      text: "Graphiste 2D et 3D, diplômé en 2025 d'une Licence Professionnelle en Design Graphique. Je m'intéresse à des domaines variés, de l'identité visuelle à l'édition, en passant par le motion design, l'animation 3D et le jeu vidéo. J'aime explorer de nouvelles techniques et apprendre à utiliser les outils adaptés à chaque projet.\n\nLa culture, le cinéma et le jeu vidéo nourrissent mon travail, mais j'apprécie aussi de découvrir de nouveaux univers et de sortir de mes habitudes.\n\nJe suis ouvert aux projets et aux collaborations : n'hésitez pas à me contacter."
+    },
+    {
+      title: "Service Communication Université Rennes 2",
+      navLabel: "Service communication",
+      jp: "レンヌ2",
+      desc: "Suite Adobe",
+      images: [
+        {
+          src: "img/stagerennes2/recherche/recherche.png",
+          caption: "Journée de la Recherche 2025",
+          text: "Après plusieurs années sans édition, la Journée de la Recherche faisait son retour autour du thème « Recherche en société ». Le brief consistait à proposer une identité qui rende la recherche plus accessible, sans reprendre les codes scientifiques habituels. J'ai travaillé sur une ligature typographique reliant les mots et sur un fond bleu animé par des ondes multicolores, pour évoquer les échanges entre recherche et société. J'ai également posé un principe pour les éditions suivantes : renouveler le travail typographique chaque année tout en conservant une identité reconnaissable. J'ai réalisé les déclinaisons sur différents supports : affiches, réseaux sociaux, diaporama et brochure."
+        },
+        {
+          src: "img/stagerennes2/campusweek/campus.png",
+          caption: "Campus Week 2025",
+          text: "La Campus Week est une semaine de rentrée consacrée à la vie étudiante de Rennes 2. Je voulais représenter cette communauté à travers une multitude de petits personnages, inspirés des dessins que je réalisais plus jeune, vivant ensemble sur l'affiche. Plutôt que de contourner le cartouche « Campus Week », contrainte importante de la composition, j'ai choisi de l'intégrer au visuel. Le projet a ensuite été décliné sur de nombreux supports : brochure, plan, réseaux sociaux, site internet et goodies."
+        },
+        {
+          src: "img/stagerennes2/olympe/olymp.png",
+          caption: "Olymp'in Fac 2025",
+          text: "À partir du logo existant et d'une direction graphique définie avec le graphiste du service, j'ai conçu une affiche pour cet événement sportif étudiant. Je me suis orienté vers une esthétique inspirée du mouvement Memphis, avec des motifs simples associés aux différentes disciplines et des espaces dédiés aux informations pratiques. J'ai réalisé une affiche classique ainsi qu'une version au format pantalon."
+        },
+        {
+          src: "img/stagerennes2/anim.mp4",
+          caption: "Congrès SFSIC 2025",
+          text: "Animation réalisée pour le congrès de la SFSIC à partir des totems graphiques conçus par le graphiste du service. J'ai animé les motifs image par image dans Illustrator, en déplaçant progressivement leurs éléments d'une frame à l'autre. Un exercice de mise en mouvement d'une identité existante, que je réaliserais aujourd'hui différemment, notamment avec Blender."
+        },
+        {
+          src: "img/stagerennes2/cartel.png",
+          caption: "Cartels SFSIC 2025",
+          text: "Conception de plusieurs gabarits de cartels destinés à accompagner les contenus présentés lors du congrès de la SFSIC. Le travail consistait à reprendre les couleurs, les typographies et les totems de l'identité de l'événement pour créer des supports lisibles et cohérents avec l'ensemble de la communication."
+        },
+        {
+          src: "img/stagerennes2/planegalite.png",
+          caption: "Plan Action Égalité 2025-2028",
+          text: "Mise en page de verbatims rapportant des propos problématiques entendus sur le campus, dans le cadre du plan d'action Égalité de Rennes 2. L'objectif était de faire ressortir la violence de ces paroles par une disposition dynamique des textes. J'ai réalisé la structure de mise en page à partir d'une sélection de typographies, tandis que le graphiste responsable du document a défini le traitement esthétique final."
+        }
+      ]
+    },
+    {
+      title: "Jeux-vidéo",
+      jp: "ビデオゲーム",
+      desc: "Construct 2, Unity",
+      images: [
+        {
+          src: "img/jeuvideo/MUR.mp4",
+          caption: "MUR",
+          text: "Développé en parallèle de mon mémoire « Barre de vie », MUR est un jeu de plateforme en 2D qui explore l'évolution des interfaces de jeu vidéo. Au cours d'une même partie, l'interface se transforme et devient une composante du gameplay. Le projet interroge la place de ces éléments : jusqu'où peut-on alléger une interface sans perdre les informations nécessaires au jeu ? À l'inverse, que se passe-t-il lorsqu'elle devient envahissante ? J'ai voulu en faire un terrain d'expérimentation, où l'on peut explorer ces extrêmes tout en jouant."
+        },
+        {
+          src: "img/jeuvideo/course.mp4",
+          caption: "-faire les courses",
+          text: "Mon premier jeu en 3D réalisé avec Unity. Le joueur se lève et part faire les courses, mais croise en chemin un personnage qui le met au défi. Le jeu enchaîne alors plusieurs mini-jeux imaginés autour de cette situation quotidienne. Le projet est resté court et expérimental, mais m'a permis d'explorer différentes idées de gameplay et de m'amuser à créer des défis originaux."
+        },
+        {
+          src: "img/3d/apaisant.mp4",
+          caption: "Apaisant",
+          text: "Concept de menu principal en 3D pour un jeu d'exploration à l'atmosphère sombre et calme. Dans un environnement à mi-chemin entre forêt et zone industrielle abandonnée, le joueur doit trouver une issue après être tombé en panne d'essence. L'idée est de créer une tension par l'absence de menace visible : les sons de la nature, le silence et la possibilité qu'une présence se rapproche suffisent à installer le doute."
+        },
+        {
+          src: "img/3d/toisondor.mp4",
+          caption: "Toison d'Or",
+          text: "Concept de menu principal en 3D pour un jeu inspiré de la mythologie et des lieux sacrés. Dans un environnement très lumineux, épuré et mystique, le joueur aurait pour objectif de récupérer un objet légendaire en surmontant différentes épreuves, à travers des mécaniques de plateforme ou d'énigmes. Une ambiance musicale douce, ponctuée d'éléments étranges, viendrait troubler cette apparente sérénité."
+        },
+        {
+          src: "img/3d/class.mp4",
+          caption: "αιεαRELICTAεςτ",
+          text: "Concept de menu principal en 3D pour un jeu de rôle inspiré du quotidien en milieu scolaire. Derrière cette apparence familière, tout semble jouer contre le personnage : gestion des relations, temps d'étude et événements imprévus compliquent progressivement sa progression vers l'obtention du diplôme. J'imagine un mélange de RPG et de roguelite dans lequel chaque choix compte et où les obstacles deviennent de plus en plus difficiles à surmonter."
+        },
+        {
+          src: "img/jeuvideo/pokemon.png",
+          caption: "Identités Pokémon Émeraude alternatives",
+          text: "Projet personnel imaginant deux éditions alternatives de Pokémon Émeraude (2004), sur le principe de versions d'un même jeu présentant des différences graphiques et thématiques. Émeraude Delta s'inspire des ruines, de l'archéologie et des légendes anciennes, tandis qu'Émeraude Alpha explore un univers plus lumineux, idéal et presque divin. J'ai décliné ces deux directions à travers les jaquettes, les cartouches, les animations de lancement et une page de magazine inspirée des publications de l'époque."
+        },
+        {
+          src: "img/jeuvideo/meute.png",
+          caption: "Meute",
+          text: "Projet personnel de jeu de stratégie sur grille. Le joueur contrôle une famille de loups vivant dans un zoo-refuge et qui cherche à s'en échapper pour partir en vacances. Chaque membre de la meute possède ses propres caractéristiques et capacités, ce qui permet d'imaginer différentes manières de franchir les obstacles et d'éviter les gardes. J'ai choisi une palette bleu et jaune, inspirée de la vision des loups, et exploré plusieurs écrans de jeu ainsi qu'une boîte imprimée et assemblée à la main. Le projet est resté au stade de l'expérimentation, avec l'envie d'imaginer un jeu de stratégie accessible à plusieurs personnes."
+        },
+        {
+          src: "img/jeuvideo/finelame.mp4",
+          caption: "Fine Lame",
+          text: "Première version de mon projet de diplôme, Fine Lame était un jeu de plateforme dans lequel on incarnait un samouraï cherchant à devenir le plus fort, avec une inspiration tirée du livre Musashi. J'ai développé les dessins, les animations, une typographie et un système d'éclairage sous Construct 2, avec la musique composée par un ami. Malgré le travail engagé sur ce projet, j'ai finalement choisi de m'orienter vers une approche plus expérimentale avec MUR, davantage en lien avec mon sujet de recherche."
+        },
+        {
+          src: "img/motiondesign/fullanimdelta.mp4",
+          caption: "Pokémon Émeraude Delta",
+          text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). Cette version explore un univers tourné vers les ruines, l'archéologie et les légendes anciennes, avec une identité inspirée des vestiges d'un monde oublié."
+        },
+        {
+          src: "img/motiondesign/pokemon-alpha-maintitle.mp4",
+          caption: "Pokémon Émeraude Alpha",
+          text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). À l'opposé de Delta, cette version explore une esthétique lumineuse et idéale, entre nature, perfection et imagerie divine."
+        }
+      ]
+    },
+    {
+      title: "Edition",
+      jp: "エディトリアル",
+      desc: "Huile de coude, suite Adobe",
+      images: [
+        {
+          src: "img/edition/barre2vie.png",
+          caption: "Barre de vie",
+          text: "Mémoire de recherche consacré aux interfaces utilisateur des jeux vidéo japonais des années 1980 et 1990, jusqu'à l'arrivée de la 3D. J'y étudie leur définition, les contraintes techniques de l'époque, les typographies employées et l'évolution des codes graphiques à travers de nombreux jeux auxquels j'ai joué et dont j'ai analysé les interfaces. Une étude de cas sur la saga The Legend of Zelda permet d'approfondir cette évolution. J'aborde également les changements liés à l'arrivée de la 3D et les attentes actuelles en matière d'interface, notamment à travers un sondage mené auprès d'étudiant·es en arts, de la licence au master, et de membres du corps enseignant de Rennes 2. Pour l'édition, j'ai conçu une bichromie cyan et rouge ainsi qu'un système de lecture à deux niveaux : les images de jeu sont visibles au premier abord, tandis que le texte apparaît lorsque l'on soulève la page de droite. J'ai réalisé une version classique et une version à couverture rigide accompagnée d'un CD regroupant des émulateurs et les jeux testés. Un PDF du mémoire peut être fourni sur demande."
+        },
+        {
+          src: "img/edition/mur.png",
+          caption: "MUR - livret",
+          text: "Livret conçu en complément de mon jeu MUR, inspiré des livrets fournis avec les jeux Nintendo DS. Je voulais retrouver le plaisir de découvrir un jeu en lisant son livret, en présentant son fonctionnement, ses commandes et son univers. J'ai également créé les éléments typographiques et graphiques du document. Pour rester cohérent avec le jeu, le livret suit la même logique d'évolution de l'interface : plus on avance, moins celle-ci occupe de place."
+        },
+        {
+          src: "img/edition/lyber.png",
+          caption: "Lyber & CSS",
+          text: "Workshop de Licence Professionnelle mené avec le collectif Luuse. À partir d'un lyber, une version gratuite d'un livre diffusée en ligne sans mise en page, nous devions concevoir une édition en utilisant le codage HTML/CSS. J'ai pris en charge l'essentiel du développement, étant le plus à l'aise avec le code, tout en participant à une réflexion collective sur la direction graphique et en répartissant les rôles au sein du groupe. Le livre portant sur Emmanuel Macron et sa politique, nous avons développé une esthétique inspirée de la communication politique et de la polarisation entre droite et gauche."
+        },
+        {
+          src: "img/edition/reggae.png",
+          caption: "Reggaeton & Fin du Monde",
+          text: "Fanzine réalisé en binôme autour du thème « Reggaeton & Fin du Monde », avec des contraintes de photocopie et de collage. Nos approches étaient différentes mais complémentaires : je développais les idées autour de la fin du monde, tandis que mon binôme apportait davantage de références au reggaeton. Le résultat cherche un équilibre entre ces deux univers. Ce projet a surtout été une expérience de collaboration, qui m'a appris à confronter des idées différentes, à partager mes doutes et à construire une proposition commune."
+        },
+        {
+          src: "img/edition/1173.png",
+          caption: "117³ - Exposition",
+          text: "Affiche et supports de communication réalisés dans le cadre d'un workshop de Licence 2 Arts Plastiques consacré à la curation et à l'exposition collective des travaux des étudiant·es. Chargé de l'affiche après avoir exprimé mon intérêt pour le graphisme, j'ai travaillé avec le groupe pour construire une proposition commune. Le titre 117³ faisait référence au temps passé dans notre atelier durant une semaine, et j'ai choisi de représenter ce nombre par une photographie de la porte de l'atelier, vidée de son contenu. Le délai très court et la diversité des avis ont imposé de faire des choix pour aboutir à une composition cohérente. J'ai également réalisé des supports de promotion, notamment un flyer et des visuels pour les réseaux sociaux."
+        },
+        {
+          src: "img/edition/flipbook/flipe.mp4",
+          caption: "E - Flipbook",
+          text: "Flipbook explorant l'évolution de la lettre « E » à travers différentes grandes catégories typographiques. Le projet m'a amené à concevoir un objet éditorial à la fois robuste et suffisamment souple pour permettre une manipulation répétée. La principale contrainte était de garantir le bon fonctionnement du feuilletage et la lisibilité des transformations. Le flipbook a été exposé au Cabinet du livre d'artiste de Rennes 2."
+        }
+      ]
+    },
+    {
+      title: "Animation 2D",
+      jp: "2Dアニメーション",
+      desc: "Suite Adobe",
+      images: [
+        {
+          src: "img/motiondesign/themachinist_final.mp4",
+          caption: "The Machinist",
+          text: "Animation inspirée du film The Machinist de Brad Anderson (2004). Je voulais retrouver cette impression que quelque chose ne tourne pas rond, dans un quotidien sombre et nihiliste où une présence mystérieuse semble perturber la vie du personnage. Je me suis notamment appuyé sur l'atmosphère de certaines scènes du film, dont celle de la salle de bain, pour construire un univers visuel inquiétant."
+        },
+        {
+          src: "img/motiondesign/load.mp4",
+          caption: "FC Loading",
+          text: "Recréation de l'animation de chargement des jeux EA SPORTS FC, que je croise régulièrement en jouant. Le projet était un défi personnel : reproduire cette boucle tout en imaginant une variante du logo dans un style inspiré des jeux vidéo rétro, à partir de petites versions alternatives que j'avais déjà explorées."
+        },
+        {
+          src: "img/motiondesign/crossed.mp4",
+          caption: "Crossed",
+          text: "Générique de fan imaginé pour Crossed, l'émission de Karim Debbache consacrée aux adaptations de jeux vidéo au cinéma. Après avoir revu l'émission, j'ai voulu proposer ma propre animation autour de son titre. J'ai choisi une interprétation littérale du mot « Crossed », sans chercher à développer une signification supplémentaire, en m'appuyant sur une musique existante qui n'a pas été composée pour ce projet."
+        }
+      ]
+    },
+    {
+      title: "Animations 3D",
+      jp: "3Dアニメーション",
+      desc: "Blender, Suite Adobe",
+      images: [
+        {
+          src: "img/3d/clerbar.mp4",
+          caption: "CLEBART",
+          text: "Première animation réalisée sur Blender. J'ai construit une scène nocturne à partir de quelques images utilisées comme éléments de décor et d'un travail d'éclairage pour installer une ambiance sombre, dans un coin de village. L'arrivée d'un personnage, le clebard, vient soudainement rompre cette atmosphère et créer un décalage."
+        },
+        {
+          src: "img/3d/loubart.mp4",
+          caption: "LOUBART",
+          text: "Dans la continuité de CLEBART, cette animation joue sur le contraste entre un décor nocturne inquiétant et l'arrivée inattendue d'un personnage, Loubart. Je voulais retrouver cette ambiance sombre et mystérieuse, puis la désamorcer par l'apparition de cet élément décalé."
+        },
+        {
+          src: "img/3d/surplace.mp4",
+          caption: "SUR PLACE OU À EMPORTER",
+          text: "Animation construite autour d'un contraste entre décor et personnage. J'ai imaginé un diner américain vide, froid et presque entièrement blanc, avant d'y introduire un iguane qui parle. Le décalage entre l'environnement et cette apparition constitue le point de départ de la scène.",
+          vertical: true
+        },
+        {
+          src: "img/3d/backroom.mp4",
+          caption: "PERDU",
+          text: "Inspirée des Backrooms, cette animation explore un environnement vide et dérangeant, dans lequel j'ai choisi d'introduire un T-Rex. Plutôt que d'en faire une menace, je voulais jouer sur le contraste entre l'imaginaire inquiétant des lieux et la présence presque anodine du dinosaure."
+        },
+        {
+          src: "img/3d/chambre.mp4",
+          caption: "DESERTEUR",
+          text: "Avec cette animation, j'ai voulu aller au-delà de mes premières scènes en vue subjective en travaillant plusieurs angles de caméra. De petits soldats y préparent leur évasion, mais l'un d'eux finit par être considéré comme un déserteur. Le projet détourne l'imaginaire des jouets et des films comme Toy Story pour raconter une petite histoire à travers la mise en scène."
+        },
+        {
+          src: "img/3d/finalmente.mp4",
+          caption: "*",
+          text: "Animation mettant en scène un personnage qui part faire ses courses dans un univers étrange et peu rassurant. Il traverse des lieux lugubres et une maison en désordre, sans jamais sembler acheter quoi que ce soit d'essentiel. Le contraste entre le calme apparent du personnage et l'atmosphère tendue des décors laisse volontairement une part d'incertitude sur ce qui se passe."
+        },
+        {
+          src: "img/3d/bombe.mp4",
+          caption: "BOMBE",
+          text: "Clip 3D imaginé à partir du morceau « Bombe » de Yoa. J'avais envie de mettre cette musique en images en reprenant littéralement ses paroles. La mise en scène s'organise ainsi autour de la représentation d'un larguage de bombe."
+        },
+        {
+          src: "img/3d/rue.mp4",
+          caption: "UN PEU DE RETENUE",
+          text: "Animation 3D inspirée du morceau « Un peu de retenue » de Théodort. Plutôt que d'illustrer directement les paroles, j'ai imaginé une ambiance nocturne et froide : une rue traversée en boucle par un chat, tandis que l'on entend des personnes rire derrière les fenêtres. Le contraste entre l'extérieur solitaire et la chaleur suggérée des intérieurs donne son atmosphère à la scène."
+        },
+        {
+          src: "img/3d/cuir.mp4",
+          caption: "どこか",
+          text: "Animation d'exploration inspirée des Backrooms. La caméra avance dans des espaces vides, contrainte de suivre un chemin dont chaque angle pourrait dissimuler quelque chose. Pourtant, rien n'apparaît. Je voulais travailler sur cette peur de l'inconnu et sur l'absence de menace visible, en laissant le vide et l'anticipation créer l'inquiétude."
+        },
+        {
+          src: "img/3d/foret.mp4",
+          caption: "Dans les bois",
+          text: "Exploration 3D d'une forêt lumineuse et mystique, pensée comme un lieu dans lequel on aurait envie de se promener. Le personnage y ramasse progressivement des objets, comme dans un jeu de survie ou un RPG. Mon objectif était de créer un environnement forestier crédible et accueillant, en travaillant l'atmosphère et l'envie d'explorer."
+        },
+        {
+          src: "img/3d/electromenager.mp4",
+          caption: "Se lever aux aurores",
+          text: "À l'origine, je voulais recréer l'atmosphère d'un grand magasin de meubles vide, en m'inspirant de mon expérience de travail dans ce type de magasin. Le projet s'est finalement concentré sur une seule pièce dans laquelle un personnage se réveille. L'ambiance devient progressivement angoissante, sans explication claire, dans la continuité de l'univers étrange développé dans mon animation « * »."
+        },
+        {
+          src: "img/3d/skelet.mp4",
+          caption: "Un lancer vaut mieux que deux tu l'auras",
+          text: "Courte animation 3D mettant en scène un squelette qui jongle avec une seule balle."
+        },
+        {
+          src: "img/3d/spider.mp4",
+          caption: "Spider-man in Japan",
+          text: "À partir de mes propres vidéos tournées au caméscope au Japon, j'ai voulu imaginer que Spider-Man s'était invité dans mes images de voyage. Le projet était un défi technique autour de l'animation et de l'incrustation d'un personnage 3D dans des prises de vues réelles. Les résultats varient selon les plans, mais l'ensemble m'a permis d'expérimenter l'intégration d'un élément virtuel dans des images filmées."
+        },
+        {
+          src: "img/3d/mouche.mp4",
+          caption: "MOUCHE",
+          text: "Animation suivant le périple nocturne d'une mouche dans une chambre."
+        }
+      ]
+    },
+    {
+      title: "Illustrations",
+      jp: "イラストレーション",
+      desc: "Huile, aquarelle et illustrations",
+      images: [
+         {
+          src: "img/mechanoid.png",
+          caption: "mechanoid",
+          text: "Cover d'une musique du compositeur Papri-K. Illustration digitale réalisée à partir des envies de l'artiste."
+        },
+        {
+          src: "img/ctrl.png",
+          caption: "CTRL",
+          text: "Cover d'une musique du compositeur Papri-K. Scène 3D rendue comme une illustrration, réalisée à partir des envies de l'artiste."
+        },
+        {
+          src: "img/avatar.png",
+          caption: "I See You, Son",
+          text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
+        },
+        {
+          src: "img/darthvader.png",
+          caption: "Anakin",
+          text: "Illustration digitale à partir d'une scène de la série Star Wars : Obi-Wan"
+        },
+        {
+          src: "img/aquarelles/1.png",
+          caption: "Aquarelles Normandes",
+          text: "Série d'aquarelles réalisées à partir de lieux visités en Normandie. Ces peintures sont une manière de conserver une trace de ces endroits et d'en retranscrire les paysages à travers la couleur et l'aquarelle."
+        },
+        {
+          src: "img/aquarelles/video.mp4",
+          caption: "Exposition",
+          text: "Exposition personnelle d'un mois consacrée à mes aquarelles, présentées en grand format A3 à l'espace La Passerelle de Theix-Noyalo, en juin 2024. Ce projet m'a permis de présenter mon travail pictural dans un espace d'exposition.",
+          vertical: true
+        },
+        {
+          src: "img/aquarelles/huile.png",
+          caption: "Huile sur toile",
+          text: "Peinture à l'huile représentant un paysage. Il s'agit de ma première expérimentation avec cette technique, une occasion de découvrir les possibilités de la peinture à l'huile et son approche différente de la couleur et de la matière."
+        }
+      ]
+    }
+  ];
 
   // Tag en japonais sur chaque slide : le titre de la catégorie
   document.querySelectorAll('.splide__slide').forEach((sl, i) => {
@@ -574,10 +630,10 @@ const SLIDE_DATA = [
     srcs.forEach(src => {
       if (isVideoSrc(src)) {
         const v = document.createElement('video');
-        v.preload = 'auto';
+        v.preload = 'metadata';   // seulement les métadonnées : pas de téléchargement de toutes les vidéos
         v.muted = true;
         v.src = src;
-        v.addEventListener('canplaythrough', itemDone, { once: true });
+        v.addEventListener('loadedmetadata', itemDone, { once: true });
         v.addEventListener('error', itemDone, { once: true });
         v.load();
       } else {
@@ -587,6 +643,39 @@ const SLIDE_DATA = [
         i.src = src;
       }
     });
+  }
+
+  // Pendant que le visiteur tape son prénom, on "chauffe" les vidéos en arrière-plan, quelques-unes à la fois :
+  // le début de chaque vidéo est déjà en cache quand on ouvre un projet, sans surcharger l'intro.
+  function warmVideosInBackground() {
+    if (liteMode || isTouch) return;
+    const srcs = [];
+    SLIDE_DATA.forEach(sl => (sl.images || []).forEach(img => {
+      [img.src].concat(img.medias || []).forEach(m => { if (isVideoSrc(m) && srcs.indexOf(m) === -1) srcs.push(m); });
+    }));
+    let i = 0, active = 0;
+    function next() {
+      while (active < WARM_CONCURRENCY && i < srcs.length) {
+        const v = document.createElement('video');
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          v.removeAttribute('src'); v.load();   // on libère la mémoire ; le début reste dans le cache du navigateur
+          active--; next();
+        };
+        const timer = setTimeout(finish, 10000);
+        active++;
+        v.preload = 'auto';
+        v.muted = true;
+        v.src = srcs[i++];
+        v.addEventListener('canplaythrough', finish, { once: true });
+        v.addEventListener('error', finish, { once: true });
+        v.load();
+      }
+    }
+    next();
   }
 
   const MIN_INTRO_TIME = 2200;
@@ -599,16 +688,26 @@ const SLIDE_DATA = [
     if (introEnded) return;
     introEnded = true;
     intro.classList.add('intro-out');
-    setTimeout(() => { intro.remove(); showNameGate(); }, 1000);
+    setTimeout(() => { intro.remove(); showNameGate(); warmVideosInBackground(); }, 1000);
   }
 
   const maxTimer = setTimeout(endIntro, MAX_INTRO_TIME);
 
-  preloadAllMedia(SLIDE_DATA, () => {
+  if (!liteMode) preloadAllMedia(SLIDE_DATA, () => {
     const elapsed = Date.now() - introStart;
     const wait = Math.max(0, MIN_INTRO_TIME - elapsed);
     setTimeout(() => { clearTimeout(maxTimer); endIntro(); }, wait);
   });
+
+  // mode optimisé au chargement : pas d'intro ni de question, on affiche directement le site
+  if (liteMode) {
+    clearTimeout(maxTimer);
+    introEnded = true;
+    intro.remove();
+    gateOpen = false;
+    pseudoEl.textContent = 'Visiteur';
+    revealSite();
+  }
 
   // =====================
   // QUESTION : COMMENT VOUS APPELEZ-VOUS ?
@@ -669,6 +768,8 @@ const SLIDE_DATA = [
   let gridFocusIdx    = 0;
   let currentData     = null;
 
+  syncIconVideos();
+
   const overlay        = document.getElementById("overlay");
   const overlayContent = document.getElementById("overlay-content");
   const overlayHint    = document.getElementById("overlay-hint");
@@ -690,6 +791,19 @@ const SLIDE_DATA = [
 
     // Un "corps" par slide : position (décalage), vitesse, destination aléatoire.
     const bodies = slideEls.map(() => ({ x: 0, y: 0, vx: 0, vy: 0, gx: 0, gy: 0, next: 0, init: false, ang: Math.random() * 6.28, angV: (Math.random() - 0.5) * 0.05 }));
+    // Répartition : l'écran est découpé en cases (grille) et chaque slide reçoit une case au hasard.
+    // Elle y reste, sauf quand la souris ou un choc la déplace ; un rappel doux la ramène ensuite.
+    const COLS_F = Math.min(4, slideEls.length);
+    const ROWS_F = Math.ceil(slideEls.length / COLS_F);
+    const order  = slideEls.map((_, i) => i).sort(() => Math.random() - 0.5);
+    const cellOf = [], rowCount = [];
+    order.forEach((si, k) => {
+      const c = k % COLS_F, rr = Math.floor(k / COLS_F);
+      cellOf[si] = { c: c, r: rr };
+      rowCount[rr] = (rowCount[rr] || 0) + 1;
+    });
+    const rowShift = rowCount.map(n => (COLS_F - n) / 2);   // dernière rangée centrée
+    let liteCleared = false;
     let mouseX = -9999, mouseY = -9999;   // position brute
     let smX = -9999, smY = -9999;         // position lissée (évite les à-coups)
     let lastT = 0;
@@ -702,6 +816,15 @@ const SLIDE_DATA = [
 
     function floatLoop(t) {
       requestAnimationFrame(floatLoop);
+      if (liteMode) {                       // mode optimisé : aucune animation, les slides redeviennent une simple grille
+        if (!liteCleared) {
+          slideEls.forEach(el => { el.style.translate = ''; el.classList.remove('off'); });
+          bodies.forEach(bd => { bd.init = false; });
+          liteCleared = true;
+        }
+        lastT = t; return;
+      }
+      liteCleared = false;
       if (overlayOpen || projectOpen) { lastT = t; return; }
       const kk = animK();
       const dt = Math.min(3, Math.min(50, t - (lastT || t)) / 16.667 * kk);
@@ -737,6 +860,9 @@ const SLIDE_DATA = [
                  width: r.width, height: bottom - r.top };
       });
 
+      const areaL = 16, areaT = 96, areaW = vw - 32, areaH = vh - 96 - 70;
+      const cw = areaW / COLS_F, ch = areaH / ROWS_F;
+
       bodies.forEach(b => { b.x0 = b.x; b.y0 = b.y; });
 
       // 2) forces + déplacement
@@ -749,18 +875,26 @@ const SLIDE_DATA = [
         b.minY = 96 - homeT;
         b.maxY = Math.max(b.minY, vh - 70 - (homeT + r.height));
 
-        // apparition au hasard : chaque slide démarre n'importe où
+        // sa case : une zone d'une grille répartie sur tout l'écran
+        const cell  = cellOf[i];
+        const ccx   = areaL + (cell.c + rowShift[cell.r] + 0.5) * cw;
+        const ccy   = areaT + (cell.r + 0.5) * ch;
+        const cxOff = ccx - (homeL + r.width / 2);     // décalage qui amène la slide au centre de sa case
+        const cyOff = ccy - (homeT + r.height / 2);
+
+        // apparition : dans sa case, avec un petit décalage au hasard
         if (!b.init) {
           b.init = true;
-          b.x = rnd(b.minX, b.maxX) * FLOAT_ROAM_X;
-          b.y = rnd(b.minY, b.maxY) * FLOAT_ROAM_Y;
+          b.x = clamp(cxOff + rnd(-0.25, 0.25) * cw, b.minX, b.maxX);
+          b.y = clamp(cyOff + rnd(-0.25, 0.25) * ch, b.minY, b.maxY);
           b.vx = rnd(-FLOAT_SPEED_X, FLOAT_SPEED_X);
           b.vy = rnd(-FLOAT_SPEED_Y, FLOAT_SPEED_Y);
         }
 
+        // destination : un point au hasard dans sa case (elle explore peu)
         if (t >= b.next) {
-          b.gx = rnd(b.minX, b.maxX) * FLOAT_ROAM_X;
-          b.gy = rnd(b.minY, b.maxY) * FLOAT_ROAM_Y;
+          b.gx = clamp(cxOff + rnd(-FLOAT_CELL_ROAM / 2, FLOAT_CELL_ROAM / 2) * cw, b.minX, b.maxX);
+          b.gy = clamp(cyOff + rnd(-FLOAT_CELL_ROAM / 2, FLOAT_CELL_ROAM / 2) * ch, b.minY, b.maxY);
           b.next = t + rnd(FLOAT_GOAL_MIN, FLOAT_GOAL_MAX);
         }
 
@@ -777,8 +911,13 @@ const SLIDE_DATA = [
         const near = Math.max(0, 1 - d / FLOAT_MOUSE_RANGE);
         const stir = near * near * windGust * FLOAT_STIR;
 
-        b.vx += ((dvx - b.vx) * FLOAT_DAMP + Math.cos(b.ang) * stir) * dt;
-        b.vy += ((dvy - b.vy) * FLOAT_DAMP + Math.sin(b.ang) * stir) * dt;
+        // rappel doux vers sa case si elle en sort trop : les slides restent bien réparties
+        const ex = b.x - cxOff, ey = b.y - cyOff, hx = cw * 0.6, hy = ch * 0.6;
+        const homeAx = Math.abs(ex) > hx ? -Math.sign(ex) * (Math.abs(ex) - hx) * FLOAT_HOME_PULL - b.vx * FLOAT_HOME_DAMP : 0;
+        const homeAy = Math.abs(ey) > hy ? -Math.sign(ey) * (Math.abs(ey) - hy) * FLOAT_HOME_PULL - b.vy * FLOAT_HOME_DAMP : 0;
+
+        b.vx += ((dvx - b.vx) * FLOAT_DAMP + Math.cos(b.ang) * stir + homeAx) * dt;
+        b.vy += ((dvy - b.vy) * FLOAT_DAMP + Math.sin(b.ang) * stir + homeAy) * dt;
         const spd = Math.hypot(b.vx, b.vy);
         if (spd > FLOAT_MAXV) { b.vx *= FLOAT_MAXV / spd; b.vy *= FLOAT_MAXV / spd; }
         b.x  += b.vx * dt;
@@ -857,7 +996,7 @@ const SLIDE_DATA = [
 
   if (!isTouch) {
     document.querySelector('.splide__list').addEventListener('mouseover', function(e) {
-      if (overlayOpen || gateOpen) return;
+      if (overlayOpen || gateOpen || liteMode) return;
       const slide = e.target.closest('.splide__slide');
       if (!slide) return;
       const slides = Array.from(document.querySelectorAll('.splide__slide'));
@@ -984,6 +1123,7 @@ const SLIDE_DATA = [
       if (!media.naturalWidth || !media.naturalHeight) return;
       ratio = media.naturalHeight / media.naturalWidth;
     }
+    ratio = Math.min(ratio, GRID_MAX_RATIO);   // les formats verticaux ne prennent plus toute la hauteur
 
     const cellWidth = cell.getBoundingClientRect().width;
     const targetHeight = cellWidth * ratio;
@@ -1027,6 +1167,10 @@ const SLIDE_DATA = [
       if (!media) return;
       if (media.tagName === 'VIDEO') {
         watchVideo(media);
+        if (liteMode) {   // mode optimisé : image fixe, la vidéo ne joue qu'au survol
+          cell.addEventListener('mouseenter', () => { const pr = media.play(); if (pr && pr.catch) pr.catch(() => {}); });
+          cell.addEventListener('mouseleave', () => media.pause());
+        }
         if (media.readyState >= 1) layoutMasonryCell(cell);
         else media.addEventListener('loadedmetadata', () => layoutMasonryCell(cell));
       } else {
@@ -1222,7 +1366,7 @@ const SLIDE_DATA = [
     overlay.classList.remove("show");
     overlayHint.classList.remove("show");
     splideEl.classList.remove("hidden");
-    splideVideos.forEach(v => { const p = v.play(); if (p && p.catch) p.catch(() => {}); });
+    syncIconVideos();
     setTimeout(() => { if (!overlayOpen) overlay.style.display = "none"; }, 400);
   }
 
@@ -1250,6 +1394,31 @@ const SLIDE_DATA = [
     navEl.appendChild(b);
   });
 
+  // Bouton "Site optimisé" : bascule vers la version sobre (sans animation ni effet) et inversement
+  const liteBtn = document.createElement('button');
+  liteBtn.type = 'button';
+  liteBtn.id = 'lite-toggle';
+  liteBtn.className = 'top-link lite-btn';
+  function setLiteMode(on) {
+    liteMode = on;
+    document.documentElement.classList.toggle('lite-mode', on);
+    try { localStorage.setItem('lite', on ? '1' : '0'); } catch (err) {}
+    liteBtn.textContent = on ? 'Site complet' : 'Site optimisé';
+    liteBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    liteBtn.title = on ? 'Revenir au site complet (animations et effets)' : 'Version sobre : aucune animation, très légère';
+    syncIconVideos();
+    if (on) window.scrollTo(0, 0);
+  }
+  liteBtn.addEventListener('click', function() { if (gateOpen || overlayOpen) return; setLiteMode(!liteMode); });
+  navEl.appendChild(liteBtn);
+  setLiteMode(liteMode);
+
+  // navigation clavier : une slide qui reçoit le focus devient la slide active
+  Array.from(document.querySelectorAll('.splide__slide')).forEach((sl, i) => {
+    sl.setAttribute('tabindex', '0');
+    sl.addEventListener('focus', function() { if (!overlayOpen && !gateOpen) { currentSlideIdx = i; splide.go(i); } });
+  });
+
   // (La grille aléatoire "Travaux" reste disponible : appeler openWorks() pour la réafficher.)
 
   // =====================
@@ -1259,6 +1428,14 @@ const SLIDE_DATA = [
     if (overlayOpen || gateOpen) return;
     const slide = e.target.closest('.splide__slide');
     if (!slide) return;
+
+    if (liteMode) {                       // mode optimisé : un clic ouvre directement la catégorie
+      const idx = Array.from(document.querySelectorAll('.splide__slide')).indexOf(slide);
+      currentSlideIdx = idx;
+      splide.go(idx);
+      openOverlay(idx);
+      return;
+    }
 
     if (isTouch) {
       if (!slide.classList.contains('is-active')) {
@@ -1364,12 +1541,26 @@ const SLIDE_DATA = [
       list.push(t);
     }
 
+    // une autre balle tombe du haut de l'écran
+    function respawn(t) {
+      const s = rand(TARGET_SIZE_MIN, TARGET_SIZE_MAX);
+      t.size = s;
+      t.el.style.width = t.el.style.height = s.toFixed(0) + 'px';
+      t.mode = 'ball';
+      t.x = rand(0, window.innerWidth - s);
+      t.y = -s - 10;
+      t.vx = rand(-1.2, 1.2);
+      t.vy = rand(0.5, 2);
+      t.spin = rand(-3, 3);
+      t.rest = 0;
+    }
+
     let lastTs = 0;
     (function targetsLoop(ts) {
       requestAnimationFrame(targetsLoop);
       const dt = Math.min(3, Math.min(50, ts - (lastTs || ts)) / 16.667 * animK());
       lastTs = ts;
-      if (overlayOpen || projectOpen) return;
+      if (overlayOpen || projectOpen || liteMode) return;
       const vw = window.innerWidth, vh = window.innerHeight;
 
       list.forEach(t => {
@@ -1398,15 +1589,18 @@ const SLIDE_DATA = [
             t.vy = Math.abs(t.vy) > 1.2 ? -t.vy * TARGET_BOUNCE : 0;
             t.vx *= 0.96;
           }
-          if (t.y < 0) { t.y = 0; t.vy = Math.abs(t.vy) * 0.5; }
           if (t.y >= floorY - 0.5 && Math.abs(t.vy) < 0.05) {
             t.rest += 16.667 * dt;
             if (t.rest > TARGET_REST_MS) { t.mode = 'float'; t.vy = -3; t.next = 0; t.rest = 0; }
           } else t.rest = 0;
         }
 
-        if (t.x < 0)             { t.x = 0;             t.vx =  Math.abs(t.vx) * 0.8; }
-        if (t.x > vw - t.size)   { t.x = vw - t.size;   t.vx = -Math.abs(t.vx) * 0.8; }
+        if (t.mode === 'float') {                        // en flottant, elle reste dans l'écran
+          if (t.x < 0)           { t.x = 0;           t.vx =  Math.abs(t.vx) * 0.8; }
+          if (t.x > vw - t.size) { t.x = vw - t.size; t.vx = -Math.abs(t.vx) * 0.8; }
+        } else if (t.x < -t.size || t.x > vw || t.y < -t.size - 30) {
+          respawn(t);                                    // sortie par la gauche, la droite ou le haut : une autre tombe
+        }
         t.rot += t.spin * dt;
         t.el.style.transform = 'translate3d(' + t.x.toFixed(1) + 'px,' + t.y.toFixed(1) + 'px,0) rotate(' + t.rot.toFixed(1) + 'deg)';
       });
@@ -1611,6 +1805,7 @@ const SLIDE_DATA = [
 
   // On ne redessine que quand l'image du fond change : beaucoup plus léger qu'avant.
   function loop(ts) {
+    if (liteMode) { requestAnimationFrame(loop); return; }
     if (bgSpeed > 0 && !document.hidden && ts - lastSwap >= BG_BASE_INTERVAL / bgSpeed) {
       lastSwap = ts;
       snapIdx = (snapIdx + 1) % snapshots.length;

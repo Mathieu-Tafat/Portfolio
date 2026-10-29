@@ -18,13 +18,13 @@ body {
 :root {
   --accent: #ff1a3a;
   --outline: var(--accent); /* couleur des contours au survol (mets #fff pour revenir au blanc) */
-  --grain: 0.14;            /* intensité du grain (0 = aucun) */
+  --grain: 0.1;            /* intensité du grain (0 = aucun) */
   --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
   --slide-border: 3px;
   --bar-font: 16px; /* même taille pour les liens, le prénom et l'heure */
   /* Curseurs en crosshair 32px : blanc (contour noir fin pour rester lisible), rouge au survol */
   --cursor-cross: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M16 2v10M16 20v10M2 16h10M20 16h10M8 8l4 4M24 8l-4 4M8 24l4-4M24 24l-4-4' stroke='black' stroke-width='4' stroke-linecap='butt' fill='none' opacity='.55'/%3E%3Cpath d='M16 3v9M16 20v9M3 16h9M20 16h9M8.5 8.5l3.5 3.5M23.5 8.5l-3.5 3.5M8.5 23.5l3.5-3.5M23.5 23.5l-3.5-3.5' stroke='white' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-  --cursor-cross-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M16 2v10M16 20v10M2 16h10M20 16h10M8 8l4 4M24 8l-4 4M8 24l4-4M24 24l-4-4' stroke='black' stroke-width='4' stroke-linecap='butt' fill='none' opacity='.55'/%3E%3Cpath d='M16 3v9M16 20v9M3 16h9M20 16h9M8.5 8.5l3.5 3.5M23.5 8.5l-3.5 3.5M8.5 23.5l3.5-3.5M23.5 23.5l-3.5-3.5' stroke='%23ff1a3a' stroke-width='2.5' fill='none'/%3E%3C/svg%3E");
+  --cursor-cross-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M16 2v10M16 20v10M2 16h10M20 16h10M10.5 10.5l3.5 3.5M21.5 10.5l-3.5 3.5M10.5 21.5l3.5-3.5M21.5 21.5l-3.5-3.5' stroke='black' stroke-width='4' stroke-linecap='butt' fill='none' opacity='.55'/%3E%3Cpath d='M16 3v9M16 20v9M3 16h9M20 16h9M11 11l2.8 2.8M21 11l-2.8 2.8M11 21l2.8-2.8M21 21l-2.8-2.8' stroke='%23ff1a3a' stroke-width='2.5' fill='none'/%3E%3C/svg%3E");
 }
 * {
   cursor: var(--cursor-cross) 16 16, crosshair;
@@ -91,22 +91,30 @@ a:hover {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.25em;
+  gap: 0.9vw;
   width: 100%;
   padding: 0 4vw;
   box-sizing: border-box;
   color: #fff;
-  font-family: "Quintessential", serif;
+  /* style Avant-Garde : géométrique, cercles parfaits (Jost via Google Fonts, sinon polices système proches) */
+  font-family: "Jost", "ITC Avant Garde Gothic", "Century Gothic", "URW Gothic", "Avant Garde", sans-serif;
 }
 .intro-big {
-  font-size: clamp(3rem, 13vw, 14rem);
-  line-height: 0.95;
-  letter-spacing: 0.02em;
+  display: inline-block;
+  white-space: nowrap;
+  font-weight: 800;             /* gras / "fat" */
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.9;
+  font-size: 10vw;              /* ajusté en JS pour que le nom fasse 86 % de la largeur */
 }
 .intro-sub {
-  font-size: clamp(1.1rem, 3.6vw, 3.4rem);
-  letter-spacing: 0.18em;
-  opacity: 0.8;
+  display: inline-block;
+  white-space: nowrap;
+  font-family: "Quintessential", serif;   /* même police que le reste du site */
+  font-weight: 400;
+  line-height: 1;
+  /* taille et espacement des lettres ajustés en JS pour faire exactement la largeur du nom */
 }
 #intro::after {
   content: '';
@@ -346,16 +354,7 @@ a:hover {
   z-index: 0;
   pointer-events: none;
 }
-.splide__slide::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  opacity: 10;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-}
+/* (grain par slide supprimé : coûteux, remplacé par le grain global) */
 
 /* =====================
    TITRES
@@ -392,9 +391,7 @@ a:hover {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  background: rgba(50, 12, 12, 0.88);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(34, 8, 8, 0.95);
   position: relative;
   padding: 40px 60px 40px 60px;
   transform: scale(0.98);
@@ -1032,7 +1029,6 @@ a:hover {
    ===================== */
 
 /* Slide active : couleur + ombre dure rouge ; les autres : noir & blanc assombri */
-.splide-bg-video { transition: filter 0.25s ease; }
 @media (hover: hover) {
   .splide__slide:not(.is-active) .splide-bg-video {
     filter: grayscale(1) contrast(1.15) brightness(0.7);
@@ -1162,16 +1158,16 @@ video.splide-bg-video.has-canvas { opacity: 0; }
    ===================== */
 #grain {
   position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
   z-index: 10000;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* bruit blanc à transparence variable : pas de mix-blend-mode, donc très léger à afficher */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.6 0 0 0 -0.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 220px 220px;
   opacity: var(--grain);
-  mix-blend-mode: overlay;
   animation: grain-shift 0.8s steps(1) infinite;
 }
 @keyframes grain-shift {
@@ -1217,3 +1213,75 @@ video.splide-bg-video.has-canvas { opacity: 0; }
   will-change: transform;
 }
 .target:hover { cursor: var(--cursor-cross-red) 16 16, crosshair; }
+
+/* =====================
+   BOUTON « SITE OPTIMISÉ »
+   ===================== */
+.lite-btn { margin-left: 14px; }
+.lite-btn[aria-pressed="true"] { border-color: #fff; }
+
+/* =====================
+   MODE « SITE OPTIMISÉ » : version sobre, sans animation ni effet
+   (grille de catégories simple, vidéos seulement au survol, aucun fond animé)
+   ===================== */
+html.lite-mode, html.lite-mode body { overflow: auto; height: auto; min-height: 100%; background: #0c0c0c; }
+html.lite-mode #bg-canvas, html.lite-mode #grain, html.lite-mode #grain-canvas,
+html.lite-mode #ticker, html.lite-mode #targets, html.lite-mode #bgbar { display: none !important; }
+html.lite-mode .splide-bg-video, html.lite-mode .splide-bg-canvas,
+html.lite-mode #btn-start { display: none !important; }
+html.lite-mode *, html.lite-mode *::before, html.lite-mode *::after {
+  transition: none !important;
+  animation: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+html.lite-mode #topbar { background: #0c0c0c; border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
+html.lite-mode .splide {
+  margin: 110px auto 48px;
+  width: min(1000px, 92vw);
+  max-width: none;
+  transform: none;
+}
+html.lite-mode .splide__track { overflow: visible; }
+html.lite-mode .splide__list {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  height: auto !important;
+  transform: none !important;
+}
+html.lite-mode .splide__slide {
+  width: auto !important;
+  height: auto !important;
+  min-height: 96px;
+  margin: 0 !important;
+  padding: 18px;
+  display: flex;
+  align-items: flex-end;
+  transform: none !important;
+  translate: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  will-change: auto;
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+html.lite-mode .splide__slide::before { display: none; }
+html.lite-mode .splide__slide:hover,
+html.lite-mode .splide__slide.is-active,
+html.lite-mode .splide__slide:focus-visible {
+  border-color: var(--accent) !important;
+  background: rgba(255, 255, 255, 0.04);
+}
+html.lite-mode .titre {
+  position: static !important;
+  opacity: 1 !important;
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 1px;
+  white-space: normal;
+  max-width: none;
+}
+html.lite-mode #overlay-box { background: #0c0c0c; backdrop-filter: none; -webkit-backdrop-filter: none; }
+html.lite-mode .og-cell-dim { display: none; }
