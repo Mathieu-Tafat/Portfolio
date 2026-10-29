@@ -455,7 +455,7 @@ const SLIDE_DATA = [
         caption: "BOMBE",
         text: "Clip 3D imaginé à partir du morceau « Bombe » de Yoa. J'avais envie de mettre cette musique en images en reprenant littéralement ses paroles. La mise en scène s'organise ainsi autour de la représentation d'un larguage de bombe."
       },
-      
+      {
         src: "img/3d/rue.mp4",
         caption: "UN PEU DE RETENUE",
         text: "Animation 3D inspirée du morceau « Un peu de retenue » de Théodort. Plutôt que d'illustrer directement les paroles, j'ai imaginé une ambiance nocturne et froide : une rue traversée en boucle par un chat, tandis que l'on entend des personnes rire derrière les fenêtres. Le contraste entre l'extérieur solitaire et la chaleur suggérée des intérieurs donne son atmosphère à la scène."
@@ -484,6 +484,11 @@ const SLIDE_DATA = [
         src: "img/3d/spider.mp4",
         caption: "Spider-man in Japan",
         text: "À partir de mes propres vidéos tournées au caméscope au Japon, j'ai voulu imaginer que Spider-Man s'était invité dans mes images de voyage. Le projet était un défi technique autour de l'animation et de l'incrustation d'un personnage 3D dans des prises de vues réelles. Les résultats varient selon les plans, mais l'ensemble m'a permis d'expérimenter l'intégration d'un élément virtuel dans des images filmées."
+      },
+      {
+        src: "img/3d/mouche.mp4",
+        caption: "MOUCHE",
+        text: "Animation suivant le périple nocturne d'une mouche dans une chambre."
       }
     ]
   },
@@ -492,6 +497,26 @@ const SLIDE_DATA = [
     jp: "イラストレーション",
     desc: "Huile, aquarelle et illustrations",
     images: [
+       {
+        src: "img/mechanoid.png",
+        caption: "mechanoid",
+        text: "Cover d'une musique du compositeur Papri-K. Illustration digitale réalisée à partir des envies de l'artiste."
+      },
+      {
+        src: "img/ctrl.png",
+        caption: "CTRL",
+        text: "Cover d'une musique du compositeur Papri-K. Scène 3D rendue comme une illustrration, réalisée à partir des envies de l'artiste."
+      },
+      {
+        src: "img/avatar.png",
+        caption: "I See You, Son",
+        text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
+      },
+      {
+        src: "img/darthvader.png",
+        caption: "Anakin",
+        text: "Illustration digitale à partir d'une scène de la série Star Wars : Obi-Wan"
+      },
       {
         src: "img/aquarelles/1.png",
         caption: "Aquarelles Normandes",
