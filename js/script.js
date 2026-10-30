@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Vidéos des slides : cadence affichée (images par seconde). 0 = fluide / désactivé.
   const ICON_VIDEO_FPS = 15;
   // true : seule la slide active joue sa vidéo, les autres restent figées (beaucoup plus léger)
-  const ICON_ONLY_ACTIVE = true;
+  const ICON_ONLY_ACTIVE = false;
+  // vitesse des vidéos des slides non actives (0.3 = 30 % de la vitesse normale)
+  const ICON_IDLE_SPEED = 0.3;
 
   // Fond animé
   const BG_DARKEN        = 0.3;  // assombrissement du fond (0 = aucun, 0.6 = très sombre)
@@ -90,6 +92,65 @@ document.addEventListener('DOMContentLoaded', function () {
   let liteMode = false;
   try { liteMode = localStorage.getItem('lite') === '1'; } catch (err) {}
   document.documentElement.classList.toggle('lite-mode', liteMode);
+
+  // =====================
+  // LANGUES : français (d'origine), anglais, japonais. Les traductions sont dans js/i18n.js.
+  // Tout ce qui n'est pas traduit s'affiche en français.
+  // =====================
+  const I18N = window.I18N || { ui: {}, cats: {}, items: {} };
+  const LANGS = [['fr', 'FR'], ['en', 'EN'], ['ja', '日本語']];
+  const UI_FR = {
+    introSub: 'graphiste 2d et 3d',
+    gateLabel: 'Comment vous appelez-vous ?', gatePlaceholder: 'Votre prénom', gateEnter: 'Entrer', gateSkip: 'Passer',
+    visitor: 'Visiteur',
+    liteOn: 'Version accessible', liteOff: 'Version complète',
+    liteOnTitle: 'Version sobre et lisible : aucune animation, texte plus confortable',
+    liteOffTitle: 'Revenir à la version complète (animations et effets)',
+    speed: 'Vitesse des animations',
+    skillsTitle: 'Logiciels', skillsRegular: 'Utilisés régulièrement', skillsBasics: 'Notions',
+    contactLabel: 'Contact',
+    formEmail: 'Votre email', formSubject: 'Sujet', formMessage: 'Votre message', formSend: 'Envoyer',
+    formSending: 'Envoi en cours…', formOk: 'Message envoyé, merci !',
+    formErr: 'Une erreur est survenue, réessayez ou écrivez-moi directement par mail.',
+    open: 'Ouvrir {c}', close: 'Fermer', closeProject: 'Fermer le projet', prev: 'Précédent', next: 'Suivant',
+    project: 'Projet', mediaOf: 'Média {i} sur {n}', textOf: 'Texte, {i} sur {n}', gotoPage: 'Aller à la page {i}',
+    navAria: 'Navigation principale', sectionAria: 'Catégories de projets', photoAria: 'Photo de Mathieu', clockAria: 'Heure',
+    langAria: 'Langue'
+  };
+  let lang = 'fr';
+  try {
+    const sv = localStorage.getItem('lang');
+    if (sv === 'fr' || sv === 'en' || sv === 'ja') lang = sv;
+    else {   // première visite : langue du navigateur (japonais, français, sinon anglais)
+      const nl = (navigator.language || 'fr').slice(0, 2).toLowerCase();
+      lang = nl === 'ja' ? 'ja' : (nl === 'fr' ? 'fr' : 'en');
+    }
+  } catch (err) {}
+  document.documentElement.lang = lang;
+  let visitorName = '';
+  let gateRender = null;
+
+  function t(key, vars) {
+    const table = lang === 'fr' ? UI_FR : ((I18N.ui || {})[lang] || {});
+    let str = table[key];
+    if (str === undefined) str = UI_FR[key];
+    if (str === undefined) return key;
+    if (vars) Object.keys(vars).forEach(k => { str = str.split('{' + k + '}').join(vars[k]); });
+    return str;
+  }
+  // catégorie / projet dans la langue courante (repli sur le français)
+  function L(sl) {
+    const tr = lang === 'fr' ? null : ((I18N.cats || {})[lang] || {})[sl.title];
+    return tr ? Object.assign({}, sl, tr) : sl;
+  }
+  function LI(item) {
+    const tr = lang === 'fr' ? null : ((I18N.items || {})[lang] || {})[item.src];
+    return { caption: (tr && tr.caption) || item.caption, text: (tr && tr.text !== undefined) ? tr.text : item.text };
+  }
+  function LCat(title) {
+    const tr = lang === 'fr' ? null : ((I18N.cats || {})[lang] || {})[title];
+    return (tr && tr.title) || title;
+  }
 
   const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -144,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   const intro = document.createElement('div');
   intro.id = 'intro';
-  intro.innerHTML = '<div id="intro-name"><span class="intro-big">Mathieu Tafat</span><span class="intro-sub">graphiste 2d et 3d</span></div>';
+  intro.innerHTML = '<div id="intro-name"><span class="intro-big">Mathieu Tafat</span><span class="intro-sub">' + esc(t('introSub')) + '</span></div>';
   document.body.appendChild(intro);
 
   // Nom = 86 % de la largeur d'écran ; la ligne du dessous est étalée pour faire exactement la même largeur
@@ -287,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (liteMode || overlayOpen) { splideVideos.forEach(v => v.pause()); return; }
     splideVideos.forEach(v => {
       const on = !ICON_ONLY_ACTIVE || v.parentElement.classList.contains('is-active');
+      applyVideoRate(v);
       if (on) { const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); } else v.pause();
     });
   }
@@ -298,7 +360,8 @@ document.addEventListener('DOMContentLoaded', function () {
   function applyVideoRate(vid) {
     const k = animK();
     if (k <= 0) { vid.pause(); return; }
-    vid.playbackRate = Math.max(0.0625, Math.min(16, k * (vid._mult || 1)));
+    const active = vid.parentElement && vid.parentElement.classList.contains('is-active');
+    vid.playbackRate = Math.max(0.0625, Math.min(16, k * (vid._mult || 1) * (active ? 1 : ICON_IDLE_SPEED)));
   }
 
   document.querySelectorAll('.splide__slide').forEach(function(slide) {
@@ -634,7 +697,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 ];
 
-
   // Tag en japonais sur chaque slide : le titre de la catégorie
   document.querySelectorAll('.splide__slide').forEach((sl, i) => {
     sl.dataset.idx = (SLIDE_DATA[i] && SLIDE_DATA[i].jp) || String(i + 1);
@@ -747,13 +809,16 @@ document.addEventListener('DOMContentLoaded', function () {
     introEnded = true;
     intro.remove();
     gateOpen = false;
-    pseudoEl.textContent = 'Visiteur';
+    visitorName = '';
+    updatePseudo();
     revealSite();
   }
 
   // =====================
   // QUESTION : COMMENT VOUS APPELEZ-VOUS ?
   // =====================
+  function updatePseudo() { pseudoEl.textContent = visitorName || t('visitor'); }
+
   function revealSite() {
     [splideElIntro, topbarIntro, bgBar, tickerEl, targetsEl].forEach(el => {
       if (!el) return;
@@ -770,23 +835,41 @@ document.addEventListener('DOMContentLoaded', function () {
     gate.setAttribute('aria-labelledby', 'gate-label');
     gate.innerHTML =
       '<form id="gate-form" autocomplete="off">' +
-        '<label id="gate-label" for="gate-input">Comment vous appelez-vous ?</label>' +
-        '<input id="gate-input" type="text" maxlength="24" placeholder="Votre prénom" autocomplete="given-name">' +
+        '<label id="gate-label" for="gate-input"></label>' +
+        '<input id="gate-input" type="text" maxlength="24" autocomplete="given-name">' +
         '<div class="gate-actions">' +
-          '<button type="submit" class="nav-btn">Entrer</button>' +
-          '<button type="button" id="gate-skip" class="nav-btn nav-btn--ghost">Passer</button>' +
+          '<button type="submit" class="nav-btn"></button>' +
+          '<button type="button" id="gate-skip" class="nav-btn nav-btn--ghost"></button>' +
         '</div>' +
+        '<div class="gate-lang" role="group"></div>' +
       '</form>';
     document.body.appendChild(gate);
 
     const input = gate.querySelector('#gate-input');
+    const gateLang = gate.querySelector('.gate-lang');
+    LANGS.forEach(function(l) {            // on peut choisir la langue dès la question du prénom
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'nav-btn nav-btn--ghost gate-lang-btn'; b.dataset.lang = l[0]; b.textContent = l[1];
+      b.addEventListener('click', function() { setLang(l[0]); });
+      gateLang.appendChild(b);
+    });
+    gateRender = function() {
+      gate.querySelector('#gate-label').textContent = t('gateLabel');
+      input.placeholder = t('gatePlaceholder');
+      gate.querySelector('button[type="submit"]').textContent = t('gateEnter');
+      gate.querySelector('#gate-skip').textContent = t('gateSkip');
+      gateLang.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false'));
+    };
+    gateRender();
     requestAnimationFrame(() => requestAnimationFrame(() => {
       gate.classList.add('in');
       input.focus({ preventScroll: true });
     }));
 
     function finish(name) {
-      pseudoEl.textContent = (name || '').trim() || 'Visiteur';
+      visitorName = (name || '').trim();
+      updatePseudo();
+      gateRender = null;
       gate.classList.remove('in');
       gate.classList.add('out');
       gateOpen = false;
@@ -1070,44 +1153,44 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function cellHTML(img) {
-    const label = '<div class="og-cell-label">' + esc(img.caption) + '</div><div class="og-cell-dim"></div>';
+    const label = '<div class="og-cell-label">' + esc(LI(img).caption) + '</div><div class="og-cell-dim"></div>';
     if (isVideoSrc(img.src)) {
       return '<video src="' + esc(img.src) + '" class="og-img" loop muted playsinline preload="metadata"></video>' + label;
     }
-    return '<img src="' + esc(img.src) + '" alt="' + esc(img.caption) + '" class="og-img" loading="lazy" />' + label;
+    return '<img src="' + esc(img.src) + '" alt="' + esc(LI(img).caption) + '" class="og-img" loading="lazy" />' + label;
   }
 
   // =====================
   // BUILD PROFILE
   // =====================
   function buildProfile() {
-    const data = SLIDE_DATA[0];
+    const data = L(SLIDE_DATA[0]);
     currentData = null;
 
     const paragraphs = data.text
       .split('\n\n')
       .filter(p => p.trim())
-      .map(p => `<p class="og-profile-p">${p.trim()}</p>`)
+      .map(p => `<p class="og-profile-p">${esc(p.trim())}</p>`)
       .join('');
 
     overlayContent.innerHTML = `
-      <div class="og-header"><span class="br">「</span>${data.title}<span class="br">」</span></div>
+      <div class="og-header"><span class="br">「</span>${esc(data.title)}<span class="br">」</span></div>
       <div class="og-profile">
         <div class="og-profile-text">
           ${paragraphs}
           <div class="og-skills">
-            <span class="og-profile-contact-label">Logiciels</span>
-            <p class="og-skills-row"><span class="og-skills-level">Utilisés régulièrement</span><span>Suite Adobe, Blender, Construct</span></p>
-            <p class="og-skills-row"><span class="og-skills-level">Notions</span><span>Unity</span></p>
+            <span class="og-profile-contact-label">${t('skillsTitle')}</span>
+            <p class="og-skills-row"><span class="og-skills-level">${t('skillsRegular')}</span><span>Suite Adobe, Blender, Construct</span></p>
+            <p class="og-skills-row"><span class="og-skills-level">${t('skillsBasics')}</span><span>Unity</span></p>
           </div>
           <div class="og-profile-contact">
-            <span class="og-profile-contact-label">Contact</span>
+            <span class="og-profile-contact-label">${t('contactLabel')}</span>
           </div>
           <form id="og-contact-form" class="og-contact-form">
-            <input type="email" name="email" placeholder="Votre email" aria-label="Votre email" required>
-            <input type="text" name="subject" placeholder="Sujet" aria-label="Sujet" required>
-            <textarea name="message" placeholder="Votre message" aria-label="Votre message" rows="4" required></textarea>
-            <button type="submit">Envoyer</button>
+            <input type="email" name="email" placeholder="${t('formEmail')}" aria-label="${t('formEmail')}" required>
+            <input type="text" name="subject" placeholder="${t('formSubject')}" aria-label="${t('formSubject')}" required>
+            <textarea name="message" placeholder="${t('formMessage')}" aria-label="${t('formMessage')}" rows="4" required></textarea>
+            <button type="submit">${t('formSend')}</button>
             <p class="og-contact-status" role="status"></p>
           </form>
           <div class="og-profile-contact">
@@ -1123,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
-      status.textContent = 'Envoi en cours...';
+      status.textContent = t('formSending');
       status.className = 'og-contact-status';
 
       try {
@@ -1134,15 +1217,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (res.ok) {
-          status.textContent = 'Message envoyé, merci !';
+          status.textContent = t('formOk');
           status.classList.add('og-contact-status--ok');
           form.reset();
         } else {
-          status.textContent = "Une erreur est survenue, réessayez ou écrivez-moi directement par mail.";
+          status.textContent = t('formErr');
           status.classList.add('og-contact-status--err');
         }
       } catch (err) {
-        status.textContent = "Une erreur est survenue, réessayez ou écrivez-moi directement par mail.";
+        status.textContent = t('formErr');
         status.classList.add('og-contact-status--err');
       }
     });
@@ -1191,11 +1274,11 @@ document.addEventListener('DOMContentLoaded', function () {
     currentData  = data;
     gridFocusIdx = 0;
 
-    let html = `<div class="og-header"><span class="br">「</span>${esc(data.title)}<span class="br">」</span></div>`;
-    if (data.desc) html += `<div class="og-desc">${esc(data.desc)}</div>`;
+    let html = `<div class="og-header"><span class="br">「</span>${esc(L(data).title)}<span class="br">」</span></div>`;
+    if (L(data).desc) html += `<div class="og-desc">${esc(L(data).desc)}</div>`;
     html += `<div class="og-grid" id="og-grid">`;
     data.images.forEach((img, i) => {
-      html += `<div class="og-cell" data-index="${i}" role="button" tabindex="0" aria-label="Ouvrir ${esc(img.caption)}">${cellHTML(img)}</div>`;
+      html += `<div class="og-cell" data-index="${i}" role="button" tabindex="0" aria-label="${esc(t('open', { c: LI(img).caption }))}">${cellHTML(img)}</div>`;
     });
     html += `</div>`;
     overlayContent.innerHTML = html;
@@ -1302,6 +1385,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function openProject(item) {
     if (!item) return;
+    const view = LI(item);
     const medias = getMedias(item);
     pjTotal = medias.length + 1; // + slide de texte
     pjTrack.innerHTML = '';
@@ -1309,24 +1393,24 @@ document.addEventListener('DOMContentLoaded', function () {
     medias.forEach((src, i) => {
       const slide = document.createElement('div');
       slide.className = 'pj-slide';
-      slide.setAttribute('aria-label', 'Média ' + (i + 1) + ' sur ' + pjTotal);
+      slide.setAttribute('aria-label', t('mediaOf', { i: i + 1, n: pjTotal }));
       if (isVideoSrc(src)) {
         slide.innerHTML = '<video class="pj-media" src="' + esc(src) + '" controls loop muted playsinline preload="metadata"></video>';
         watchVideo(slide.firstChild);
       } else {
-        slide.innerHTML = '<img class="pj-media" src="' + esc(src) + '" alt="' + esc(item.caption) + '">';
+        slide.innerHTML = '<img class="pj-media" src="' + esc(src) + '" alt="' + esc(view.caption) + '">';
       }
       pjTrack.appendChild(slide);
     });
 
     const textSlide = document.createElement('div');
     textSlide.className = 'pj-slide';
-    textSlide.setAttribute('aria-label', 'Texte, ' + pjTotal + ' sur ' + pjTotal);
+    textSlide.setAttribute('aria-label', t('textOf', { i: pjTotal, n: pjTotal }));
     textSlide.innerHTML =
       '<div class="pj-text">' +
-        (item.category ? '<p class="pj-text-cat">' + esc(item.category) + '</p>' : '') +
-        '<h2 class="pj-text-caption">' + esc(item.caption) + '</h2>' +
-        (item.text ? '<p class="pj-text-body">' + esc(item.text) + '</p>' : '') +
+        (item.category ? '<p class="pj-text-cat">' + esc(LCat(item.category)) + '</p>' : '') +
+        '<h2 class="pj-text-caption">' + esc(view.caption) + '</h2>' +
+        (view.text ? '<p class="pj-text-body">' + esc(view.text) + '</p>' : '') +
       '</div>';
     pjTrack.appendChild(textSlide);
 
@@ -1335,12 +1419,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'pj-dot';
-      b.setAttribute('aria-label', 'Aller à la page ' + (i + 1));
+      b.setAttribute('aria-label', t('gotoPage', { i: i + 1 }));
       b.addEventListener('click', () => pjGo(i));
       pjDots.appendChild(b);
     }
 
-    pjTitle.textContent = item.caption;
+    pjTitle.textContent = view.caption;
     projectOpen = true;
     project.style.display = 'block';
     pjTrack.scrollLeft = 0;
@@ -1418,42 +1502,95 @@ document.addEventListener('DOMContentLoaded', function () {
   // BOUTONS DE LA BARRE : Contact / Travaux
   // =====================
   const navEl = document.getElementById('nav');
-  const navOrder = SLIDE_DATA.map((d, i) => i);
 
-  navOrder.forEach(i => {
-    const d = SLIDE_DATA[i];
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'top-link';
-    b.textContent = d.navLabel || d.title;
-    b.setAttribute('aria-label', d.title);
-    b.addEventListener('click', function() {
-      if (gateOpen || overlayOpen) return;
-      currentSlideIdx = i;
-      splide.go(i);
-      openOverlay(i);
-    });
-    navEl.appendChild(b);
-  });
-
-  // Bouton "Site optimisé" : bascule vers la version sobre (sans animation ni effet) et inversement
+  // Bouton "Version accessible" : version sobre (sans animation ni effet, texte plus lisible) et inversement
   const liteBtn = document.createElement('button');
   liteBtn.type = 'button';
   liteBtn.id = 'lite-toggle';
   liteBtn.className = 'top-link lite-btn';
+  function updateLiteBtn() {
+    liteBtn.textContent = liteMode ? t('liteOff') : t('liteOn');
+    liteBtn.setAttribute('aria-pressed', liteMode ? 'true' : 'false');
+    liteBtn.title = liteMode ? t('liteOffTitle') : t('liteOnTitle');
+  }
   function setLiteMode(on) {
     liteMode = on;
     document.documentElement.classList.toggle('lite-mode', on);
     try { localStorage.setItem('lite', on ? '1' : '0'); } catch (err) {}
-    liteBtn.textContent = on ? 'Site complet' : 'Site optimisé';
-    liteBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    liteBtn.title = on ? 'Revenir au site complet (animations et effets)' : 'Version sobre : aucune animation, très légère';
+    updateLiteBtn();
     syncIconVideos();
     if (on) window.scrollTo(0, 0);
   }
   liteBtn.addEventListener('click', function() { if (gateOpen || overlayOpen) return; setLiteMode(!liteMode); });
-  navEl.appendChild(liteBtn);
+
+  function renderNav() {
+    navEl.innerHTML = '';
+    SLIDE_DATA.forEach((d, i) => {
+      const ld = L(d);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'top-link';
+      b.textContent = ld.navLabel || ld.title;
+      b.setAttribute('aria-label', ld.title);
+      b.addEventListener('click', function() {
+        if (gateOpen || overlayOpen) return;
+        currentSlideIdx = i;
+        splide.go(i);
+        openOverlay(i);
+      });
+      navEl.appendChild(b);
+    });
+    navEl.appendChild(liteBtn);
+  }
+
+  // Sélecteur de langue (FR / EN / 日本語)
+  const langBox = document.getElementById('lang');
+  LANGS.forEach(function(l) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'top-link lang-btn';
+    b.dataset.lang = l[0];
+    b.textContent = l[1];
+    b.setAttribute('lang', l[0]);
+    b.addEventListener('click', function() { if (gateOpen) return; setLang(l[0]); });
+    langBox.appendChild(b);
+  });
+
+  function setLang(code) {
+    if (code === lang) return;
+    if (overlayOpen) closeOverlayFn();
+    lang = code;
+    try { localStorage.setItem('lang', lang); } catch (err) {}
+    applyLanguage();
+  }
+
+  function applyLanguage() {
+    document.documentElement.lang = lang;
+    const sub = intro.querySelector('.intro-sub');
+    if (sub) { sub.textContent = t('introSub'); fitIntro(); }
+    updatePseudo();
+    document.querySelectorAll('.titre').forEach((h, i) => { if (SLIDE_DATA[i]) h.textContent = L(SLIDE_DATA[i]).title; });
+    attacherStart();
+    renderNav();
+    updateLiteBtn();
+    navEl.setAttribute('aria-label', t('navAria'));
+    document.querySelector('.splide').setAttribute('aria-label', t('sectionAria'));
+    document.getElementById('pdp').setAttribute('aria-label', t('photoAria'));
+    document.getElementById('clock').setAttribute('aria-label', t('clockAria'));
+    langBox.setAttribute('aria-label', t('langAria'));
+    const sp = document.getElementById('bg-speed');
+    sp.setAttribute('aria-label', t('speed')); sp.title = t('speed');
+    overlayHint.setAttribute('aria-label', t('close'));
+    project.setAttribute('aria-label', t('project'));
+    project.querySelector('#project-close').setAttribute('aria-label', t('closeProject'));
+    project.querySelector('#project-prev').setAttribute('aria-label', t('prev'));
+    project.querySelector('#project-next').setAttribute('aria-label', t('next'));
+    langBox.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false'));
+    if (gateRender) gateRender();
+  }
+
   setLiteMode(liteMode);
+  applyLanguage();
 
   // navigation clavier : une slide qui reçoit le focus devient la slide active
   Array.from(document.querySelectorAll('.splide__slide')).forEach((sl, i) => {
