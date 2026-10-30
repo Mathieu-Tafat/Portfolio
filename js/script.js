@@ -99,6 +99,47 @@ document.addEventListener('DOMContentLoaded', function () {
   const isVideoSrc = src => /\.(mp4|webm|ogg)$/i.test(src);
 
   // =====================
+  // CURSEUR CROSSHAIR PERSONNALISÉ (desktop) : blanc, devient rouge au survol des éléments cliquables
+  // avec une transition douce (les diagonales se rapprochent du centre). Un vrai curseur CSS ne peut
+  // pas être animé, donc on le dessine nous-mêmes et on masque le curseur natif.
+  // =====================
+  if (!isTouch) {
+    const cur = document.createElement('div');
+    cur.id = 'cursor';
+    cur.setAttribute('aria-hidden', 'true');
+    cur.innerHTML =
+      '<svg viewBox="0 0 32 32" width="32" height="32">' +
+        '<g class="cur-out" fill="none" stroke="#000" stroke-opacity="0.55" stroke-width="4">' +
+          '<path d="M16 2v10M16 20v10M2 16h10M20 16h10"/>' +
+          '<path class="diag" d="M8 8l4 4M24 8l-4 4M8 24l4-4M24 24l-4-4"/>' +
+        '</g>' +
+        '<g class="cur-col" fill="none">' +
+          '<path d="M16 3v9M16 20v9M3 16h9M20 16h9"/>' +
+          '<path class="diag" d="M8.5 8.5l3.5 3.5M23.5 8.5l-3.5 3.5M8.5 23.5l3.5-3.5M23.5 23.5l-3.5-3.5"/>' +
+        '</g>' +
+      '</svg>';
+    document.body.appendChild(cur);
+    document.documentElement.classList.add('custom-cursor');
+
+    const HOVER_SEL = 'a, button, .splide__slide, .og-cell, #btn-start, .target, #bg-speed, .og-img, label[for]';
+    const TEXT_SEL  = 'input, textarea, select, [contenteditable="true"]';
+    let cx = -100, cy = -100, curRaf = 0;
+
+    document.addEventListener('mousemove', function(e) {
+      cx = e.clientX; cy = e.clientY;
+      if (!curRaf) curRaf = requestAnimationFrame(() => {
+        curRaf = 0;
+        cur.style.transform = 'translate3d(' + (cx - 16) + 'px,' + (cy - 16) + 'px,0)';
+      });
+      const t = e.target;
+      const isText = !!(t.closest && t.closest(TEXT_SEL));
+      cur.style.opacity = isText ? '0' : '1';          // sur un champ de texte : curseur texte natif
+      cur.classList.toggle('is-hover', !!(t.closest && t.closest(HOVER_SEL)));
+    }, { passive: true });
+    document.documentElement.addEventListener('mouseleave', () => { cur.style.opacity = '0'; });
+  }
+
+  // =====================
   // INTRO (texte)
   // =====================
   const intro = document.createElement('div');
@@ -309,289 +350,290 @@ document.addEventListener('DOMContentLoaded', function () {
   // Sans "medias", on utilise le média principal (src) répété PROJECT_PLACEHOLDER_COUNT fois.
   // =====================
   const SLIDE_DATA = [
-    {
-      title: "Profil",
-      navLabel: "Profil & Contact",
-      jp: "プロフィール",
-      profile: true,
-      text: "Graphiste 2D et 3D, diplômé en 2025 d'une Licence Professionnelle en Design Graphique. Je m'intéresse à des domaines variés, de l'identité visuelle à l'édition, en passant par le motion design, l'animation 3D et le jeu vidéo. J'aime explorer de nouvelles techniques et apprendre à utiliser les outils adaptés à chaque projet.\n\nLa culture, le cinéma et le jeu vidéo nourrissent mon travail, mais j'apprécie aussi de découvrir de nouveaux univers et de sortir de mes habitudes.\n\nJe suis ouvert aux projets et aux collaborations : n'hésitez pas à me contacter."
-    },
-    {
-      title: "Service Communication Université Rennes 2",
-      navLabel: "Service communication",
-      jp: "レンヌ2",
-      desc: "Suite Adobe",
-      images: [
-        {
-          src: "img/stagerennes2/recherche/recherche.png",
-          caption: "Journée de la Recherche 2025",
-          text: "Après plusieurs années sans édition, la Journée de la Recherche faisait son retour autour du thème « Recherche en société ». Le brief consistait à proposer une identité qui rende la recherche plus accessible, sans reprendre les codes scientifiques habituels. J'ai travaillé sur une ligature typographique reliant les mots et sur un fond bleu animé par des ondes multicolores, pour évoquer les échanges entre recherche et société. J'ai également posé un principe pour les éditions suivantes : renouveler le travail typographique chaque année tout en conservant une identité reconnaissable. J'ai réalisé les déclinaisons sur différents supports : affiches, réseaux sociaux, diaporama et brochure."
-        },
-        {
-          src: "img/stagerennes2/campusweek/campus.png",
-          caption: "Campus Week 2025",
-          text: "La Campus Week est une semaine de rentrée consacrée à la vie étudiante de Rennes 2. Je voulais représenter cette communauté à travers une multitude de petits personnages, inspirés des dessins que je réalisais plus jeune, vivant ensemble sur l'affiche. Plutôt que de contourner le cartouche « Campus Week », contrainte importante de la composition, j'ai choisi de l'intégrer au visuel. Le projet a ensuite été décliné sur de nombreux supports : brochure, plan, réseaux sociaux, site internet et goodies."
-        },
-        {
-          src: "img/stagerennes2/olympe/olymp.png",
-          caption: "Olymp'in Fac 2025",
-          text: "À partir du logo existant et d'une direction graphique définie avec le graphiste du service, j'ai conçu une affiche pour cet événement sportif étudiant. Je me suis orienté vers une esthétique inspirée du mouvement Memphis, avec des motifs simples associés aux différentes disciplines et des espaces dédiés aux informations pratiques. J'ai réalisé une affiche classique ainsi qu'une version au format pantalon."
-        },
-        {
-          src: "img/stagerennes2/anim.mp4",
-          caption: "Congrès SFSIC 2025",
-          text: "Animation réalisée pour le congrès de la SFSIC à partir des totems graphiques conçus par le graphiste du service. J'ai animé les motifs image par image dans Illustrator, en déplaçant progressivement leurs éléments d'une frame à l'autre. Un exercice de mise en mouvement d'une identité existante, que je réaliserais aujourd'hui différemment, notamment avec Blender."
-        },
-        {
-          src: "img/stagerennes2/cartel.png",
-          caption: "Cartels SFSIC 2025",
-          text: "Conception de plusieurs gabarits de cartels destinés à accompagner les contenus présentés lors du congrès de la SFSIC. Le travail consistait à reprendre les couleurs, les typographies et les totems de l'identité de l'événement pour créer des supports lisibles et cohérents avec l'ensemble de la communication."
-        },
-        {
-          src: "img/stagerennes2/planegalite.png",
-          caption: "Plan Action Égalité 2025-2028",
-          text: "Mise en page de verbatims rapportant des propos problématiques entendus sur le campus, dans le cadre du plan d'action Égalité de Rennes 2. L'objectif était de faire ressortir la violence de ces paroles par une disposition dynamique des textes. J'ai réalisé la structure de mise en page à partir d'une sélection de typographies, tandis que le graphiste responsable du document a défini le traitement esthétique final."
-        }
-      ]
-    },
-    {
-      title: "Jeux-vidéo",
-      jp: "ビデオゲーム",
-      desc: "Construct 2, Unity",
-      images: [
-        {
-          src: "img/jeuvideo/MUR.mp4",
-          caption: "MUR",
-          text: "Développé en parallèle de mon mémoire « Barre de vie », MUR est un jeu de plateforme en 2D qui explore l'évolution des interfaces de jeu vidéo. Au cours d'une même partie, l'interface se transforme et devient une composante du gameplay. Le projet interroge la place de ces éléments : jusqu'où peut-on alléger une interface sans perdre les informations nécessaires au jeu ? À l'inverse, que se passe-t-il lorsqu'elle devient envahissante ? J'ai voulu en faire un terrain d'expérimentation, où l'on peut explorer ces extrêmes tout en jouant."
-        },
-        {
-          src: "img/jeuvideo/course.mp4",
-          caption: "-faire les courses",
-          text: "Mon premier jeu en 3D réalisé avec Unity. Le joueur se lève et part faire les courses, mais croise en chemin un personnage qui le met au défi. Le jeu enchaîne alors plusieurs mini-jeux imaginés autour de cette situation quotidienne. Le projet est resté court et expérimental, mais m'a permis d'explorer différentes idées de gameplay et de m'amuser à créer des défis originaux."
-        },
-        {
-          src: "img/3d/apaisant.mp4",
-          caption: "Apaisant",
-          text: "Concept de menu principal en 3D pour un jeu d'exploration à l'atmosphère sombre et calme. Dans un environnement à mi-chemin entre forêt et zone industrielle abandonnée, le joueur doit trouver une issue après être tombé en panne d'essence. L'idée est de créer une tension par l'absence de menace visible : les sons de la nature, le silence et la possibilité qu'une présence se rapproche suffisent à installer le doute."
-        },
-        {
-          src: "img/3d/toisondor.mp4",
-          caption: "Toison d'Or",
-          text: "Concept de menu principal en 3D pour un jeu inspiré de la mythologie et des lieux sacrés. Dans un environnement très lumineux, épuré et mystique, le joueur aurait pour objectif de récupérer un objet légendaire en surmontant différentes épreuves, à travers des mécaniques de plateforme ou d'énigmes. Une ambiance musicale douce, ponctuée d'éléments étranges, viendrait troubler cette apparente sérénité."
-        },
-        {
-          src: "img/3d/class.mp4",
-          caption: "αιεαRELICTAεςτ",
-          text: "Concept de menu principal en 3D pour un jeu de rôle inspiré du quotidien en milieu scolaire. Derrière cette apparence familière, tout semble jouer contre le personnage : gestion des relations, temps d'étude et événements imprévus compliquent progressivement sa progression vers l'obtention du diplôme. J'imagine un mélange de RPG et de roguelite dans lequel chaque choix compte et où les obstacles deviennent de plus en plus difficiles à surmonter."
-        },
-        {
-          src: "img/jeuvideo/pokemon.png",
-          caption: "Identités Pokémon Émeraude alternatives",
-          text: "Projet personnel imaginant deux éditions alternatives de Pokémon Émeraude (2004), sur le principe de versions d'un même jeu présentant des différences graphiques et thématiques. Émeraude Delta s'inspire des ruines, de l'archéologie et des légendes anciennes, tandis qu'Émeraude Alpha explore un univers plus lumineux, idéal et presque divin. J'ai décliné ces deux directions à travers les jaquettes, les cartouches, les animations de lancement et une page de magazine inspirée des publications de l'époque."
-        },
-        {
-          src: "img/jeuvideo/meute.png",
-          caption: "Meute",
-          text: "Projet personnel de jeu de stratégie sur grille. Le joueur contrôle une famille de loups vivant dans un zoo-refuge et qui cherche à s'en échapper pour partir en vacances. Chaque membre de la meute possède ses propres caractéristiques et capacités, ce qui permet d'imaginer différentes manières de franchir les obstacles et d'éviter les gardes. J'ai choisi une palette bleu et jaune, inspirée de la vision des loups, et exploré plusieurs écrans de jeu ainsi qu'une boîte imprimée et assemblée à la main. Le projet est resté au stade de l'expérimentation, avec l'envie d'imaginer un jeu de stratégie accessible à plusieurs personnes."
-        },
-        {
-          src: "img/jeuvideo/finelame.mp4",
-          caption: "Fine Lame",
-          text: "Première version de mon projet de diplôme, Fine Lame était un jeu de plateforme dans lequel on incarnait un samouraï cherchant à devenir le plus fort, avec une inspiration tirée du livre Musashi. J'ai développé les dessins, les animations, une typographie et un système d'éclairage sous Construct 2, avec la musique composée par un ami. Malgré le travail engagé sur ce projet, j'ai finalement choisi de m'orienter vers une approche plus expérimentale avec MUR, davantage en lien avec mon sujet de recherche."
-        },
-        {
-          src: "img/motiondesign/fullanimdelta.mp4",
-          caption: "Pokémon Émeraude Delta",
-          text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). Cette version explore un univers tourné vers les ruines, l'archéologie et les légendes anciennes, avec une identité inspirée des vestiges d'un monde oublié."
-        },
-        {
-          src: "img/motiondesign/pokemon-alpha-maintitle.mp4",
-          caption: "Pokémon Émeraude Alpha",
-          text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). À l'opposé de Delta, cette version explore une esthétique lumineuse et idéale, entre nature, perfection et imagerie divine."
-        }
-      ]
-    },
-    {
-      title: "Edition",
-      jp: "エディトリアル",
-      desc: "Huile de coude, suite Adobe",
-      images: [
-        {
-          src: "img/edition/barre2vie.png",
-          caption: "Barre de vie",
-          text: "Mémoire de recherche consacré aux interfaces utilisateur des jeux vidéo japonais des années 1980 et 1990, jusqu'à l'arrivée de la 3D. J'y étudie leur définition, les contraintes techniques de l'époque, les typographies employées et l'évolution des codes graphiques à travers de nombreux jeux auxquels j'ai joué et dont j'ai analysé les interfaces. Une étude de cas sur la saga The Legend of Zelda permet d'approfondir cette évolution. J'aborde également les changements liés à l'arrivée de la 3D et les attentes actuelles en matière d'interface, notamment à travers un sondage mené auprès d'étudiant·es en arts, de la licence au master, et de membres du corps enseignant de Rennes 2. Pour l'édition, j'ai conçu une bichromie cyan et rouge ainsi qu'un système de lecture à deux niveaux : les images de jeu sont visibles au premier abord, tandis que le texte apparaît lorsque l'on soulève la page de droite. J'ai réalisé une version classique et une version à couverture rigide accompagnée d'un CD regroupant des émulateurs et les jeux testés. Un PDF du mémoire peut être fourni sur demande."
-        },
-        {
-          src: "img/edition/mur.png",
-          caption: "MUR - livret",
-          text: "Livret conçu en complément de mon jeu MUR, inspiré des livrets fournis avec les jeux Nintendo DS. Je voulais retrouver le plaisir de découvrir un jeu en lisant son livret, en présentant son fonctionnement, ses commandes et son univers. J'ai également créé les éléments typographiques et graphiques du document. Pour rester cohérent avec le jeu, le livret suit la même logique d'évolution de l'interface : plus on avance, moins celle-ci occupe de place."
-        },
-        {
-          src: "img/edition/lyber.png",
-          caption: "Lyber & CSS",
-          text: "Workshop de Licence Professionnelle mené avec le collectif Luuse. À partir d'un lyber, une version gratuite d'un livre diffusée en ligne sans mise en page, nous devions concevoir une édition en utilisant le codage HTML/CSS. J'ai pris en charge l'essentiel du développement, étant le plus à l'aise avec le code, tout en participant à une réflexion collective sur la direction graphique et en répartissant les rôles au sein du groupe. Le livre portant sur Emmanuel Macron et sa politique, nous avons développé une esthétique inspirée de la communication politique et de la polarisation entre droite et gauche."
-        },
-        {
-          src: "img/edition/reggae.png",
-          caption: "Reggaeton & Fin du Monde",
-          text: "Fanzine réalisé en binôme autour du thème « Reggaeton & Fin du Monde », avec des contraintes de photocopie et de collage. Nos approches étaient différentes mais complémentaires : je développais les idées autour de la fin du monde, tandis que mon binôme apportait davantage de références au reggaeton. Le résultat cherche un équilibre entre ces deux univers. Ce projet a surtout été une expérience de collaboration, qui m'a appris à confronter des idées différentes, à partager mes doutes et à construire une proposition commune."
-        },
-        {
-          src: "img/edition/1173.png",
-          caption: "117³ - Exposition",
-          text: "Affiche et supports de communication réalisés dans le cadre d'un workshop de Licence 2 Arts Plastiques consacré à la curation et à l'exposition collective des travaux des étudiant·es. Chargé de l'affiche après avoir exprimé mon intérêt pour le graphisme, j'ai travaillé avec le groupe pour construire une proposition commune. Le titre 117³ faisait référence au temps passé dans notre atelier durant une semaine, et j'ai choisi de représenter ce nombre par une photographie de la porte de l'atelier, vidée de son contenu. Le délai très court et la diversité des avis ont imposé de faire des choix pour aboutir à une composition cohérente. J'ai également réalisé des supports de promotion, notamment un flyer et des visuels pour les réseaux sociaux."
-        },
-        {
-          src: "img/edition/flipbook/flipe.mp4",
-          caption: "E - Flipbook",
-          text: "Flipbook explorant l'évolution de la lettre « E » à travers différentes grandes catégories typographiques. Le projet m'a amené à concevoir un objet éditorial à la fois robuste et suffisamment souple pour permettre une manipulation répétée. La principale contrainte était de garantir le bon fonctionnement du feuilletage et la lisibilité des transformations. Le flipbook a été exposé au Cabinet du livre d'artiste de Rennes 2."
-        }
-      ]
-    },
-    {
-      title: "Animation 2D",
-      jp: "2Dアニメーション",
-      desc: "Suite Adobe",
-      images: [
-        {
-          src: "img/motiondesign/themachinist_final.mp4",
-          caption: "The Machinist",
-          text: "Animation inspirée du film The Machinist de Brad Anderson (2004). Je voulais retrouver cette impression que quelque chose ne tourne pas rond, dans un quotidien sombre et nihiliste où une présence mystérieuse semble perturber la vie du personnage. Je me suis notamment appuyé sur l'atmosphère de certaines scènes du film, dont celle de la salle de bain, pour construire un univers visuel inquiétant."
-        },
-        {
-          src: "img/motiondesign/load.mp4",
-          caption: "FC Loading",
-          text: "Recréation de l'animation de chargement des jeux EA SPORTS FC, que je croise régulièrement en jouant. Le projet était un défi personnel : reproduire cette boucle tout en imaginant une variante du logo dans un style inspiré des jeux vidéo rétro, à partir de petites versions alternatives que j'avais déjà explorées."
-        },
-        {
-          src: "img/motiondesign/crossed.mp4",
-          caption: "Crossed",
-          text: "Générique de fan imaginé pour Crossed, l'émission de Karim Debbache consacrée aux adaptations de jeux vidéo au cinéma. Après avoir revu l'émission, j'ai voulu proposer ma propre animation autour de son titre. J'ai choisi une interprétation littérale du mot « Crossed », sans chercher à développer une signification supplémentaire, en m'appuyant sur une musique existante qui n'a pas été composée pour ce projet."
-        }
-      ]
-    },
-    {
-      title: "Animations 3D",
-      jp: "3Dアニメーション",
-      desc: "Blender, Suite Adobe",
-      images: [
-        {
-          src: "img/3d/clerbar.mp4",
-          caption: "CLEBART",
-          text: "Première animation réalisée sur Blender. J'ai construit une scène nocturne à partir de quelques images utilisées comme éléments de décor et d'un travail d'éclairage pour installer une ambiance sombre, dans un coin de village. L'arrivée d'un personnage, le clebard, vient soudainement rompre cette atmosphère et créer un décalage."
-        },
-        {
-          src: "img/3d/loubart.mp4",
-          caption: "LOUBART",
-          text: "Dans la continuité de CLEBART, cette animation joue sur le contraste entre un décor nocturne inquiétant et l'arrivée inattendue d'un personnage, Loubart. Je voulais retrouver cette ambiance sombre et mystérieuse, puis la désamorcer par l'apparition de cet élément décalé."
-        },
-        {
-          src: "img/3d/surplace.mp4",
-          caption: "SUR PLACE OU À EMPORTER",
-          text: "Animation construite autour d'un contraste entre décor et personnage. J'ai imaginé un diner américain vide, froid et presque entièrement blanc, avant d'y introduire un iguane qui parle. Le décalage entre l'environnement et cette apparition constitue le point de départ de la scène.",
-          vertical: true
-        },
-        {
-          src: "img/3d/backroom.mp4",
-          caption: "PERDU",
-          text: "Inspirée des Backrooms, cette animation explore un environnement vide et dérangeant, dans lequel j'ai choisi d'introduire un T-Rex. Plutôt que d'en faire une menace, je voulais jouer sur le contraste entre l'imaginaire inquiétant des lieux et la présence presque anodine du dinosaure."
-        },
-        {
-          src: "img/3d/chambre.mp4",
-          caption: "DESERTEUR",
-          text: "Avec cette animation, j'ai voulu aller au-delà de mes premières scènes en vue subjective en travaillant plusieurs angles de caméra. De petits soldats y préparent leur évasion, mais l'un d'eux finit par être considéré comme un déserteur. Le projet détourne l'imaginaire des jouets et des films comme Toy Story pour raconter une petite histoire à travers la mise en scène."
-        },
-        {
-          src: "img/3d/finalmente.mp4",
-          caption: "*",
-          text: "Animation mettant en scène un personnage qui part faire ses courses dans un univers étrange et peu rassurant. Il traverse des lieux lugubres et une maison en désordre, sans jamais sembler acheter quoi que ce soit d'essentiel. Le contraste entre le calme apparent du personnage et l'atmosphère tendue des décors laisse volontairement une part d'incertitude sur ce qui se passe."
-        },
-        {
-          src: "img/3d/bombe.mp4",
-          caption: "BOMBE",
-          text: "Clip 3D imaginé à partir du morceau « Bombe » de Yoa. J'avais envie de mettre cette musique en images en reprenant littéralement ses paroles. La mise en scène s'organise ainsi autour de la représentation d'un larguage de bombe."
-        },
-        {
-          src: "img/3d/rue.mp4",
-          caption: "UN PEU DE RETENUE",
-          text: "Animation 3D inspirée du morceau « Un peu de retenue » de Théodort. Plutôt que d'illustrer directement les paroles, j'ai imaginé une ambiance nocturne et froide : une rue traversée en boucle par un chat, tandis que l'on entend des personnes rire derrière les fenêtres. Le contraste entre l'extérieur solitaire et la chaleur suggérée des intérieurs donne son atmosphère à la scène."
-        },
-        {
-          src: "img/3d/cuir.mp4",
-          caption: "どこか",
-          text: "Animation d'exploration inspirée des Backrooms. La caméra avance dans des espaces vides, contrainte de suivre un chemin dont chaque angle pourrait dissimuler quelque chose. Pourtant, rien n'apparaît. Je voulais travailler sur cette peur de l'inconnu et sur l'absence de menace visible, en laissant le vide et l'anticipation créer l'inquiétude."
-        },
-        {
-          src: "img/3d/foret.mp4",
-          caption: "Dans les bois",
-          text: "Exploration 3D d'une forêt lumineuse et mystique, pensée comme un lieu dans lequel on aurait envie de se promener. Le personnage y ramasse progressivement des objets, comme dans un jeu de survie ou un RPG. Mon objectif était de créer un environnement forestier crédible et accueillant, en travaillant l'atmosphère et l'envie d'explorer."
-        },
-        {
-          src: "img/3d/electromenager.mp4",
-          caption: "Se lever aux aurores",
-          text: "À l'origine, je voulais recréer l'atmosphère d'un grand magasin de meubles vide, en m'inspirant de mon expérience de travail dans ce type de magasin. Le projet s'est finalement concentré sur une seule pièce dans laquelle un personnage se réveille. L'ambiance devient progressivement angoissante, sans explication claire, dans la continuité de l'univers étrange développé dans mon animation « * »."
-        },
-        {
-          src: "img/3d/skelet.mp4",
-          caption: "Un lancer vaut mieux que deux tu l'auras",
-          text: "Courte animation 3D mettant en scène un squelette qui jongle avec une seule balle."
-        },
-        {
-          src: "img/3d/spider.mp4",
-          caption: "Spider-man in Japan",
-          text: "À partir de mes propres vidéos tournées au caméscope au Japon, j'ai voulu imaginer que Spider-Man s'était invité dans mes images de voyage. Le projet était un défi technique autour de l'animation et de l'incrustation d'un personnage 3D dans des prises de vues réelles. Les résultats varient selon les plans, mais l'ensemble m'a permis d'expérimenter l'intégration d'un élément virtuel dans des images filmées."
-        },
-        {
-          src: "img/3d/mouche.mp4",
-          caption: "MOUCHE",
-          text: "Animation suivant le périple nocturne d'une mouche dans une chambre."
-        }
-      ]
-    },
-    {
-      title: "Illustrations",
-      jp: "イラストレーション",
-      desc: "Huile, aquarelle et illustrations",
-      images: [
-         {
-          src: "img/mechanoid.png",
-          caption: "mechanoid",
-          text: "Cover d'une musique du compositeur Papri-K. Illustration digitale réalisée à partir des envies de l'artiste."
-        },
-        {
-          src: "img/ctrl.png",
-          caption: "CTRL",
-          text: "Cover d'une musique du compositeur Papri-K. Scène 3D rendue comme une illustrration, réalisée à partir des envies de l'artiste."
-        },
-        {
-          src: "img/avatar.png",
-          caption: "I See You, Son",
-          text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
-        },
-        {
-          src: "img/darthvader.png",
-          caption: "Anakin",
-          text: "Illustration digitale à partir d'une scène de la série Star Wars : Obi-Wan"
-        },
-        {
-          src: "img/aquarelles/1.png",
-          caption: "Aquarelles Normandes",
-          text: "Série d'aquarelles réalisées à partir de lieux visités en Normandie. Ces peintures sont une manière de conserver une trace de ces endroits et d'en retranscrire les paysages à travers la couleur et l'aquarelle."
-        },
-        {
-          src: "img/aquarelles/video.mp4",
-          caption: "Exposition",
-          text: "Exposition personnelle d'un mois consacrée à mes aquarelles, présentées en grand format A3 à l'espace La Passerelle de Theix-Noyalo, en juin 2024. Ce projet m'a permis de présenter mon travail pictural dans un espace d'exposition.",
-          vertical: true
-        },
-        {
-          src: "img/aquarelles/huile.png",
-          caption: "Huile sur toile",
-          text: "Peinture à l'huile représentant un paysage. Il s'agit de ma première expérimentation avec cette technique, une occasion de découvrir les possibilités de la peinture à l'huile et son approche différente de la couleur et de la matière."
-        }
-      ]
-    }
-  ];
+  {
+    title: "Profil",
+    navLabel: "Profil & Contact",
+    jp: "プロフィール",
+    profile: true,
+    text: "Graphiste 2D et 3D, diplômé en 2025 d'une Licence Professionnelle en Design Graphique. Je m'intéresse à des domaines variés, de l'identité visuelle à l'édition, en passant par le motion design, l'animation 3D et le jeu vidéo. J'aime explorer de nouvelles techniques et apprendre à utiliser les outils adaptés à chaque projet.\n\nLa culture, le cinéma et le jeu vidéo nourrissent mon travail, mais j'apprécie aussi de découvrir de nouveaux univers et de sortir de mes habitudes.\n\nJe suis ouvert aux projets et aux collaborations : n'hésitez pas à me contacter."
+  },
+  {
+    title: "Service Communication Université Rennes 2",
+    navLabel: "Service communication",
+    jp: "レンヌ2",
+    desc: "Suite Adobe",
+    images: [
+      {
+        src: "img/stagerennes2/recherche/recherche.png",
+        caption: "Journée de la Recherche 2025",
+        text: "Après plusieurs années sans édition, la Journée de la Recherche faisait son retour autour du thème « Recherche en société ». Le brief consistait à proposer une identité qui rende la recherche plus accessible, sans reprendre les codes scientifiques habituels. J'ai travaillé sur une ligature typographique reliant les mots et sur un fond bleu animé par des ondes multicolores, pour évoquer les échanges entre recherche et société. J'ai également posé un principe pour les éditions suivantes : renouveler le travail typographique chaque année tout en conservant une identité reconnaissable. J'ai réalisé les déclinaisons sur différents supports : affiches, réseaux sociaux, diaporama et brochure."
+      },
+      {
+        src: "img/stagerennes2/campusweek/campus.png",
+        caption: "Campus Week 2025",
+        text: "La Campus Week est une semaine de rentrée consacrée à la vie étudiante de Rennes 2. Je voulais représenter cette communauté à travers une multitude de petits personnages, inspirés des dessins que je réalisais plus jeune, vivant ensemble sur l'affiche. Plutôt que de contourner le cartouche « Campus Week », contrainte importante de la composition, j'ai choisi de l'intégrer au visuel. Le projet a ensuite été décliné sur de nombreux supports : brochure, plan, réseaux sociaux, site internet et goodies."
+      },
+      {
+        src: "img/stagerennes2/olympe/olymp.png",
+        caption: "Olymp'in Fac 2025",
+        text: "À partir du logo existant et d'une direction graphique définie avec le graphiste du service, j'ai conçu une affiche pour cet événement sportif étudiant. Je me suis orienté vers une esthétique inspirée du mouvement Memphis, avec des motifs simples associés aux différentes disciplines et des espaces dédiés aux informations pratiques. J'ai réalisé une affiche classique ainsi qu'une version au format pantalon."
+      },
+      {
+        src: "img/stagerennes2/anim.mp4",
+        caption: "Congrès SFSIC 2025",
+        text: "Animation réalisée pour le congrès de la SFSIC à partir des totems graphiques conçus par le graphiste du service. J'ai animé les motifs image par image dans Illustrator, en déplaçant progressivement leurs éléments d'une frame à l'autre. Un exercice de mise en mouvement d'une identité existante, que je réaliserais aujourd'hui différemment, notamment avec Blender."
+      },
+      {
+        src: "img/stagerennes2/cartel.png",
+        caption: "Cartels SFSIC 2025",
+        text: "Conception de plusieurs gabarits de cartels destinés à accompagner les contenus présentés lors du congrès de la SFSIC. Le travail consistait à reprendre les couleurs, les typographies et les totems de l'identité de l'événement pour créer des supports lisibles et cohérents avec l'ensemble de la communication."
+      },
+      {
+        src: "img/stagerennes2/planegalite.png",
+        caption: "Plan Action Égalité 2025-2028",
+        text: "Mise en page de verbatims rapportant des propos problématiques entendus sur le campus, dans le cadre du plan d'action Égalité de Rennes 2. L'objectif était de faire ressortir la violence de ces paroles par une disposition dynamique des textes. J'ai réalisé la structure de mise en page à partir d'une sélection de typographies, tandis que le graphiste responsable du document a défini le traitement esthétique final."
+      }
+    ]
+  },
+  {
+    title: "Jeux-vidéo",
+    jp: "ビデオゲーム",
+    desc: "Construct 2, Unity",
+    images: [
+      {
+        src: "img/jeuvideo/MUR.mp4",
+        caption: "MUR",
+        text: "Développé en parallèle de mon mémoire « Barre de vie », MUR est un jeu de plateforme en 2D qui explore l'évolution des interfaces de jeu vidéo. Au cours d'une même partie, l'interface se transforme et devient une composante du gameplay. Le projet interroge la place de ces éléments : jusqu'où peut-on alléger une interface sans perdre les informations nécessaires au jeu ? À l'inverse, que se passe-t-il lorsqu'elle devient envahissante ? J'ai voulu en faire un terrain d'expérimentation, où l'on peut explorer ces extrêmes tout en jouant."
+      },
+      {
+        src: "img/jeuvideo/course.mp4",
+        caption: "-faire les courses",
+        text: "Mon premier jeu en 3D réalisé avec Unity. Le joueur se lève et part faire les courses, mais croise en chemin un personnage qui le met au défi. Le jeu enchaîne alors plusieurs mini-jeux imaginés autour de cette situation quotidienne. Le projet est resté court et expérimental, mais m'a permis d'explorer différentes idées de gameplay et de m'amuser à créer des défis originaux."
+      },
+      {
+        src: "img/3d/apaisant.mp4",
+        caption: "Apaisant",
+        text: "Concept de menu principal en 3D pour un jeu d'exploration à l'atmosphère sombre et calme. Dans un environnement à mi-chemin entre forêt et zone industrielle abandonnée, le joueur doit trouver une issue après être tombé en panne d'essence. L'idée est de créer une tension par l'absence de menace visible : les sons de la nature, le silence et la possibilité qu'une présence se rapproche suffisent à installer le doute."
+      },
+      {
+        src: "img/3d/toisondor.mp4",
+        caption: "Toison d'Or",
+        text: "Concept de menu principal en 3D pour un jeu inspiré de la mythologie et des lieux sacrés. Dans un environnement très lumineux, épuré et mystique, le joueur aurait pour objectif de récupérer un objet légendaire en surmontant différentes épreuves, à travers des mécaniques de plateforme ou d'énigmes. Une ambiance musicale douce, ponctuée d'éléments étranges, viendrait troubler cette apparente sérénité."
+      },
+      {
+        src: "img/3d/class.mp4",
+        caption: "αιεαRELICTAεςτ",
+        text: "Concept de menu principal en 3D pour un jeu de rôle inspiré du quotidien en milieu scolaire. Derrière cette apparence familière, tout semble jouer contre le personnage : gestion des relations, temps d'étude et événements imprévus compliquent progressivement sa progression vers l'obtention du diplôme. J'imagine un mélange de RPG et de roguelite dans lequel chaque choix compte et où les obstacles deviennent de plus en plus difficiles à surmonter."
+      },
+      {
+        src: "img/jeuvideo/pokemon.png",
+        caption: "Identités Pokémon Émeraude alternatives",
+        text: "Projet personnel imaginant deux éditions alternatives de Pokémon Émeraude (2004), sur le principe de versions d'un même jeu présentant des différences graphiques et thématiques. Émeraude Delta s'inspire des ruines, de l'archéologie et des légendes anciennes, tandis qu'Émeraude Alpha explore un univers plus lumineux, idéal et presque divin. J'ai décliné ces deux directions à travers les jaquettes, les cartouches, les animations de lancement et une page de magazine inspirée des publications de l'époque."
+      },
+      {
+        src: "img/jeuvideo/meute.png",
+        caption: "Meute",
+        text: "Projet personnel de jeu de stratégie sur grille. Le joueur contrôle une famille de loups vivant dans un zoo-refuge et qui cherche à s'en échapper pour partir en vacances. Chaque membre de la meute possède ses propres caractéristiques et capacités, ce qui permet d'imaginer différentes manières de franchir les obstacles et d'éviter les gardes. J'ai choisi une palette bleu et jaune, inspirée de la vision des loups, et exploré plusieurs écrans de jeu ainsi qu'une boîte imprimée et assemblée à la main. Le projet est resté au stade de l'expérimentation, avec l'envie d'imaginer un jeu de stratégie accessible à plusieurs personnes."
+      },
+      {
+        src: "img/jeuvideo/finelame.mp4",
+        caption: "Fine Lame",
+        text: "Première version de mon projet de diplôme, Fine Lame était un jeu de plateforme dans lequel on incarnait un samouraï cherchant à devenir le plus fort, avec une inspiration tirée du livre Musashi. J'ai développé les dessins, les animations, une typographie et un système d'éclairage sous Construct 2, avec la musique composée par un ami. Malgré le travail engagé sur ce projet, j'ai finalement choisi de m'orienter vers une approche plus expérimentale avec MUR, davantage en lien avec mon sujet de recherche."
+      },
+      {
+        src: "img/motiondesign/fullanimdelta.mp4",
+        caption: "Pokémon Émeraude Delta",
+        text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). Cette version explore un univers tourné vers les ruines, l'archéologie et les légendes anciennes, avec une identité inspirée des vestiges d'un monde oublié."
+      },
+      {
+        src: "img/motiondesign/pokemon-alpha-maintitle.mp4",
+        caption: "Pokémon Émeraude Alpha",
+        text: "Animation de lancement imaginée pour une édition alternative de Pokémon Émeraude (2004). À l'opposé de Delta, cette version explore une esthétique lumineuse et idéale, entre nature, perfection et imagerie divine."
+      }
+    ]
+  },
+  {
+    title: "Edition",
+    jp: "エディトリアル",
+    desc: "Huile de coude, suite Adobe",
+    images: [
+      {
+        src: "img/edition/barre2vie.png",
+        caption: "Barre de vie",
+        text: "Mémoire de recherche consacré aux interfaces utilisateur des jeux vidéo japonais des années 1980 et 1990, jusqu'à l'arrivée de la 3D. J'y étudie leur définition, les contraintes techniques de l'époque, les typographies employées et l'évolution des codes graphiques à travers de nombreux jeux auxquels j'ai joué et dont j'ai analysé les interfaces. Une étude de cas sur la saga The Legend of Zelda permet d'approfondir cette évolution. J'aborde également les changements liés à l'arrivée de la 3D et les attentes actuelles en matière d'interface, notamment à travers un sondage mené auprès d'étudiant·es en arts, de la licence au master, et de membres du corps enseignant de Rennes 2. Pour l'édition, j'ai conçu une bichromie cyan et rouge ainsi qu'un système de lecture à deux niveaux : les images de jeu sont visibles au premier abord, tandis que le texte apparaît lorsque l'on soulève la page de droite. J'ai réalisé une version classique et une version à couverture rigide accompagnée d'un CD regroupant des émulateurs et les jeux testés. Un PDF du mémoire peut être fourni sur demande."
+      },
+      {
+        src: "img/edition/mur.png",
+        caption: "MUR - livret",
+        text: "Livret conçu en complément de mon jeu MUR, inspiré des livrets fournis avec les jeux Nintendo DS. Je voulais retrouver le plaisir de découvrir un jeu en lisant son livret, en présentant son fonctionnement, ses commandes et son univers. J'ai également créé les éléments typographiques et graphiques du document. Pour rester cohérent avec le jeu, le livret suit la même logique d'évolution de l'interface : plus on avance, moins celle-ci occupe de place."
+      },
+      {
+        src: "img/edition/lyber.png",
+        caption: "Lyber & CSS",
+        text: "Workshop de Licence Professionnelle mené avec le collectif Luuse. À partir d'un lyber, une version gratuite d'un livre diffusée en ligne sans mise en page, nous devions concevoir une édition en utilisant le codage HTML/CSS. J'ai pris en charge l'essentiel du développement, étant le plus à l'aise avec le code, tout en participant à une réflexion collective sur la direction graphique et en répartissant les rôles au sein du groupe. Le livre portant sur Emmanuel Macron et sa politique, nous avons développé une esthétique inspirée de la communication politique et de la polarisation entre droite et gauche."
+      },
+      {
+        src: "img/edition/reggae.png",
+        caption: "Reggaeton & Fin du Monde",
+        text: "Fanzine réalisé en binôme autour du thème « Reggaeton & Fin du Monde », avec des contraintes de photocopie et de collage. Nos approches étaient différentes mais complémentaires : je développais les idées autour de la fin du monde, tandis que mon binôme apportait davantage de références au reggaeton. Le résultat cherche un équilibre entre ces deux univers. Ce projet a surtout été une expérience de collaboration, qui m'a appris à confronter des idées différentes, à partager mes doutes et à construire une proposition commune."
+      },
+      {
+        src: "img/edition/1173.png",
+        caption: "117³ - Exposition",
+        text: "Affiche et supports de communication réalisés dans le cadre d'un workshop de Licence 2 Arts Plastiques consacré à la curation et à l'exposition collective des travaux des étudiant·es. Chargé de l'affiche après avoir exprimé mon intérêt pour le graphisme, j'ai travaillé avec le groupe pour construire une proposition commune. Le titre 117³ faisait référence au temps passé dans notre atelier durant une semaine, et j'ai choisi de représenter ce nombre par une photographie de la porte de l'atelier, vidée de son contenu. Le délai très court et la diversité des avis ont imposé de faire des choix pour aboutir à une composition cohérente. J'ai également réalisé des supports de promotion, notamment un flyer et des visuels pour les réseaux sociaux."
+      },
+      {
+        src: "img/edition/flipbook/flipe.mp4",
+        caption: "E - Flipbook",
+        text: "Flipbook explorant l'évolution de la lettre « E » à travers différentes grandes catégories typographiques. Le projet m'a amené à concevoir un objet éditorial à la fois robuste et suffisamment souple pour permettre une manipulation répétée. La principale contrainte était de garantir le bon fonctionnement du feuilletage et la lisibilité des transformations. Le flipbook a été exposé au Cabinet du livre d'artiste de Rennes 2."
+      }
+    ]
+  },
+  {
+    title: "Animation 2D",
+    jp: "2Dアニメーション",
+    desc: "Suite Adobe",
+    images: [
+      {
+        src: "img/motiondesign/themachinist_final.mp4",
+        caption: "The Machinist",
+        text: "Animation inspirée du film The Machinist de Brad Anderson (2004). Je voulais retrouver cette impression que quelque chose ne tourne pas rond, dans un quotidien sombre et nihiliste où une présence mystérieuse semble perturber la vie du personnage. Je me suis notamment appuyé sur l'atmosphère de certaines scènes du film, dont celle de la salle de bain, pour construire un univers visuel inquiétant."
+      },
+      {
+        src: "img/motiondesign/load.mp4",
+        caption: "FC Loading",
+        text: "Recréation de l'animation de chargement des jeux EA SPORTS FC, que je croise régulièrement en jouant. Le projet était un défi personnel : reproduire cette boucle tout en imaginant une variante du logo dans un style inspiré des jeux vidéo rétro, à partir de petites versions alternatives que j'avais déjà explorées."
+      },
+      {
+        src: "img/motiondesign/crossed.mp4",
+        caption: "Crossed",
+        text: "Générique de fan imaginé pour Crossed, l'émission de Karim Debbache consacrée aux adaptations de jeux vidéo au cinéma. Après avoir revu l'émission, j'ai voulu proposer ma propre animation autour de son titre. J'ai choisi une interprétation littérale du mot « Crossed », sans chercher à développer une signification supplémentaire, en m'appuyant sur une musique existante qui n'a pas été composée pour ce projet."
+      }
+    ]
+  },
+  {
+    title: "Animations 3D",
+    jp: "3Dアニメーション",
+    desc: "Blender, Suite Adobe",
+    images: [
+      {
+        src: "img/3d/clerbar.mp4",
+        caption: "CLEBART",
+        text: "Première animation réalisée sur Blender. J'ai construit une scène nocturne à partir de quelques images utilisées comme éléments de décor et d'un travail d'éclairage pour installer une ambiance sombre, dans un coin de village. L'arrivée d'un personnage, le clebard, vient soudainement rompre cette atmosphère et créer un décalage."
+      },
+      {
+        src: "img/3d/loubart.mp4",
+        caption: "LOUBART",
+        text: "Dans la continuité de CLEBART, cette animation joue sur le contraste entre un décor nocturne inquiétant et l'arrivée inattendue d'un personnage, Loubart. Je voulais retrouver cette ambiance sombre et mystérieuse, puis la désamorcer par l'apparition de cet élément décalé."
+      },
+      {
+        src: "img/3d/surplace.mp4",
+        caption: "SUR PLACE OU À EMPORTER",
+        text: "Animation construite autour d'un contraste entre décor et personnage. J'ai imaginé un diner américain vide, froid et presque entièrement blanc, avant d'y introduire un iguane qui parle. Le décalage entre l'environnement et cette apparition constitue le point de départ de la scène.",
+        vertical: true
+      },
+      {
+        src: "img/3d/backroom.mp4",
+        caption: "PERDU",
+        text: "Inspirée des Backrooms, cette animation explore un environnement vide et dérangeant, dans lequel j'ai choisi d'introduire un T-Rex. Plutôt que d'en faire une menace, je voulais jouer sur le contraste entre l'imaginaire inquiétant des lieux et la présence presque anodine du dinosaure."
+      },
+      {
+        src: "img/3d/chambre.mp4",
+        caption: "DESERTEUR",
+        text: "Avec cette animation, j'ai voulu aller au-delà de mes premières scènes en vue subjective en travaillant plusieurs angles de caméra. De petits soldats y préparent leur évasion, mais l'un d'eux finit par être considéré comme un déserteur. Le projet détourne l'imaginaire des jouets et des films comme Toy Story pour raconter une petite histoire à travers la mise en scène."
+      },
+      {
+        src: "img/3d/finalmente.mp4",
+        caption: "*",
+        text: "Animation mettant en scène un personnage qui part faire ses courses dans un univers étrange et peu rassurant. Il traverse des lieux lugubres et une maison en désordre, sans jamais sembler acheter quoi que ce soit d'essentiel. Le contraste entre le calme apparent du personnage et l'atmosphère tendue des décors laisse volontairement une part d'incertitude sur ce qui se passe."
+      },
+      {
+        src: "img/3d/bombe.mp4",
+        caption: "BOMBE",
+        text: "Clip 3D imaginé à partir du morceau « Bombe » de Yoa. J'avais envie de mettre cette musique en images en reprenant littéralement ses paroles. La mise en scène s'organise ainsi autour de la représentation d'un larguage de bombe."
+      },
+      {
+        src: "img/3d/rue.mp4",
+        caption: "UN PEU DE RETENUE",
+        text: "Animation 3D inspirée du morceau « Un peu de retenue » de Théodort. Plutôt que d'illustrer directement les paroles, j'ai imaginé une ambiance nocturne et froide : une rue traversée en boucle par un chat, tandis que l'on entend des personnes rire derrière les fenêtres. Le contraste entre l'extérieur solitaire et la chaleur suggérée des intérieurs donne son atmosphère à la scène."
+      },
+      {
+        src: "img/3d/cuir.mp4",
+        caption: "どこか",
+        text: "Animation d'exploration inspirée des Backrooms. La caméra avance dans des espaces vides, contrainte de suivre un chemin dont chaque angle pourrait dissimuler quelque chose. Pourtant, rien n'apparaît. Je voulais travailler sur cette peur de l'inconnu et sur l'absence de menace visible, en laissant le vide et l'anticipation créer l'inquiétude."
+      },
+      {
+        src: "img/3d/foret.mp4",
+        caption: "Dans les bois",
+        text: "Exploration 3D d'une forêt lumineuse et mystique, pensée comme un lieu dans lequel on aurait envie de se promener. Le personnage y ramasse progressivement des objets, comme dans un jeu de survie ou un RPG. Mon objectif était de créer un environnement forestier crédible et accueillant, en travaillant l'atmosphère et l'envie d'explorer."
+      },
+      {
+        src: "img/3d/electromenager.mp4",
+        caption: "Se lever aux aurores",
+        text: "À l'origine, je voulais recréer l'atmosphère d'un grand magasin de meubles vide, en m'inspirant de mon expérience de travail dans ce type de magasin. Le projet s'est finalement concentré sur une seule pièce dans laquelle un personnage se réveille. L'ambiance devient progressivement angoissante, sans explication claire, dans la continuité de l'univers étrange développé dans mon animation « * »."
+      },
+      {
+        src: "img/3d/skelet.mp4",
+        caption: "Un lancer vaut mieux que deux tu l'auras",
+        text: "Courte animation 3D mettant en scène un squelette qui jongle avec une seule balle."
+      },
+      {
+        src: "img/3d/spider.mp4",
+        caption: "Spider-man in Japan",
+        text: "À partir de mes propres vidéos tournées au caméscope au Japon, j'ai voulu imaginer que Spider-Man s'était invité dans mes images de voyage. Le projet était un défi technique autour de l'animation et de l'incrustation d'un personnage 3D dans des prises de vues réelles. Les résultats varient selon les plans, mais l'ensemble m'a permis d'expérimenter l'intégration d'un élément virtuel dans des images filmées."
+      },
+      {
+        src: "img/3d/mouche.mp4",
+        caption: "MOUCHE",
+        text: "Animation suivant le périple nocturne d'une mouche dans une chambre."
+      }
+    ]
+  },
+  {
+    title: "Illustrations",
+    jp: "イラストレーション",
+    desc: "Huile, aquarelle et illustrations",
+    images: [
+       {
+        src: "img/mechanoid.png",
+        caption: "mechanoid",
+        text: "Cover d'une musique du compositeur Papri-K. Illustration digitale réalisée à partir des envies de l'artiste."
+      },
+      {
+        src: "img/ctrl.png",
+        caption: "CTRL",
+        text: "Cover d'une musique du compositeur Papri-K. Scène 3D rendue comme une illustrration, réalisée à partir des envies de l'artiste."
+      },
+      {
+        src: "img/avatar.png",
+        caption: "I See You, Son",
+        text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
+      },
+      {
+        src: "img/darthvader.png",
+        caption: "Anakin",
+        text: "Illustration digitale à partir d'une scène de la série Star Wars : Obi-Wan"
+      },
+      {
+        src: "img/aquarelles/1.png",
+        caption: "Aquarelles Normandes",
+        text: "Série d'aquarelles réalisées à partir de lieux visités en Normandie. Ces peintures sont une manière de conserver une trace de ces endroits et d'en retranscrire les paysages à travers la couleur et l'aquarelle."
+      },
+      {
+        src: "img/aquarelles/video.mp4",
+        caption: "Exposition",
+        text: "Exposition personnelle d'un mois consacrée à mes aquarelles, présentées en grand format A3 à l'espace La Passerelle de Theix-Noyalo, en juin 2024. Ce projet m'a permis de présenter mon travail pictural dans un espace d'exposition.",
+        vertical: true
+      },
+      {
+        src: "img/aquarelles/huile.png",
+        caption: "Huile sur toile",
+        text: "Peinture à l'huile représentant un paysage. Il s'agit de ma première expérimentation avec cette technique, une occasion de découvrir les possibilités de la peinture à l'huile et son approche différente de la couleur et de la matière."
+      }
+    ]
+  }
+];
+
 
   // Tag en japonais sur chaque slide : le titre de la catégorie
   document.querySelectorAll('.splide__slide').forEach((sl, i) => {
