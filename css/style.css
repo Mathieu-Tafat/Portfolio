@@ -1168,7 +1168,7 @@ video.splide-bg-video.has-canvas { opacity: 0; }
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.6 0 0 0 -0.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 220px 220px;
   opacity: var(--grain);
-  animation: grain-shift 0.8s steps(1) infinite;
+  /* grain FIXE : un grain qui bouge force un recomposage plein écran à chaque saut, très coûteux (test : -30 % d'images/s) */
 }
 @keyframes grain-shift {
   0%   { transform: translate(0, 0); }
@@ -1356,3 +1356,29 @@ html.lite-mode .og-cell-label { font-size: 15px; font-weight: 700; padding: 6px 
 html.lite-mode .og-contact-form input, html.lite-mode .og-contact-form textarea, html.lite-mode .og-contact-form button { font-size: 17px; }
 html.lite-mode .og-profile-text::after { display: none; }   /* mention de la police du site : inutile ici */
 html.lite-mode a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* =====================
+   GARDE-FOU DE PERFORMANCE (voir script.js) : effets retirés par paliers si le site rame
+   ===================== */
+html.perf-1 #grain { display: none; }
+html.perf-2 #targets { display: none; }
+html.perf-2 *, html.perf-2 *::before, html.perf-2 *::after { text-shadow: none !important; }
+
+#perf-hint {
+  position: fixed;
+  left: 24px;
+  bottom: 44px;
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-width: min(560px, calc(100vw - 48px));
+  padding: 12px 14px;
+  background: rgba(20, 3, 6, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  font-family: "Quintessential", serif;
+  font-size: 15px;
+  color: #fff;
+}
+#perf-hint .nav-btn { font-size: 14px; padding: 0.4em 0.9em; }

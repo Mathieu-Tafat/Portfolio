@@ -31,7 +31,8 @@ window.I18N = {
       open: "Open {c}", close: "Close", closeProject: "Close project", prev: "Previous", next: "Next",
       project: "Project", mediaOf: "Media {i} of {n}", textOf: "Text, {i} of {n}", gotoPage: "Go to page {i}",
       navAria: "Main navigation", sectionAria: "Project categories", photoAria: "Photo of Mathieu", clockAria: "Time",
-      langAria: "Language"
+      langAria: "Language",
+      perfHint: "The site seems to be running slowly on this device.", perfYes: "Switch to the accessible version", perfNo: "Not now"
     },
     ja: {
       introSub: "2D・3Dグラフィックデザイナー",
@@ -49,7 +50,8 @@ window.I18N = {
       open: "{c}を開く", close: "閉じる", closeProject: "プロジェクトを閉じる", prev: "前へ", next: "次へ",
       project: "プロジェクト", mediaOf: "メディア {i} / {n}", textOf: "テキスト {i} / {n}", gotoPage: "{i}ページ目へ",
       navAria: "メインナビゲーション", sectionAria: "プロジェクトのカテゴリー", photoAria: "Mathieuの写真", clockAria: "時刻",
-      langAria: "言語"
+      langAria: "言語",
+      perfHint: "この端末では動作が重いようです。", perfYes: "アクセシブル版に切り替える", perfNo: "あとで"
     }
   },
 
