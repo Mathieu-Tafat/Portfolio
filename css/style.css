@@ -69,6 +69,16 @@ a:hover {
   font-display: swap;
 }
 
+/* Polices locales (rien n'est demandé à un service tiers : pas de transmission d'adresse IP).
+   Déposer les fichiers dans /fonts : Jost-ExtraBold.woff2, AtkinsonHyperlegible-Regular.woff2, AtkinsonHyperlegible-Bold.woff2.
+   Sans ces fichiers, le navigateur utilise une police système proche (Century Gothic / Verdana). */
+@font-face { font-family: "Jost"; font-weight: 800; font-style: normal; font-display: swap;
+  src: local("Jost ExtraBold"), local("Jost-ExtraBold"), local("Jost Bold"), url("../fonts/Jost-ExtraBold.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-weight: 400; font-style: normal; font-display: swap;
+  src: local("Atkinson Hyperlegible"), local("AtkinsonHyperlegible-Regular"), url("../fonts/AtkinsonHyperlegible-Regular.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-weight: 700; font-style: normal; font-display: swap;
+  src: local("Atkinson Hyperlegible Bold"), local("AtkinsonHyperlegible-Bold"), url("../fonts/AtkinsonHyperlegible-Bold.woff2") format("woff2"); }
+
 /* =====================
    INTRO (texte)
    ===================== */
@@ -1322,6 +1332,7 @@ html.lite-mode #cursor .cur-col path { transition: stroke 0.22s ease, stroke-wid
 .gate-lang-btn { font-size: 13px; padding: 0.4em 0.9em; }
 .gate-lang-btn[aria-pressed="true"] { border-color: #fff; color: #fff; }
 #nav { overflow-x: auto; scrollbar-width: none; }
+:lang(ja) .top-link { letter-spacing: 0; }   /* pas d'espacement forcé entre les caractères japonais : barre moins chargée */
 #nav::-webkit-scrollbar { display: none; }
 :lang(ja) .og-skills-level { flex-basis: 11em; }
 
@@ -1364,7 +1375,7 @@ html.perf-1 #grain { display: none; }
 html.perf-2 #targets { display: none; }
 html.perf-2 *, html.perf-2 *::before, html.perf-2 *::after { text-shadow: none !important; }
 
-#perf-hint {
+#perf-hint, #notice {
   position: fixed;
   left: 24px;
   bottom: 44px;
@@ -1381,4 +1392,170 @@ html.perf-2 *, html.perf-2 *::before, html.perf-2 *::after { text-shadow: none !
   font-size: 15px;
   color: #fff;
 }
-#perf-hint .nav-btn { font-size: 14px; padding: 0.4em 0.9em; }
+#perf-hint .nav-btn, #notice .nav-btn { font-size: 14px; padding: 0.4em 0.9em; }
+
+/* =====================================================================
+   ACCESSIBILITÉ (RGAA 4.1 / WCAG 2.1 AA) : base commune aux deux versions
+   ===================================================================== */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+/* lien d'évitement : visible au focus (RGAA 12.7) */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -80px;
+  z-index: 10003;
+  padding: 12px 16px;
+  background: #fff;
+  color: #000;
+  font: 700 1rem/1.2 Verdana, system-ui, sans-serif;
+}
+.skip-link:focus { top: 8px; }
+#main:focus { outline: none; }
+/* bouton transparent qui couvre chaque slide : focus clavier + nom pour les lecteurs d'écran */
+.card-open {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.card-open:focus-visible { outline: 3px solid #fff; outline-offset: -6px; }
+/* un élément caché ne doit pas rester atteignable au clavier */
+#overlay-hint:not(.show) { visibility: hidden; }
+/* libellés de champs : toujours présents pour les lecteurs d'écran, visibles dans la version accessible */
+.og-label {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+  font-family: "Quintessential", serif; color: #fff;
+}
+.og-form-note { margin: 0 0 4px; font-family: "Quintessential", serif; font-size: 13px; color: rgba(255,255,255,0.7); }
+h2.og-header { margin-top: 0; font-weight: 400; }
+h2.og-header:focus { outline: none; }
+.og-sitemap, .og-sitemap ul { list-style: none; margin: 0; padding: 0; }
+.og-sitemap ul { margin: 4px 0 14px 18px; }
+.og-sitelink {
+  background: none; border: 0; padding: 6px 0; text-align: left;
+  font-family: "Quintessential", serif; font-size: 15px; color: #fff;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.og-sitelink--sub { font-size: 14px; color: rgba(255,255,255,0.85); }
+.og-sitelink:hover { color: var(--accent); }
+#site-footer { display: none; }
+
+/* contenu décoratif généré (tag japonais sur les slides) : ignoré par les technologies d'assistance */
+.splide__slide::before { content: "[" attr(data-idx) "]" / ""; }
+
+/* =====================================================================
+   VERSION ACCESSIBLE : exigences RGAA
+   - tailles en rem (agrandissement du texte jusqu'à 200 % sans perte)
+   - contrastes ≥ 4,5:1 (texte) et ≥ 3:1 (composants), focus très visible
+   - en-tête non fixe, mise en page qui se réorganise (reflow), curseur natif
+   - aucun contenu en mouvement
+   ===================================================================== */
+html.lite-mode { font-size: 100%; scroll-behavior: auto; }
+html.lite-mode body { line-height: 1.5; }
+
+/* en-tête et navigation : pas de position fixe, retour à la ligne plutôt que défilement horizontal */
+html.lite-mode #topbar { position: static; flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+html.lite-mode #nav { flex-wrap: wrap; overflow: visible; width: auto; gap: 6px; }
+html.lite-mode #topbar-right { flex-wrap: wrap; gap: 10px; }
+html.lite-mode .top-link, html.lite-mode .lang-btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35em 0.8em;
+  border: 2px solid transparent;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+html.lite-mode .lite-btn, html.lite-mode .lang-btn[aria-pressed="true"] { border-color: #fff; }
+html.lite-mode #pseudo, html.lite-mode #clock { font-size: 1rem; font-weight: 700; color: #fff; }
+
+/* contenu */
+html.lite-mode .splide { margin: 16px auto 24px; }
+html.lite-mode .splide__slide { position: relative; min-height: 96px; border: 2px solid rgba(255, 255, 255, 0.8) !important; }
+html.lite-mode .titre { font-size: 1.25rem; font-weight: 700; color: #fff; }
+html.lite-mode .og-header, html.lite-mode .pj-text-caption { font-size: 1.75rem; }
+html.lite-mode .og-desc, html.lite-mode .og-skills-row, html.lite-mode .og-profile-p,
+html.lite-mode .pj-text-body, html.lite-mode .og-profile-contact a, html.lite-mode .og-contact-status,
+html.lite-mode .og-sitelink, html.lite-mode .og-form-note { font-size: 1.125rem; line-height: 1.7; color: #fff; }
+html.lite-mode .og-sitelink--sub { font-size: 1rem; }
+html.lite-mode .og-skills-level, html.lite-mode .pj-text-cat, html.lite-mode .og-profile-contact-label { font-size: 1rem; color: #f0e4e6; }
+html.lite-mode .og-cell { border: 2px solid rgba(255, 255, 255, 0.8); }
+html.lite-mode .og-cell-label { font-size: 1rem; }
+html.lite-mode .og-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); }
+html.lite-mode .og-profile-text { padding-right: 0; }
+
+/* formulaires : libellés visibles (RGAA 11.1), bordures et placeholders contrastés */
+html.lite-mode .og-label {
+  position: static; width: auto; height: auto; margin: 8px 0 2px; clip: auto; clip-path: none;
+  overflow: visible; white-space: normal; display: block; font-size: 1.0625rem; font-weight: 700;
+}
+html.lite-mode .og-contact-form input, html.lite-mode .og-contact-form textarea {
+  font-size: 1.0625rem; color: #fff; background: #3a1016; border: 2px solid #fff; min-height: 44px;
+}
+html.lite-mode ::placeholder { color: #ead9dc; opacity: 1; }
+html.lite-mode .og-contact-form button {
+  font-size: 1.0625rem; min-height: 44px; padding: 8px 22px; color: #fff; background: #3a1016; border: 2px solid #fff;
+}
+
+/* survol / focus : fond rouge foncé (blanc dessus = 7:1, le rouge vif ne donnait que 3,9:1) */
+html.lite-mode .top-link:hover, html.lite-mode .top-link:focus-visible,
+html.lite-mode .nav-btn:hover, html.lite-mode .og-contact-form button:hover {
+  background: #b3001b !important;
+  border-color: #fff !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+html.lite-mode .og-sitelink:hover { color: #fff; background: #b3001b; }
+html.lite-mode .splide__slide:hover, html.lite-mode .splide__slide.is-active { border-color: #fff !important; background: #3a1016; }
+
+/* focus : contour blanc épais + liseré noir, visible sur tous les fonds (RGAA 10.7) */
+html.lite-mode :focus-visible {
+  outline: 3px solid #fff !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #000;
+}
+html.lite-mode .card-open:focus-visible { outline-offset: -8px; box-shadow: none; }
+html.lite-mode .og-cell:focus-visible { outline-offset: -6px; box-shadow: none; }
+
+/* fenêtre de projets */
+html.lite-mode #overlay-hint { font-size: 2.25rem; color: #fff; padding: 4px 14px; min-width: 44px; min-height: 44px; }
+html.lite-mode #project-close, html.lite-mode .pj-arrow { color: #fff; }
+html.lite-mode .pj-dot::before { border-color: #fff; }
+
+/* curseur natif (pas de curseur dessiné), pas de contenu animé */
+html.lite-mode, html.lite-mode * { cursor: auto !important; }
+html.lite-mode a, html.lite-mode button, html.lite-mode .og-cell, html.lite-mode .card-open, html.lite-mode select { cursor: pointer !important; }
+html.lite-mode input, html.lite-mode textarea { cursor: text !important; }
+html.lite-mode #cursor, html.lite-mode #perf-hint { display: none !important; }
+
+/* pied de page : plan du site et déclaration d'accessibilité (RGAA 12.1, 13.x) */
+html.lite-mode #site-footer {
+  display: flex; flex-wrap: wrap; gap: 8px 16px;
+  padding: 16px; margin: 24px auto 32px; max-width: min(1000px, 92vw);
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+/* connexion lente : aperçu vidéo remplacé par un simple bloc (aucune vidéo téléchargée) */
+.og-img--placeholder {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; min-height: 100%;
+  background: #3a1016; color: #fff; font-size: 2rem;
+}
+html.lite-mode #notice {
+  background: #000; border: 2px solid #fff; font-family: var(--readable); font-size: 1rem; z-index: 10002;
+}
+html.lite-mode #notice .nav-btn { min-height: 44px; font-size: 1rem; }

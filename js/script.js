@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Nombre de médias affichés par défaut dans la vue "projet en grand"
   // quand un projet n'a pas de liste "medias" (avant le texte final).
   // Mets 1 pour n'afficher que le média principal.
-  const PROJECT_PLACEHOLDER_COUNT = 3;
+  const PROJECT_PLACEHOLDER_COUNT = 1;
 
   // Flottement des slides (desktop uniquement) : petite simulation "dans l'espace"
   const FLOAT_CELL_ROAM     = 0.5;   // part de sa case que chaque slide explore (0 = immobile, 1 = toute la case)
@@ -16,9 +16,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const FLOAT_GOAL_MAX      = 20000; // ms maxi
   const FLOAT_HOME_PULL     = 0.0008;// rappel vers sa case quand une slide s'en éloigne trop (pour rester bien répartie)
   const FLOAT_HOME_DAMP     = 0.03;  // freinage pendant ce rappel
-  const FLOAT_MOUSE_RANGE   = 520;   // px, distance à laquelle le mouvement de la souris remue les slides
-  const FLOAT_STIR          = 0.02;  // force avec laquelle la souris remue les slides (dans leur propre direction, sans les suivre)
-  const FLOAT_DAMP          = 0.008; // frottement : très faible = les slides gardent leur élan, comme en apesanteur
+  // La souris "remue l'eau" : en bougeant, elle crée un courant léger autour d'elle (les slides glissent
+  // dans le sens du mouvement et sont un peu écartées), puis l'eau se calme. Rien n'est simulé : c'est une idée.
+  const FLOAT_MOUSE_RANGE   = 420;    // px, étendue du courant autour de la souris
+  const FLOAT_WATER_DRAG    = 0.004;  // entraînement dans le sens du mouvement de la souris
+  const FLOAT_WATER_PUSH    = 0.003;  // écartement des slides proches du passage de la souris
+  const FLOAT_DAMP          = 0.012;  // frottement de l'eau : les slides glissent puis ralentissent
   const FLOAT_SPACE         = 0;     // px de marge entre deux slides (0 = elles se touchent vraiment)
   const FLOAT_BUMP          = 0.35;  // vitesse mini d'éloignement après un choc
   const FLOAT_BOUNCE        = 0.92;  // élasticité des chocs (1 = parfaitement élastique)
@@ -67,17 +70,13 @@ document.addEventListener('DOMContentLoaded', function () {
   // Fond animé
   const BG_DARKEN        = 0.3;  // assombrissement du fond (0 = aucun, 0.6 = très sombre)
   const BG_BASE_INTERVAL = 333;  // ms entre deux images du fond à vitesse ×1
-  const BG_SPEED_DEFAULT = 1.4;  // vitesse par défaut (légèrement plus rapide qu'avant)
+  const BG_SPEED_DEFAULT = 0.35; // vitesse au départ (≈ 61 % de la barre) ; sert aussi de référence "×1" pour les animations
   const BG_SPEED_MIN     = 0.12; // vitesse mini de la barre (tout reste en mouvement lent, jamais figé)
-  const BG_SPEED_MAX     = 5;    // vitesse maxi de la barre
+  const BG_SPEED_MAX     = 0.7;  // vitesse maxi de la barre = l'ancien 50 % moins 10 % (l'ancien maximum était 5)
 
   // Vitesse globale réglée par la barre en bas à droite : fond, slides qui flottent,
   // bandeau du bas et vidéos des slides. Au minimum, tout reste en mouvement lent.
   let bgSpeed = BG_SPEED_DEFAULT;
-  try {
-    const saved = parseFloat(localStorage.getItem('bgSpeed'));
-    if (!isNaN(saved) && saved >= BG_SPEED_MIN && saved <= BG_SPEED_MAX) bgSpeed = saved;
-  } catch (err) {}
   const animK = () => bgSpeed / BG_SPEED_DEFAULT; // 1 = vitesse normale
 
   // =====================
@@ -89,8 +88,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // "Site optimisé" (bouton en haut) : version sobre, sans animation ni effet, qui ne rame pas.
   // Le choix est mémorisé entre les visites.
-  let liteMode = false;
-  try { liteMode = localStorage.getItem('lite') === '1'; } catch (err) {}
+  let liteMode = false, liteWhy = '';
+  const urlParams = new URLSearchParams(location.search);
+  let explicitLite = urlParams.get('lite') === '1' ? true : (urlParams.get('lite') === '0' ? false : null);   // choix de l'adresse ou du bouton
+  let explicitLang = ['fr', 'en', 'ja'].includes(urlParams.get('lang'));
+
+  // mesure du débit sur nos propres fichiers (utile quand l'API Network Information n'existe pas : Safari, Firefox)
+  function measuredSlow() {
+    try {
+      const es = performance.getEntriesByType('resource').filter(e => /\.(js|css)(\?|$)/.test(e.name) && e.encodedBodySize > 20000 && e.responseEnd > e.startTime);
+      if (!es.length) return false;
+      let bytes = 0, t0 = Infinity, t1 = 0;
+      es.forEach(e => { bytes += e.encodedBodySize; t0 = Math.min(t0, e.startTime); t1 = Math.max(t1, e.responseEnd); });
+      if (bytes < 100000) return false;
+      return (bytes * 8) / ((t1 - t0) / 1000) < 1000000;     // moins de 1 Mbit/s
+    } catch (err) { return false; }
+  }
+
+  if (window.__lite) { liteMode = !!window.__lite.on; liteWhy = window.__lite.why || ''; }   // décidé dès l'en-tête de la page
+  else if (explicitLite !== null) { liteMode = explicitLite; liteWhy = 'url'; }
+  else if (reduceMotion) { liteMode = true; liteWhy = 'motion'; }
+  if (explicitLite === null && !liteMode && measuredSlow()) { liteMode = true; liteWhy = 'slow'; }
+  const slowConn = liteWhy === 'slow';                         // connexion lente : pas de vidéos téléchargées en mode accessible
+  const lightMedia = () => liteMode && slowConn;
   document.documentElement.classList.toggle('lite-mode', liteMode);
 
   // =====================
@@ -116,17 +136,36 @@ document.addEventListener('DOMContentLoaded', function () {
     project: 'Projet', mediaOf: 'Média {i} sur {n}', textOf: 'Texte, {i} sur {n}', gotoPage: 'Aller à la page {i}',
     navAria: 'Navigation principale', sectionAria: 'Catégories de projets', photoAria: 'Photo de Mathieu', clockAria: 'Heure',
     langAria: 'Langue',
-    perfHint: 'Le site a l\'air de ramer sur cet appareil.', perfYes: 'Passer en version accessible', perfNo: 'Plus tard'
+    perfHint: 'Le site a l\'air de ramer sur cet appareil.', perfYes: 'Passer en version accessible', perfNo: 'Plus tard',
+    siteTitle: 'Mathieu Tafat — graphiste 2D et 3D', skip: 'Aller au contenu principal',
+    sitemap: 'Plan du site', a11yLink: 'Accessibilité : partiellement conforme', a11yTitle: "Déclaration d'accessibilité",
+    a11yP1: "Ce site vise à respecter le Référentiel général d'amélioration de l'accessibilité (RGAA 4.1), fondé sur les WCAG 2.1 niveau AA. La « version accessible », activable avec le bouton en haut de la page, est la version conçue pour cela : aucune animation, texte lisible, navigation au clavier.",
+    a11yP2: "État de conformité : partiellement conforme au RGAA 4.1. Il s'agit d'une auto-évaluation : le site n'a pas encore fait l'objet d'un audit par un tiers. La version complète, très animée, n'est pas destinée à être conforme.",
+    a11yP3: "Contenus non accessibles : les vidéos n'ont ni sous-titres ni transcription. Le texte de présentation de chaque projet décrit son contenu mais ne remplace pas la bande sonore ou les dialogues. Certaines images n'ont que leur titre comme description.",
+    a11yP4: "Retour d'information et contact : pour signaler un défaut d'accessibilité ou obtenir un contenu sous une autre forme, écrivez à contact.tmdesignstudio@gmail.com.",
+    a11yP5: "Voies de recours : si votre demande reste sans réponse satisfaisante, vous pouvez écrire au Défenseur des droits.",
+    a11yDate: 'Déclaration établie en novembre 2026.',
+    formNote: 'Tous les champs sont obligatoires.', newWindow: '(nouvelle fenêtre)',
+    noticeSlow: 'Connexion lente détectée : la version accessible, plus légère, a été chargée.',
+    noticeMotion: 'Votre système demande de réduire les animations : la version accessible a été chargée.',
+    noticeFull: 'Passer à la version complète', connChange: 'La connexion semble être devenue lente.',
+    privacyLink: 'Confidentialité', privacyTitle: 'Confidentialité et données personnelles',
+    privacyP1: "Ce site ne dépose aucun cookie et n'utilise ni stockage local, ni outil de mesure d'audience, ni service tiers de polices ou de statistiques. Aucune donnée n'est enregistrée dans votre navigateur.",
+    privacyP2: "Vos choix (langue, version accessible) ne sont pas mémorisés : ils peuvent être conservés dans l'adresse de la page (par exemple ?lang=fr&lite=1), que vous pouvez mettre en favori.",
+    privacyP3: "Le prénom saisi à l'arrivée sur le site reste uniquement dans la page ouverte : il n'est ni enregistré ni envoyé.",
+    privacyP4: "Le formulaire de contact envoie votre adresse e-mail, le sujet et votre message au service Formspree, uniquement pour que je puisse vous répondre. Vous pouvez aussi m'écrire directement par e-mail.",
+    privacyP5: "Comme tout site, l'hébergeur peut conserver des journaux techniques de connexion (adresse IP), ce que je ne contrôle pas.",
+    privacyP6: "Pour toute question ou demande concernant vos données : contact.tmdesignstudio@gmail.com."
   };
   let lang = 'fr';
-  try {
-    const sv = localStorage.getItem('lang');
-    if (sv === 'fr' || sv === 'en' || sv === 'ja') lang = sv;
-    else {   // première visite : langue du navigateur (japonais, français, sinon anglais)
+  {
+    const fromUrl = urlParams.get('lang');
+    if (fromUrl === 'fr' || fromUrl === 'en' || fromUrl === 'ja') lang = fromUrl;
+    else {   // langue du navigateur (japonais, français, sinon anglais)
       const nl = (navigator.language || 'fr').slice(0, 2).toLowerCase();
       lang = nl === 'ja' ? 'ja' : (nl === 'fr' ? 'fr' : 'en');
     }
-  } catch (err) {}
+  }
   document.documentElement.lang = lang;
   let visitorName = '';
   let gateRender = null;
@@ -150,6 +189,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const tr = lang === 'fr' ? null : ((I18N.items || {})[lang] || {})[item.src];
     return { caption: (tr && tr.caption) || item.caption, text: (tr && tr.text !== undefined) ? tr.text : item.text };
   }
+  // RGAA 8.7 : un mot ou titre dans une autre langue que la page est signalé par un attribut lang
+  function langOf(str) {
+    if (/[\u3040-\u30ff\u3400-\u9fff]/.test(str)) return 'ja';
+    if (/[\u0370-\u03ff]/.test(str)) return 'el';
+    return '';
+  }
+  function la(str) { const l = langOf(str); return l && l !== lang ? ' lang="' + l + '"' : ''; }
+
   function LCat(title) {
     const tr = lang === 'fr' ? null : ((I18N.cats || {})[lang] || {})[title];
     return (tr && tr.title) || title;
@@ -357,6 +404,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   splide.on('move', function() { setTimeout(syncIconVideos, 30); });
 
+  // les vidéos des slides ne sont téléchargées qu'en version complète (jamais en version accessible)
+  function loadIconVideos() {
+    splideVideos.forEach(v => { if (v._loaded) return; v._loaded = true; v.preload = 'auto'; v.load(); });
+  }
+  if (!liteMode) loadIconVideos();
+
   // =====================
   // VIDÉOS DES SLIDES : vitesse (barre globale × accélération au survol)
   // =====================
@@ -364,7 +417,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const k = animK();
     if (k <= 0) { vid.pause(); return; }
     const active = vid.parentElement && vid.parentElement.classList.contains('is-active');
-    vid.playbackRate = Math.max(0.0625, Math.min(16, k * (vid._mult || 1) * (active ? 1 : ICON_IDLE_SPEED)));
+    const vk = 0.5 + 0.5 * k;   // les vidéos suivent la barre, mais plus doucement que le reste
+    vid.playbackRate = Math.max(0.0625, Math.min(16, vk * (vid._mult || 1) * (active ? 1 : ICON_IDLE_SPEED)));
   }
 
   document.querySelectorAll('.splide__slide').forEach(function(slide) {
@@ -760,7 +814,8 @@ document.addEventListener('DOMContentLoaded', function () {
   // Pendant que le visiteur tape son prénom, on "chauffe" les vidéos en arrière-plan, quelques-unes à la fois :
   // le début de chaque vidéo est déjà en cache quand on ouvre un projet, sans surcharger l'intro.
   function warmVideosInBackground() {
-    if (liteMode || isTouch) return;
+    const nc = navigator.connection;
+    if (liteMode || isTouch || (nc && nc.saveData)) return;
     const srcs = [];
     SLIDE_DATA.forEach(sl => (sl.images || []).forEach(img => {
       [img.src].concat(img.medias || []).forEach(m => { if (isVideoSrc(m) && srcs.indexOf(m) === -1) srcs.push(m); });
@@ -908,7 +963,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const overlayHint    = document.getElementById("overlay-hint");
   const splideEl       = document.querySelector(".splide");
 
-  const getCols = () => window.matchMedia('(max-width: 768px)').matches ? 2 : 3;
+  const getCols = () => {
+    const g = document.getElementById('og-grid');
+    if (g) { const n = getComputedStyle(g).gridTemplateColumns.split(' ').length; if (n > 0) return n; }
+    return window.matchMedia('(max-width: 768px)').matches ? 2 : 3;
+  };
 
   // =====================
   // FLOTTEMENT DES SLIDES (desktop)
@@ -942,7 +1001,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let lastT = 0;
     let narrowReset = false;
     const trackEl = document.querySelector('.splide__track');
-    let windGust = 0, prevSmX = -9999, prevSmY = -9999; // l'effet est plus fort quand la souris bouge
+    const mvS = { x: 0, y: 0 };                      // vitesse lissée de la souris (px par image)
+    let prevSmX = -9999, prevSmY = -9999;
 
     window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; }, { passive: true });
     document.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
@@ -959,10 +1019,9 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       liteCleared = false;
       if (overlayOpen || projectOpen) { lastT = t; return; }
-      const kk = animK();
-      const dt = Math.min(3, Math.min(50, t - (lastT || t)) / 16.667 * kk);
+      const kk = animK();   // la barre de vitesse règle la dérive spontanée ; la souris et les chocs restent en temps réel
+      const dt = Math.min(3, Math.min(50, t - (lastT || t)) / 16.667);
       lastT = t;
-      if (kk <= 0) return; // pause
 
       const vw = window.innerWidth, vh = window.innerHeight;
       if (vw <= 768) { // mise en page mobile : pas de flottement
@@ -977,10 +1036,12 @@ document.addEventListener('DOMContentLoaded', function () {
       else { smX += (mouseX - smX) * 0.45; smY += (mouseY - smY) * 0.45; }
 
       // rafale : l'effet est fort quand la souris bouge, nul quand elle est immobile
+      // vitesse de la souris : c'est elle qui "remue l'eau"
       if (smX > -9000 && prevSmX > -9000) {
-        const sp = Math.hypot(smX - prevSmX, smY - prevSmY);
-        windGust += (Math.min(1, sp / 12) - windGust) * 0.3;
-      } else windGust *= 0.9;
+        mvS.x += ((smX - prevSmX) - mvS.x) * 0.25;
+        mvS.y += ((smY - prevSmY) - mvS.y) * 0.25;
+      } else { mvS.x *= 0.8; mvS.y *= 0.8; }
+      const ms = Math.hypot(mvS.x, mvS.y);
       prevSmX = smX; prevSmY = smY;
 
       // 1) lecture de toutes les positions (une seule passe, pas de va-et-vient lecture/écriture)
@@ -1034,23 +1095,23 @@ document.addEventListener('DOMContentLoaded', function () {
         b.visible = true;
 
         // vitesse souhaitée : vers la destination, en douceur
-        const dvx = clamp((b.gx - b.x) * 0.01,  -FLOAT_SPEED_X, FLOAT_SPEED_X);
-        const dvy = clamp((b.gy - b.y) * 0.01,  -FLOAT_SPEED_Y, FLOAT_SPEED_Y);
+        const dvx = clamp((b.gx - b.x) * 0.01,  -FLOAT_SPEED_X * kk, FLOAT_SPEED_X * kk);
+        const dvy = clamp((b.gy - b.y) * 0.01,  -FLOAT_SPEED_Y * kk, FLOAT_SPEED_Y * kk);
 
-        // le MOUVEMENT de la souris remue les slides proches : chacune réagit dans SA propre
-        // direction (qui tourne doucement). Elles ne suivent pas le curseur et ne le fuient pas.
-        b.ang += b.angV * dt;
-        const d    = Math.hypot((r.left + r.width / 2) - smX, (r.top + r.height / 2) - smY);
-        const near = Math.max(0, 1 - d / FLOAT_MOUSE_RANGE);
-        const stir = near * near * windGust * FLOAT_STIR;
+        // courant créé par la souris : nul sous le curseur (pas de saccade) et au loin, maximal entre les deux
+        const rx = (r.left + r.width / 2) - smX, ry = (r.top + r.height / 2) - smY;
+        const d  = Math.hypot(rx, ry) || 1;
+        const fl = smooth(1 - d / FLOAT_MOUSE_RANGE) * smooth(d / 70);
+        const wx = fl * (FLOAT_WATER_DRAG * mvS.x + FLOAT_WATER_PUSH * (rx / d) * ms);
+        const wy = fl * (FLOAT_WATER_DRAG * mvS.y + FLOAT_WATER_PUSH * (ry / d) * ms);
 
         // rappel doux vers sa case si elle en sort trop : les slides restent bien réparties
         const ex = b.x - cxOff, ey = b.y - cyOff, hx = cw * 0.6, hy = ch * 0.6;
         const homeAx = Math.abs(ex) > hx ? -Math.sign(ex) * (Math.abs(ex) - hx) * FLOAT_HOME_PULL - b.vx * FLOAT_HOME_DAMP : 0;
         const homeAy = Math.abs(ey) > hy ? -Math.sign(ey) * (Math.abs(ey) - hy) * FLOAT_HOME_PULL - b.vy * FLOAT_HOME_DAMP : 0;
 
-        b.vx += ((dvx - b.vx) * FLOAT_DAMP + Math.cos(b.ang) * stir + homeAx) * dt;
-        b.vy += ((dvy - b.vy) * FLOAT_DAMP + Math.sin(b.ang) * stir + homeAy) * dt;
+        b.vx += ((dvx - b.vx) * FLOAT_DAMP + wx + homeAx) * dt;
+        b.vy += ((dvy - b.vy) * FLOAT_DAMP + wy + homeAy) * dt;
         const spd = Math.hypot(b.vx, b.vy);
         if (spd > FLOAT_MAXV) { b.vx *= FLOAT_MAXV / spd; b.vy *= FLOAT_MAXV / spd; }
         b.x  += b.vx * dt;
@@ -1161,11 +1222,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function cellHTML(img) {
-    const label = '<div class="og-cell-label">' + esc(LI(img).caption) + '</div><div class="og-cell-dim"></div>';
+    const label = '<div class="og-cell-label"' + la(LI(img).caption) + '>' + esc(LI(img).caption) + '</div><div class="og-cell-dim"></div>';
     if (isVideoSrc(img.src)) {
-      return '<video src="' + esc(img.src) + '" class="og-img" loop muted playsinline preload="metadata"></video>' + label;
+      if (lightMedia()) return '<div class="og-img og-img--placeholder" aria-hidden="true">▶</div>' + label;   // connexion lente : aucune vidéo téléchargée
+      return '<video src="' + esc(img.src) + '" class="og-img" loop muted playsinline preload="metadata" aria-hidden="true" tabindex="-1"></video>' + label;
     }
-    return '<img src="' + esc(img.src) + '" alt="' + esc(LI(img).caption) + '" class="og-img" loading="lazy" />' + label;
+    // image décorative ici : la cellule est un bouton dont le nom est la légende (RGAA 1.2)
+    return '<img src="' + esc(img.src) + '" alt="" class="og-img" loading="lazy" decoding="async" />' + label;
   }
 
   // =====================
@@ -1182,7 +1245,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .join('');
 
     overlayContent.innerHTML = `
-      <div class="og-header"><span class="br">「</span>${esc(data.title)}<span class="br">」</span></div>
+      <h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>${esc(data.title)}<span class="br">」</span></h2>
       <div class="og-profile">
         <div class="og-profile-text">
           ${paragraphs}
@@ -1194,16 +1257,20 @@ document.addEventListener('DOMContentLoaded', function () {
           <div class="og-profile-contact">
             <span class="og-profile-contact-label">${t('contactLabel')}</span>
           </div>
-          <form id="og-contact-form" class="og-contact-form">
-            <input type="email" name="email" placeholder="${t('formEmail')}" aria-label="${t('formEmail')}" required>
-            <input type="text" name="subject" placeholder="${t('formSubject')}" aria-label="${t('formSubject')}" required>
-            <textarea name="message" placeholder="${t('formMessage')}" aria-label="${t('formMessage')}" rows="4" required></textarea>
+          <form id="og-contact-form" class="og-contact-form" aria-describedby="cf-note">
+            <p id="cf-note" class="og-form-note">${t('formNote')}</p>
+            <label class="og-label" for="cf-email">${t('formEmail')}</label>
+            <input id="cf-email" type="email" name="email" autocomplete="email" placeholder="${t('formEmail')}" required aria-required="true">
+            <label class="og-label" for="cf-subject">${t('formSubject')}</label>
+            <input id="cf-subject" type="text" name="subject" autocomplete="off" placeholder="${t('formSubject')}" required aria-required="true">
+            <label class="og-label" for="cf-message">${t('formMessage')}</label>
+            <textarea id="cf-message" name="message" rows="4" placeholder="${t('formMessage')}" required aria-required="true"></textarea>
             <button type="submit">${t('formSend')}</button>
-            <p class="og-contact-status" role="status"></p>
+            <p class="og-contact-status" role="status" aria-live="polite"></p>
           </form>
           <div class="og-profile-contact">
             <a href="mailto:contact.tmdesignstudio@gmail.com">contact.tmdesignstudio@gmail.com</a>
-            <a href="https://fr.linkedin.com/in/mathieu-tafat-031518261" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://fr.linkedin.com/in/mathieu-tafat-031518261" target="_blank" rel="noopener">LinkedIn<span class="sr-only"> ${t('newWindow')}</span></a>
           </div>
         </div>
       </div>
@@ -1246,10 +1313,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const grid = document.getElementById('og-grid');
     if (!grid) return;
     const media = cell.querySelector('video, img');
-    if (!media) return;
-
     let ratio;
-    if (media.tagName === 'VIDEO') {
+    if (!media) {
+      if (!cell.querySelector('.og-img--placeholder')) return;
+      ratio = 0.75;
+    } else if (media.tagName === 'VIDEO') {
       if (!media.videoWidth || !media.videoHeight) return;
       ratio = media.videoHeight / media.videoWidth;
     } else {
@@ -1282,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', function () {
     currentData  = data;
     gridFocusIdx = 0;
 
-    let html = `<div class="og-header"><span class="br">「</span>${esc(L(data).title)}<span class="br">」</span></div>`;
+    let html = `<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>${esc(L(data).title)}<span class="br">」</span></h2>`;
     if (L(data).desc) html += `<div class="og-desc">${esc(L(data).desc)}</div>`;
     html += `<div class="og-grid" id="og-grid">`;
     data.images.forEach((img, i) => {
@@ -1297,13 +1365,9 @@ document.addEventListener('DOMContentLoaded', function () {
       attachCellHover(cell);
 
       const media = cell.querySelector('video, img');
-      if (!media) return;
+      if (!media) { layoutMasonryCell(cell); return; }
       if (media.tagName === 'VIDEO') {
         watchVideo(media);
-        if (liteMode) {   // mode optimisé : image fixe, la vidéo ne joue qu'au survol
-          cell.addEventListener('mouseenter', () => { const pr = media.play(); if (pr && pr.catch) pr.catch(() => {}); });
-          cell.addEventListener('mouseleave', () => media.pause());
-        }
         if (media.readyState >= 1) layoutMasonryCell(cell);
         else media.addEventListener('loadedmetadata', () => layoutMasonryCell(cell));
       } else {
@@ -1403,7 +1467,7 @@ document.addEventListener('DOMContentLoaded', function () {
       slide.className = 'pj-slide';
       slide.setAttribute('aria-label', t('mediaOf', { i: i + 1, n: pjTotal }));
       if (isVideoSrc(src)) {
-        slide.innerHTML = '<video class="pj-media" src="' + esc(src) + '" controls loop muted playsinline preload="metadata"></video>';
+        slide.innerHTML = '<video class="pj-media" src="' + esc(src) + '" controls loop muted playsinline preload="' + (lightMedia() ? 'none' : 'metadata') + '" aria-label="' + esc(view.caption) + '"' + la(view.caption) + '></video>';
         watchVideo(slide.firstChild);
       } else {
         slide.innerHTML = '<img class="pj-media" src="' + esc(src) + '" alt="' + esc(view.caption) + '">';
@@ -1417,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', function () {
     textSlide.innerHTML =
       '<div class="pj-text">' +
         (item.category ? '<p class="pj-text-cat">' + esc(LCat(item.category)) + '</p>' : '') +
-        '<h2 class="pj-text-caption">' + esc(view.caption) + '</h2>' +
+        '<h2 class="pj-text-caption"' + la(view.caption) + '>' + esc(view.caption) + '</h2>' +
         (view.text ? '<p class="pj-text-body">' + esc(view.text) + '</p>' : '') +
       '</div>';
     pjTrack.appendChild(textSlide);
@@ -1433,6 +1497,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     pjTitle.textContent = view.caption;
+    const pl = langOf(view.caption);
+    if (pl && pl !== lang) pjTitle.setAttribute('lang', pl); else pjTitle.removeAttribute('lang');
+    projectOpener = document.activeElement;
+    overlay.inert = true; overlayHint.inert = true;
     projectOpen = true;
     project.style.display = 'block';
     pjTrack.scrollLeft = 0;
@@ -1444,6 +1512,9 @@ document.addEventListener('DOMContentLoaded', function () {
   function closeProject() {
     if (!projectOpen) return;
     projectOpen = false;
+    overlay.inert = false; overlayHint.inert = false;
+    if (projectOpener && projectOpener.isConnected) { projectOpener.focus({ preventScroll: true }); }
+    projectOpener = null;
     project.classList.remove('show');
     setTimeout(() => {
       if (projectOpen) return;
@@ -1455,15 +1526,29 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   // OVERLAY : ouvrir / fermer
   // =====================
+  // ---- accessibilité des fenêtres : focus, arrière-plan inerte, titre de la page (RGAA 7.x, 8.x, 12.x)
+  let overlayOpener = null, projectOpener = null;
+  const BG_IDS = ['topbar', 'main', 'site-footer', 'ticker', 'bgbar', 'targets', 'skip-link'];
+  function setBgInert(on) { BG_IDS.forEach(id => { const e = document.getElementById(id); if (e) e.inert = on; }); }
+  function focusOverlayTitle() {
+    const h = overlayContent.querySelector('.og-header');
+    if (h) h.focus({ preventScroll: true });
+    const name = h ? h.textContent.replace(/[「」]/g, '').trim() : '';
+    document.title = name ? name + ' — Mathieu Tafat' : t('siteTitle');
+  }
+
   function showOverlay(build) {
+    if (!overlayOpen) overlayOpener = document.activeElement;
     overlayOpen = true;
     overlay.style.display = "block";
     splideEl.classList.add("hidden");
     splideVideos.forEach(v => v.pause());
     build();
+    setBgInert(true);
     setTimeout(() => {
       overlay.classList.add("show");
       overlayHint.classList.add("show");
+      focusOverlayTitle();
     }, 10);
   }
 
@@ -1494,6 +1579,71 @@ document.addEventListener('DOMContentLoaded', function () {
     }));
   }
 
+  // Avis court, annoncé par les lecteurs d'écran (role=status)
+  function showNotice(msg, yesLabel, onYes) {
+    const old = document.getElementById('notice'); if (old) old.remove();
+    const box = document.createElement('div');
+    box.id = 'notice';
+    box.setAttribute('role', 'status');
+    box.innerHTML = '<span></span><button type="button" class="nav-btn" data-yes></button><button type="button" class="nav-btn nav-btn--ghost" data-no></button>';
+    box.querySelector('span').textContent = msg;
+    box.querySelector('[data-yes]').textContent = yesLabel;
+    box.querySelector('[data-no]').textContent = t('close');
+    box.querySelector('[data-yes]').addEventListener('click', () => { onYes(); box.remove(); });
+    box.querySelector('[data-no]').addEventListener('click', () => box.remove());
+    document.body.appendChild(box);
+  }
+
+  // Confidentialité : ce que le site fait (et ne fait pas) des données
+  function buildPrivacy() {
+    currentData = null;
+    overlayContent.innerHTML =
+      '<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>' + esc(t('privacyTitle')) + '<span class="br">」</span></h2>' +
+      '<div class="og-profile"><div class="og-profile-text">' +
+      ['privacyP1', 'privacyP2', 'privacyP3', 'privacyP4', 'privacyP5', 'privacyP6'].map(k => '<p class="og-profile-p">' + esc(t(k)) + '</p>').join('') +
+      '</div></div>';
+  }
+
+  // Plan du site : deuxième système de navigation (RGAA 12.1)
+  function buildSitemap() {
+    currentData = null;
+    let html = '<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>' + esc(t('sitemap')) + '<span class="br">」</span></h2>' +
+               '<div class="og-profile"><div class="og-profile-text"><ul class="og-sitemap">';
+    SLIDE_DATA.forEach((d, i) => {
+      html += '<li><button type="button" class="og-sitelink" data-cat="' + i + '">' + esc(L(d).title) + '</button>';
+      if (d.images) {
+        html += '<ul>';
+        d.images.forEach((im, j) => {
+          const cap = LI(im).caption;
+          html += '<li><button type="button" class="og-sitelink og-sitelink--sub" data-cat="' + i + '" data-item="' + j + '"' + la(cap) + '>' + esc(cap) + '</button></li>';
+        });
+        html += '</ul>';
+      }
+      html += '</li>';
+    });
+    html += '</ul></div></div>';
+    overlayContent.innerHTML = html;
+    overlayContent.querySelectorAll('.og-sitelink').forEach(b => b.addEventListener('click', () => {
+      const d = SLIDE_DATA[+b.dataset.cat];
+      if (d.profile) { buildProfile(); focusOverlayTitle(); return; }
+      buildGrid(d);
+      focusOverlayTitle();
+      if (b.dataset.item !== undefined) openProject(d.images[+b.dataset.item]);
+    }));
+  }
+
+  // Déclaration d'accessibilité (auto-évaluation, non auditée)
+  function buildA11y() {
+    currentData = null;
+    overlayContent.innerHTML =
+      '<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>' + esc(t('a11yTitle')) + '<span class="br">」</span></h2>' +
+      '<div class="og-profile"><div class="og-profile-text">' +
+      ['a11yP1', 'a11yP2', 'a11yP3', 'a11yP4', 'a11yP5'].map(k => '<p class="og-profile-p">' + esc(t(k)) + '</p>').join('') +
+      '<p class="og-profile-p"><a href="https://www.defenseurdesdroits.fr" target="_blank" rel="noopener">defenseurdesdroits.fr<span class="sr-only"> ' + esc(t('newWindow')) + '</span></a></p>' +
+      '<p class="og-profile-p">' + esc(t('a11yDate')) + '</p>' +
+      '</div></div>';
+  }
+
   function closeOverlayFn() {
     closeProject();
     overlayOpen = false;
@@ -1501,6 +1651,10 @@ document.addEventListener('DOMContentLoaded', function () {
     overlayHint.classList.remove("show");
     splideEl.classList.remove("hidden");
     syncIconVideos();
+    setBgInert(false);
+    document.title = t('siteTitle');
+    if (overlayOpener && overlayOpener.isConnected) overlayOpener.focus({ preventScroll: true });
+    overlayOpener = null;
     setTimeout(() => { if (!overlayOpen) overlay.style.display = "none"; }, 400);
   }
 
@@ -1521,15 +1675,26 @@ document.addEventListener('DOMContentLoaded', function () {
     liteBtn.setAttribute('aria-pressed', liteMode ? 'true' : 'false');
     liteBtn.title = liteMode ? t('liteOffTitle') : t('liteOnTitle');
   }
-  function setLiteMode(on) {
+  // Les choix du visiteur ne sont PAS enregistrés dans le navigateur : ils sont gardés dans l'adresse (?lang=ja&lite=1)
+  function syncUrl() {
+    try {
+      const u = new URL(location.href);
+      if (explicitLang) u.searchParams.set('lang', lang);
+      if (explicitLite !== null) u.searchParams.set('lite', explicitLite ? '1' : '0');
+      history.replaceState(null, '', u.toString());
+    } catch (err) {}
+  }
+
+  function setLiteMode(on, fromUser) {
     liteMode = on;
     document.documentElement.classList.toggle('lite-mode', on);
-    try { localStorage.setItem('lite', on ? '1' : '0'); } catch (err) {}
+    if (fromUser) { explicitLite = on; syncUrl(); }
+    if (!on) loadIconVideos();
     updateLiteBtn();
     syncIconVideos();
     if (on) window.scrollTo(0, 0);
   }
-  liteBtn.addEventListener('click', function() { if (gateOpen || overlayOpen) return; setLiteMode(!liteMode); });
+  liteBtn.addEventListener('click', function() { if (gateOpen || overlayOpen) return; setLiteMode(!liteMode, true); });
 
   function renderNav() {
     navEl.innerHTML = '';
@@ -1568,7 +1733,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (code === lang) return;
     if (overlayOpen) closeOverlayFn();
     lang = code;
-    try { localStorage.setItem('lang', lang); } catch (err) {}
+    explicitLang = true;
+    syncUrl();
     applyLanguage();
   }
 
@@ -1584,7 +1750,13 @@ document.addEventListener('DOMContentLoaded', function () {
     navEl.setAttribute('aria-label', t('navAria'));
     document.querySelector('.splide').setAttribute('aria-label', t('sectionAria'));
     document.getElementById('pdp').setAttribute('aria-label', t('photoAria'));
-    document.getElementById('clock').setAttribute('aria-label', t('clockAria'));
+    document.getElementById('site-title').textContent = t('siteTitle');
+    document.getElementById('skip-link').textContent = t('skip');
+    document.getElementById('foot-sitemap').textContent = t('sitemap');
+    document.getElementById('foot-a11y').textContent = t('a11yLink');
+    document.getElementById('foot-privacy').textContent = t('privacyLink');
+    document.querySelectorAll('.card-open').forEach((b, i) => { if (SLIDE_DATA[i]) b.setAttribute('aria-label', t('open', { c: L(SLIDE_DATA[i]).title })); });
+    if (!overlayOpen) document.title = t('siteTitle');
     langBox.setAttribute('aria-label', t('langAria'));
     const sp = document.getElementById('bg-speed');
     sp.setAttribute('aria-label', t('speed')); sp.title = t('speed');
@@ -1597,14 +1769,49 @@ document.addEventListener('DOMContentLoaded', function () {
     if (gateRender) gateRender();
   }
 
-  setLiteMode(liteMode);
+  setLiteMode(liteMode, false);
   applyLanguage();
 
-  // navigation clavier : une slide qui reçoit le focus devient la slide active
+  // la connexion se dégrade pendant la visite : on le propose, on ne l'impose pas
+  const connAPI = navigator.connection;
+  if (connAPI && connAPI.addEventListener) {
+    connAPI.addEventListener('change', function() {
+      if (liteMode || explicitLite !== null || gateOpen) return;
+      const bad = connAPI.saveData || /(^|-)2g$|^3g$/.test(connAPI.effectiveType || '') || (connAPI.downlink && connAPI.downlink < 1.5);
+      if (bad) showNotice(t('connChange'), t('perfYes'), () => setLiteMode(true, true));
+    });
+  }
+
+  // arrivée en version accessible décidée automatiquement : on l'explique et on laisse revenir en arrière
+  if (liteMode && (liteWhy === 'slow' || liteWhy === 'motion')) {
+    setTimeout(() => showNotice(t(liteWhy === 'slow' ? 'noticeSlow' : 'noticeMotion'), t('noticeFull'), () => setLiteMode(false, true)), 500);
+  }
+
+  // Chaque slide contient un vrai bouton (focus clavier, annoncé par les lecteurs d'écran) ; il ouvre la catégorie.
+  // On normalise aussi les rôles ajoutés par la bibliothèque du carrousel : ici c'est une simple liste.
+  splideEl.removeAttribute('aria-roledescription');
+  const listEl = document.querySelector('.splide__list');
+  listEl.setAttribute('role', 'list');
   Array.from(document.querySelectorAll('.splide__slide')).forEach((sl, i) => {
-    sl.setAttribute('tabindex', '0');
-    sl.addEventListener('focus', function() { if (!overlayOpen && !gateOpen) { currentSlideIdx = i; splide.go(i); } });
+    ['aria-roledescription', 'aria-label', 'aria-hidden', 'tabindex'].forEach(a => sl.removeAttribute(a));
+    sl.setAttribute('role', 'listitem');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'card-open';
+    btn.setAttribute('aria-label', t('open', { c: L(SLIDE_DATA[i]).title }));
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (gateOpen || overlayOpen) return;
+      currentSlideIdx = i;
+      splide.go(i);
+      openOverlay(i);
+    });
+    btn.addEventListener('focus', function() { if (!overlayOpen && !gateOpen) { currentSlideIdx = i; splide.go(i); } });
+    sl.appendChild(btn);
   });
+  document.getElementById('foot-sitemap').addEventListener('click', function() { if (gateOpen || overlayOpen) return; showOverlay(buildSitemap); });
+  document.getElementById('foot-privacy').addEventListener('click', function() { if (gateOpen || overlayOpen) return; showOverlay(buildPrivacy); });
+  document.getElementById('foot-a11y').addEventListener('click', function() { if (gateOpen || overlayOpen) return; showOverlay(buildA11y); });
 
   // (La grille aléatoire "Travaux" reste disponible : appeler openWorks() pour la réafficher.)
 
@@ -1642,6 +1849,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   document.addEventListener("keydown", function(e) {
     const t = e.target;
+    if (e.code === "Escape" && !gateOpen && (projectOpen || overlayOpen)) {
+      e.preventDefault();
+      if (projectOpen) closeProject(); else closeOverlayFn();
+      return;
+    }
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
     if (gateOpen) return;
 
@@ -1813,9 +2025,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (n >= 1) { iconOnlyActive = true; syncIconVideos(); }
     }
     function propose() {
-      let seen = false;
-      try { seen = sessionStorage.getItem('perfAsked') === '1'; sessionStorage.setItem('perfAsked', '1'); } catch (err) {}
-      if (asked || seen || liteMode) return;
+      if (asked || liteMode) return;   // une seule fois par visite (en mémoire, rien n'est stocké)
       asked = true;
       const box = document.createElement('div');
       box.id = 'perf-hint';
@@ -1824,7 +2034,7 @@ document.addEventListener('DOMContentLoaded', function () {
       box.querySelector('span').textContent = t('perfHint');
       box.querySelector('[data-yes]').textContent = t('perfYes');
       box.querySelector('[data-no]').textContent = t('perfNo');
-      box.querySelector('[data-yes]').addEventListener('click', () => { setLiteMode(true); box.remove(); });
+      box.querySelector('[data-yes]').addEventListener('click', () => { setLiteMode(true, true); box.remove(); });
       box.querySelector('[data-no]').addEventListener('click', () => box.remove());
       document.body.appendChild(box);
     }
@@ -1866,12 +2076,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   splide.on('move', function(newIndex) {
     currentSlideIdx = newIndex;
-    document.querySelectorAll('h1').forEach(function(h1, index) {
+    document.querySelectorAll('.titre').forEach(function(h1, index) {
       h1.classList.toggle('isactive', index === newIndex);
     });
   });
 
-  const h1s = document.querySelectorAll('h1');
+  const h1s = document.querySelectorAll('.titre');
   if (h1s[0]) h1s[0].classList.add('isactive');
 
   // =====================
@@ -2027,7 +2237,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   speedInput.addEventListener('input', function() {
     bgSpeed = sliderToSpeed(parseInt(speedInput.value, 10));
-    try { localStorage.setItem('bgSpeed', String(bgSpeed)); } catch (err) {}
     updateFill();
     applySpeed();
   });
