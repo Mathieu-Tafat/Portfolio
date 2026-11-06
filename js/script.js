@@ -72,7 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const BG_BASE_INTERVAL = 333;  // ms entre deux images du fond à vitesse ×1
   const BG_SPEED_DEFAULT = 0.35; // vitesse au départ (≈ 61 % de la barre) ; sert aussi de référence "×1" pour les animations
   const BG_SPEED_MIN     = 0.12; // vitesse mini de la barre (tout reste en mouvement lent, jamais figé)
-  const BG_SPEED_MAX     = 0.7;  // vitesse maxi de la barre = l'ancien 50 % moins 10 % (l'ancien maximum était 5)
+  const BG_SPEED_MAX     = 2.5;  // vitesse maxi de la barre (tout en haut)
+  const BG_SPEED_KNEE    = 60;   // jusqu'à cette position (en %), l'échelle est celle d'avant ; au-delà, elle accélère jusqu'au maximum
 
   // Vitesse globale réglée par la barre en bas à droite : fond, slides qui flottent,
   // bandeau du bas et vidéos des slides. Au minimum, tout reste en mouvement lent.
@@ -138,24 +139,11 @@ document.addEventListener('DOMContentLoaded', function () {
     langAria: 'Langue',
     perfHint: 'Le site a l\'air de ramer sur cet appareil.', perfYes: 'Passer en version accessible', perfNo: 'Plus tard',
     siteTitle: 'Mathieu Tafat — graphiste 2D et 3D', skip: 'Aller au contenu principal',
-    sitemap: 'Plan du site', a11yLink: 'Accessibilité : partiellement conforme', a11yTitle: "Déclaration d'accessibilité",
-    a11yP1: "Ce site vise à respecter le Référentiel général d'amélioration de l'accessibilité (RGAA 4.1), fondé sur les WCAG 2.1 niveau AA. La « version accessible », activable avec le bouton en haut de la page, est la version conçue pour cela : aucune animation, texte lisible, navigation au clavier.",
-    a11yP2: "État de conformité : partiellement conforme au RGAA 4.1. Il s'agit d'une auto-évaluation : le site n'a pas encore fait l'objet d'un audit par un tiers. La version complète, très animée, n'est pas destinée à être conforme.",
-    a11yP3: "Contenus non accessibles : les vidéos n'ont ni sous-titres ni transcription. Le texte de présentation de chaque projet décrit son contenu mais ne remplace pas la bande sonore ou les dialogues. Certaines images n'ont que leur titre comme description.",
-    a11yP4: "Retour d'information et contact : pour signaler un défaut d'accessibilité ou obtenir un contenu sous une autre forme, écrivez à contact.tmdesignstudio@gmail.com.",
-    a11yP5: "Voies de recours : si votre demande reste sans réponse satisfaisante, vous pouvez écrire au Défenseur des droits.",
-    a11yDate: 'Déclaration établie en novembre 2026.',
+    sitemap: 'Plan du site',
     formNote: 'Tous les champs sont obligatoires.', newWindow: '(nouvelle fenêtre)',
     noticeSlow: 'Connexion lente détectée : la version accessible, plus légère, a été chargée.',
     noticeMotion: 'Votre système demande de réduire les animations : la version accessible a été chargée.',
     noticeFull: 'Passer à la version complète', connChange: 'La connexion semble être devenue lente.',
-    privacyLink: 'Confidentialité', privacyTitle: 'Confidentialité et données personnelles',
-    privacyP1: "Ce site ne dépose aucun cookie et n'utilise ni stockage local, ni outil de mesure d'audience, ni service tiers de polices ou de statistiques. Aucune donnée n'est enregistrée dans votre navigateur.",
-    privacyP2: "Vos choix (langue, version accessible) ne sont pas mémorisés : ils peuvent être conservés dans l'adresse de la page (par exemple ?lang=fr&lite=1), que vous pouvez mettre en favori.",
-    privacyP3: "Le prénom saisi à l'arrivée sur le site reste uniquement dans la page ouverte : il n'est ni enregistré ni envoyé.",
-    privacyP4: "Le formulaire de contact envoie votre adresse e-mail, le sujet et votre message au service Formspree, uniquement pour que je puisse vous répondre. Vous pouvez aussi m'écrire directement par e-mail.",
-    privacyP5: "Comme tout site, l'hébergeur peut conserver des journaux techniques de connexion (adresse IP), ce que je ne contrôle pas.",
-    privacyP6: "Pour toute question ou demande concernant vos données : contact.tmdesignstudio@gmail.com."
   };
   let lang = 'fr';
   {
@@ -408,6 +396,11 @@ document.addEventListener('DOMContentLoaded', function () {
   function loadIconVideos() {
     splideVideos.forEach(v => { if (v._loaded) return; v._loaded = true; v.preload = 'auto'; v.load(); });
   }
+  // une icône peut avoir une vidéo de secours (data-fallback) si son fichier n'existe pas encore
+  splideVideos.forEach(v => {
+    const fb = v.dataset.fallback;
+    if (fb) v.addEventListener('error', () => { if (!v._fb) { v._fb = true; v.src = fb; v.load(); } });
+  });
   if (!liteMode) loadIconVideos();
 
   // =====================
@@ -720,16 +713,6 @@ document.addEventListener('DOMContentLoaded', function () {
       desc: "Huile, aquarelle et illustrations",
       images: [
          {
-          src: "img/mechanoid.png",
-          caption: "mechanoid",
-          text: "Cover d'une musique du compositeur Papri-K. Illustration digitale réalisée à partir des envies de l'artiste."
-        },
-        {
-          src: "img/ctrl.png",
-          caption: "CTRL",
-          text: "Cover d'une musique du compositeur Papri-K. Scène 3D rendue comme une illustrration, réalisée à partir des envies de l'artiste."
-        },
-        {
           src: "img/avatar.png",
           caption: "I See You, Son",
           text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
@@ -754,6 +737,29 @@ document.addEventListener('DOMContentLoaded', function () {
           src: "img/aquarelles/huile.png",
           caption: "Huile sur toile",
           text: "Peinture à l'huile représentant un paysage. Il s'agit de ma première expérimentation avec cette technique, une occasion de découvrir les possibilités de la peinture à l'huile et son approche différente de la couleur et de la matière."
+        }
+      ]
+    },
+    {
+      title: "Music covers",
+      navLabel: "Music covers",
+      jp: "カバーアート",
+      desc: "Illustration digitale, 3D, photographie",
+      images: [
+        {
+          src: "img/mechanoid.png",
+          caption: "mechanoid",
+          text: "Cover d'une musique du compositeur Papri-K. Illustration digitale réalisée à partir des envies de l'artiste."
+        },
+        {
+          src: "img/ctrl.png",
+          caption: "CTRL",
+          text: "Cover d'une musique du compositeur Papri-K. Scène 3D rendue comme une illustration, réalisée à partir des envies de l'artiste."
+        },
+        {
+          src: "img/cheriestop.png",
+          caption: "Chérie Stop !",
+          text: "Cover de la musique « Chérie Stop ! » de Nathana. Photographie avec un effet spécial pratique réalisé sur le t-shirt."
         }
       ]
     }
@@ -1528,7 +1534,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   // ---- accessibilité des fenêtres : focus, arrière-plan inerte, titre de la page (RGAA 7.x, 8.x, 12.x)
   let overlayOpener = null, projectOpener = null;
-  const BG_IDS = ['topbar', 'main', 'site-footer', 'ticker', 'bgbar', 'targets', 'skip-link'];
+  const BG_IDS = ['lite-banner', 'topbar', 'main', 'site-footer', 'ticker', 'bgbar', 'targets', 'skip-link'];
   function setBgInert(on) { BG_IDS.forEach(id => { const e = document.getElementById(id); if (e) e.inert = on; }); }
   function focusOverlayTitle() {
     const h = overlayContent.querySelector('.og-header');
@@ -1544,6 +1550,14 @@ document.addEventListener('DOMContentLoaded', function () {
     splideEl.classList.add("hidden");
     splideVideos.forEach(v => v.pause());
     build();
+    if (liteMode) {   // version accessible : on peut revenir à la version complète sans fermer la fenêtre à la main
+      const back = document.createElement('div');
+      back.className = 'og-lite-back';
+      back.innerHTML = '<button type="button" class="nav-btn"></button>';
+      back.firstChild.textContent = t('liteOff');
+      back.firstChild.addEventListener('click', function() { closeOverlayFn(); setLiteMode(false, true); });
+      overlayContent.appendChild(back);
+    }
     setBgInert(true);
     setTimeout(() => {
       overlay.classList.add("show");
@@ -1594,16 +1608,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.appendChild(box);
   }
 
-  // Confidentialité : ce que le site fait (et ne fait pas) des données
-  function buildPrivacy() {
-    currentData = null;
-    overlayContent.innerHTML =
-      '<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>' + esc(t('privacyTitle')) + '<span class="br">」</span></h2>' +
-      '<div class="og-profile"><div class="og-profile-text">' +
-      ['privacyP1', 'privacyP2', 'privacyP3', 'privacyP4', 'privacyP5', 'privacyP6'].map(k => '<p class="og-profile-p">' + esc(t(k)) + '</p>').join('') +
-      '</div></div>';
-  }
-
   // Plan du site : deuxième système de navigation (RGAA 12.1)
   function buildSitemap() {
     currentData = null;
@@ -1630,18 +1634,6 @@ document.addEventListener('DOMContentLoaded', function () {
       focusOverlayTitle();
       if (b.dataset.item !== undefined) openProject(d.images[+b.dataset.item]);
     }));
-  }
-
-  // Déclaration d'accessibilité (auto-évaluation, non auditée)
-  function buildA11y() {
-    currentData = null;
-    overlayContent.innerHTML =
-      '<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>' + esc(t('a11yTitle')) + '<span class="br">」</span></h2>' +
-      '<div class="og-profile"><div class="og-profile-text">' +
-      ['a11yP1', 'a11yP2', 'a11yP3', 'a11yP4', 'a11yP5'].map(k => '<p class="og-profile-p">' + esc(t(k)) + '</p>').join('') +
-      '<p class="og-profile-p"><a href="https://www.defenseurdesdroits.fr" target="_blank" rel="noopener">defenseurdesdroits.fr<span class="sr-only"> ' + esc(t('newWindow')) + '</span></a></p>' +
-      '<p class="og-profile-p">' + esc(t('a11yDate')) + '</p>' +
-      '</div></div>';
   }
 
   function closeOverlayFn() {
@@ -1674,6 +1666,11 @@ document.addEventListener('DOMContentLoaded', function () {
     liteBtn.textContent = liteMode ? t('liteOff') : t('liteOn');
     liteBtn.setAttribute('aria-pressed', liteMode ? 'true' : 'false');
     liteBtn.title = liteMode ? t('liteOffTitle') : t('liteOnTitle');
+    // version accessible : le bouton de retour est dans un bandeau tout en haut (toujours visible) ; sinon, en fin de navigation
+    const slot = document.getElementById('lite-slot');
+    const hadFocus = document.activeElement === liteBtn;
+    if (liteMode) slot.appendChild(liteBtn); else if (navEl) navEl.appendChild(liteBtn);
+    if (hadFocus) liteBtn.focus({ preventScroll: true });   // déplacer le bouton ne doit pas faire perdre le focus
   }
   // Les choix du visiteur ne sont PAS enregistrés dans le navigateur : ils sont gardés dans l'adresse (?lang=ja&lite=1)
   function syncUrl() {
@@ -1713,7 +1710,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       navEl.appendChild(b);
     });
-    navEl.appendChild(liteBtn);
+    if (!liteMode) navEl.appendChild(liteBtn);   // en version accessible, le bouton est dans le bandeau du haut
   }
 
   // Sélecteur de langue (FR / EN / 日本語)
@@ -1753,8 +1750,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('site-title').textContent = t('siteTitle');
     document.getElementById('skip-link').textContent = t('skip');
     document.getElementById('foot-sitemap').textContent = t('sitemap');
-    document.getElementById('foot-a11y').textContent = t('a11yLink');
-    document.getElementById('foot-privacy').textContent = t('privacyLink');
     document.querySelectorAll('.card-open').forEach((b, i) => { if (SLIDE_DATA[i]) b.setAttribute('aria-label', t('open', { c: L(SLIDE_DATA[i]).title })); });
     if (!overlayOpen) document.title = t('siteTitle');
     langBox.setAttribute('aria-label', t('langAria'));
@@ -1810,8 +1805,6 @@ document.addEventListener('DOMContentLoaded', function () {
     sl.appendChild(btn);
   });
   document.getElementById('foot-sitemap').addEventListener('click', function() { if (gateOpen || overlayOpen) return; showOverlay(buildSitemap); });
-  document.getElementById('foot-privacy').addEventListener('click', function() { if (gateOpen || overlayOpen) return; showOverlay(buildPrivacy); });
-  document.getElementById('foot-a11y').addEventListener('click', function() { if (gateOpen || overlayOpen) return; showOverlay(buildA11y); });
 
   // (La grille aléatoire "Travaux" reste disponible : appeler openWorks() pour la réafficher.)
 
@@ -2204,8 +2197,13 @@ document.addEventListener('DOMContentLoaded', function () {
   let lastSwap = 0;
 
   // barre : 0..100 -> vitesse mini..maxi (échelle logarithmique), jamais à l'arrêt
-  const sliderToSpeed = v => BG_SPEED_MIN * Math.pow(BG_SPEED_MAX / BG_SPEED_MIN, v / 100);
-  const speedToSlider = sp => Math.round(100 * Math.log(sp / BG_SPEED_MIN) / Math.log(BG_SPEED_MAX / BG_SPEED_MIN));
+  const BG_KNEE_SPEED = BG_SPEED_MIN * Math.pow(0.7 / BG_SPEED_MIN, BG_SPEED_KNEE / 100);   // vitesse à la position du coude (≈ 0,35)
+  const sliderToSpeed = v => v <= BG_SPEED_KNEE
+    ? BG_SPEED_MIN * Math.pow(BG_KNEE_SPEED / BG_SPEED_MIN, v / BG_SPEED_KNEE)
+    : BG_KNEE_SPEED * Math.pow(BG_SPEED_MAX / BG_KNEE_SPEED, (v - BG_SPEED_KNEE) / (100 - BG_SPEED_KNEE));
+  const speedToSlider = sp => sp <= BG_KNEE_SPEED
+    ? Math.round(BG_SPEED_KNEE * Math.log(sp / BG_SPEED_MIN) / Math.log(BG_KNEE_SPEED / BG_SPEED_MIN))
+    : Math.round(BG_SPEED_KNEE + (100 - BG_SPEED_KNEE) * Math.log(sp / BG_KNEE_SPEED) / Math.log(BG_SPEED_MAX / BG_KNEE_SPEED));
 
   const speedInput  = document.getElementById('bg-speed');
   const bgBarEl     = document.getElementById('bgbar');

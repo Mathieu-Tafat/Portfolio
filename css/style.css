@@ -1467,7 +1467,9 @@ html.lite-mode { font-size: 100%; scroll-behavior: auto; }
 html.lite-mode body { line-height: 1.5; }
 
 /* en-tête et navigation : pas de position fixe, retour à la ligne plutôt que défilement horizontal */
-html.lite-mode #topbar { position: static; flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+/* position: relative + z-index : sans cela, le fond (canvas fixe, z-index 0) passait AU-DESSUS de l'en-tête devenu non fixe */
+html.lite-mode #topbar { position: relative; z-index: 10; flex-wrap: wrap; gap: 12px; padding: 12px 16px; }
+html.lite-mode #lite-banner, html.lite-mode #site-footer { position: relative; z-index: 10; }
 html.lite-mode #nav { flex-wrap: wrap; overflow: visible; width: auto; gap: 6px; }
 html.lite-mode #topbar-right { flex-wrap: wrap; gap: 10px; }
 html.lite-mode .top-link, html.lite-mode .lang-btn {
@@ -1559,3 +1561,12 @@ html.lite-mode #notice {
   background: #000; border: 2px solid #fff; font-family: var(--readable); font-size: 1rem; z-index: 10002;
 }
 html.lite-mode #notice .nav-btn { min-height: 44px; font-size: 1rem; }
+
+/* =====================
+   VERSION ACCESSIBLE : bandeau en haut avec le bouton de retour (toujours visible, y compris sur mobile)
+   ===================== */
+#lite-banner { display: none; }
+html.lite-mode #lite-banner { display: flex; padding: 8px 16px 0; }
+html.lite-mode #lite-banner .lite-btn { margin: 0; }
+.og-lite-back { margin-top: 24px; padding-bottom: 8px; }
+.og-lite-back .nav-btn { min-height: 44px; font-size: 1rem; border-color: #fff; }

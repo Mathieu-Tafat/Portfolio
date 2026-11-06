@@ -33,24 +33,11 @@ window.I18N = {
       navAria: "Main navigation", sectionAria: "Project categories", photoAria: "Photo of Mathieu", clockAria: "Time",
       langAria: "Language",
       siteTitle: "Mathieu Tafat — 2D & 3D graphic designer", skip: "Skip to main content",
-      sitemap: "Site map", a11yLink: "Accessibility: partially compliant", a11yTitle: "Accessibility statement",
-      a11yP1: "This site aims to follow the French Référentiel général d'amélioration de l'accessibilité (RGAA 4.1), which is based on WCAG 2.1 level AA. The “accessible version”, which you can switch on with the button at the top of the page, is the version designed for this: no animation, readable text, keyboard navigation.",
-      a11yP2: "Compliance status: partially compliant with RGAA 4.1. This is a self-assessment: the site has not yet been audited by a third party. The full version, which is highly animated, is not intended to be compliant.",
-      a11yP3: "Content that is not accessible: videos have neither captions nor transcripts. The presentation text of each project describes its content but does not replace the soundtrack or dialogue. Some images are described only by their title.",
-      a11yP4: "Feedback and contact: to report an accessibility problem or to get content in another form, write to contact.tmdesignstudio@gmail.com.",
-      a11yP5: "Remedies: if you do not get a satisfactory answer, you can contact the French Defender of Rights (Défenseur des droits).",
-      a11yDate: "Statement drawn up in November 2026.",
+      sitemap: "Site map",
       formNote: "All fields are required.", newWindow: "(opens in a new window)",
       noticeSlow: "Slow connection detected: the lighter accessible version has been loaded.",
       noticeMotion: "Your system asks for reduced motion: the accessible version has been loaded.",
       noticeFull: "Switch to the full version", connChange: "Your connection seems to have become slow.",
-      privacyLink: "Privacy", privacyTitle: "Privacy and personal data",
-      privacyP1: "This site does not set any cookie and does not use local storage, analytics, or third-party fonts or statistics services. Nothing is saved in your browser.",
-      privacyP2: "Your choices (language, accessible version) are not remembered: they can be kept in the page address (for example ?lang=en&lite=1), which you can bookmark.",
-      privacyP3: "The first name you enter when you arrive stays only in the open page: it is neither saved nor sent anywhere.",
-      privacyP4: "The contact form sends your email address, subject and message to the Formspree service, only so that I can reply to you. You can also write to me directly by email.",
-      privacyP5: "As with any website, the host may keep technical connection logs (IP address), which I do not control.",
-      privacyP6: "For any question or request about your data: contact.tmdesignstudio@gmail.com.",
       perfHint: "The site seems to be running slowly on this device.", perfYes: "Switch to the accessible version", perfNo: "Not now"
     },
     ja: {
@@ -71,24 +58,11 @@ window.I18N = {
       navAria: "メインナビゲーション", sectionAria: "プロジェクトのカテゴリー", photoAria: "Mathieuの写真", clockAria: "時刻",
       langAria: "言語",
       siteTitle: "Mathieu Tafat — 2D・3Dグラフィックデザイナー", skip: "メインコンテンツへ移動",
-      sitemap: "サイトマップ", a11yLink: "アクセシビリティ:部分的に準拠", a11yTitle: "アクセシビリティに関する声明",
-      a11yP1: "このサイトは、WCAG 2.1 レベルAAに基づくフランスのアクセシビリティ基準「RGAA 4.1」(Référentiel général d'amélioration de l'accessibilité)への準拠を目指しています。ページ上部のボタンで切り替えられる「アクセシブル版」は、そのために設計された版で、アニメーションがなく、文字が読みやすく、キーボードで操作できます。",
-      a11yP2: "適合状況:RGAA 4.1に部分的に準拠しています。これは自己評価であり、第三者による監査はまだ受けていません。アニメーションの多いフル版は、準拠を目的としていません。",
-      a11yP3: "アクセシブルでない内容:動画には字幕も文字起こしもありません。各プロジェクトの紹介文は内容を説明していますが、音声や会話の代わりにはなりません。一部の画像は、タイトルのみで説明されています。",
-      a11yP4: "ご意見・お問い合わせ:アクセシビリティ上の問題の報告や、別の形式での内容のご希望は、contact.tmdesignstudio@gmail.com までご連絡ください。",
-      a11yP5: "救済手段:満足のいく回答が得られない場合は、フランスの権利擁護官(Défenseur des droits)に申し立てることができます。",
-      a11yDate: "この声明は2026年11月に作成しました。",
+      sitemap: "サイトマップ",
       formNote: "すべての項目が必須です。", newWindow: "(新しいウィンドウで開きます)",
       noticeSlow: "通信が遅いため、より軽いアクセシブル版を読み込みました。",
       noticeMotion: "システムの設定で動きの軽減が求められているため、アクセシブル版を読み込みました。",
       noticeFull: "フル版に切り替える", connChange: "通信が遅くなったようです。",
-      privacyLink: "プライバシー", privacyTitle: "プライバシーと個人情報",
-      privacyP1: "このサイトは、Cookie、ローカルストレージ、アクセス解析、外部のフォントや統計サービスを一切使用しません。ブラウザには何も保存されません。",
-      privacyP2: "選択内容(言語、アクセシブル版)は記憶されません。ページのアドレス(例:?lang=ja&lite=1)に残すことができ、ブックマークできます。",
-      privacyP3: "最初に入力したお名前は、開いているページの中にとどまるだけで、保存も送信もされません。",
-      privacyP4: "お問い合わせフォームは、ご返信のためだけに、メールアドレス・件名・メッセージをFormspreeのサービスへ送信します。メールで直接ご連絡いただくこともできます。",
-      privacyP5: "他のウェブサイトと同様に、ホスティング事業者が接続ログ(IPアドレス)を保持する場合があります。これは私の管理外です。",
-      privacyP6: "データに関するご質問やご要望は、contact.tmdesignstudio@gmail.com までご連絡ください。",
       perfHint: "この端末では動作が重いようです。", perfYes: "アクセシブル版に切り替える", perfNo: "あとで"
     }
   },
@@ -105,7 +79,8 @@ window.I18N = {
       "Edition": { title: "Editorial design", navLabel: "Editorial design", desc: "Elbow grease, Adobe suite" },
       "Animation 2D": { title: "2D animation", navLabel: "2D animation", desc: "Adobe suite" },
       "Animations 3D": { title: "3D animation", navLabel: "3D animation", desc: "Blender, Adobe suite" },
-      "Illustrations": { title: "Illustrations", navLabel: "Illustrations", desc: "Oil, watercolor and illustrations" }
+      "Illustrations": { title: "Illustrations", navLabel: "Illustrations", desc: "Oil, watercolor and illustrations" },
+      "Music covers": { title: "Music covers", navLabel: "Music covers", desc: "Digital illustration, 3D, photography" }
     },
     ja: {
       "Profil": {
@@ -118,7 +93,8 @@ window.I18N = {
       "Edition": { title: "エディトリアルデザイン", navLabel: "エディトリアル", desc: "手仕事の根気、Adobeスイート" },
       "Animation 2D": { title: "2Dアニメーション", navLabel: "2Dアニメーション", desc: "Adobeスイート" },
       "Animations 3D": { title: "3Dアニメーション", navLabel: "3Dアニメーション", desc: "Blender、Adobeスイート" },
-      "Illustrations": { title: "イラストレーション", navLabel: "イラスト", desc: "油彩、水彩、イラスト" }
+      "Illustrations": { title: "イラストレーション", navLabel: "イラスト", desc: "油彩、水彩、イラスト" },
+      "Music covers": { title: "ミュージック・カバーアート", navLabel: "カバーアート", desc: "デジタルイラスト、3D、写真" }
     }
   },
 
@@ -263,6 +239,9 @@ window.I18N = {
       },
 
       /* ---------- Illustrations ---------- */
+      "img/cheriestop.png": {
+        text: "Cover for the track “Chérie Stop!” by Nathana. Photograph with a practical special effect done on the T-shirt."
+      },
       "img/mechanoid.png": {
         text: "Cover for a track by the composer Papri-K. Digital illustration created from the artist's wishes."
       },
@@ -429,6 +408,9 @@ window.I18N = {
       },
 
       /* ---------- Illustrations ---------- */
+      "img/cheriestop.png": {
+        text: "Nathanaの楽曲「Chérie Stop !」のカバーです。Tシャツに実際の仕掛けで施した特殊効果(プラクティカル・エフェクト)を使った写真です。"
+      },
       "img/mechanoid.png": {
         text: "作曲家Papri-Kの楽曲のカバーです。アーティストの要望をもとに制作したデジタルイラストです。"
       },

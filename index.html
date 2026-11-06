@@ -24,7 +24,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Portfolio de Mathieu Tafat, graphiste 2D et 3D : identité visuelle, édition, motion design, animation 3D, jeu vidéo, illustration.">
 
-  <link rel="stylesheet" href="css/style.css?v=20261029f">
+  <link rel="stylesheet" href="css/style.css?v=20261029h">
   <link rel="icon" type="image/x-icon" href="img/icon.ico">
   <link rel="stylesheet" href="css/splide.min.css">
   <script src="js/splide.min.js"></script>
@@ -33,6 +33,7 @@
 </head>
 <body>
   <a class="skip-link" id="skip-link" href="#main">Aller au contenu principal</a>
+  <div id="lite-banner"><span id="lite-slot"></span></div>
   <canvas id="bg-canvas" aria-hidden="true" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;"></canvas>
 
   <header id="topbar">
@@ -75,8 +76,12 @@
             <h2 class="titre">Animations 3D</h2>
           </li>
           <li class="splide__slide" id="splide01-slide07">
-            <video class="splide-bg-video" src="img/icones/sax.mp4" loop muted playsinline preload="none" aria-hidden="true"></video>
+            <video class="splide-bg-video" src="img/icones/palette.mp4" loop muted playsinline preload="none" aria-hidden="true"></video>
             <h2 class="titre">Illustrations</h2>
+          </li>
+          <li class="splide__slide" id="splide01-slide08">
+            <video class="splide-bg-video" src="img/icones/vinyl.mp4" data-fallback="img/icones/sax.mp4" loop muted playsinline preload="none" aria-hidden="true"></video>
+            <h2 class="titre">Music covers</h2>
           </li>
         </ul>
       </div>
@@ -85,14 +90,12 @@
 
   <footer id="site-footer">
     <button type="button" class="top-link" id="foot-sitemap">Plan du site</button>
-    <button type="button" class="top-link" id="foot-a11y">Accessibilité : partiellement conforme</button>
-    <button type="button" class="top-link" id="foot-privacy">Confidentialité</button>
   </footer>
 
   <div id="ticker" aria-hidden="true">
     <div class="ticker-track">
-      <span>GRAPHISTE 2D &amp; 3D ™ OUVERT AUX PROJETS ™ COMMUNICATION ™ JEUX-VIDÉO ™ ÉDITION ™ ANIMATION 2D &amp; 3D ™ ILLUSTRATIONS ™ 2D &amp; 3D GRAPHIC DESIGN ™ OPEN FOR PROJECTS ™ COMMUNICATION ™ VIDEO GAMES ™ EDITORIAL DESIGN ™ 2D &amp; 3D ANIMATION ™ ILLUSTRATION ™ 2D・3D グラフィックデザイン ™ お仕事募集中 ™ コミュニケーションデザイン ™ ビデオゲーム ™ エディトリアルデザイン ™ 2D・3Dアニメーション ™ イラストレーション ™ </span>
-      <span>GRAPHISTE 2D &amp; 3D ™ OUVERT AUX PROJETS ™ COMMUNICATION ™ JEUX-VIDÉO ™ ÉDITION ™ ANIMATION 2D &amp; 3D ™ ILLUSTRATIONS ™ 2D &amp; 3D GRAPHIC DESIGN ™ OPEN FOR PROJECTS ™ COMMUNICATION ™ VIDEO GAMES ™ EDITORIAL DESIGN ™ 2D &amp; 3D ANIMATION ™ ILLUSTRATION ™ 2D・3D グラフィックデザイン ™ お仕事募集中 ™ コミュニケーションデザイン ™ ビデオゲーム ™ エディトリアルデザイン ™ 2D・3Dアニメーション ™ イラストレーション ™ </span>
+      <span>GRAPHISTE 2D &amp; 3D ™ OUVERT AUX PROJETS ™ COMMUNICATION ™ JEUX-VIDÉO ™ ÉDITION ™ ANIMATION 2D &amp; 3D ™ ILLUSTRATIONS ™ MUSIC COVERS ™ AUCUN COOKIE, RIEN N'EST ENREGISTRÉ SUR VOTRE APPAREIL ™ 2D &amp; 3D GRAPHIC DESIGN ™ OPEN FOR PROJECTS ™ COMMUNICATION ™ VIDEO GAMES ™ EDITORIAL DESIGN ™ 2D &amp; 3D ANIMATION ™ ILLUSTRATION ™ MUSIC COVERS ™ NO COOKIES, NOTHING IS STORED ON YOUR DEVICE ™ 2D・3D グラフィックデザイン ™ お仕事募集中 ™ コミュニケーションデザイン ™ ビデオゲーム ™ エディトリアルデザイン ™ 2D・3Dアニメーション ™ イラストレーション ™ カバーアート ™ Cookieなし、お使いの端末には何も保存されません ™ </span>
+      <span>GRAPHISTE 2D &amp; 3D ™ OUVERT AUX PROJETS ™ COMMUNICATION ™ JEUX-VIDÉO ™ ÉDITION ™ ANIMATION 2D &amp; 3D ™ ILLUSTRATIONS ™ MUSIC COVERS ™ AUCUN COOKIE, RIEN N'EST ENREGISTRÉ SUR VOTRE APPAREIL ™ 2D &amp; 3D GRAPHIC DESIGN ™ OPEN FOR PROJECTS ™ COMMUNICATION ™ VIDEO GAMES ™ EDITORIAL DESIGN ™ 2D &amp; 3D ANIMATION ™ ILLUSTRATION ™ MUSIC COVERS ™ NO COOKIES, NOTHING IS STORED ON YOUR DEVICE ™ 2D・3D グラフィックデザイン ™ お仕事募集中 ™ コミュニケーションデザイン ™ ビデオゲーム ™ エディトリアルデザイン ™ 2D・3Dアニメーション ™ イラストレーション ™ カバーアート ™ Cookieなし、お使いの端末には何も保存されません ™ </span>
     </div>
   </div>
 
