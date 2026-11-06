@@ -713,12 +713,12 @@ document.addEventListener('DOMContentLoaded', function () {
       desc: "Huile, aquarelle et illustrations",
       images: [
          {
-          src: "img/avatar.png",
+          src: "img/avatar.PNG",
           caption: "I See You, Son",
           text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
         },
         {
-          src: "img/darthvader.png",
+          src: "img/darthvader.PNG",
           caption: "Anakin",
           text: "Illustration digitale à partir d'une scène de la série Star Wars : Obi-Wan"
         },
