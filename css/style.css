@@ -288,7 +288,7 @@ a:hover {
    SPLIDE - DESKTOP
    ===================== */
 .splide {
-  margin-top: 130px;
+  margin-top: max(130px, calc(var(--topbar-h, 0px) + 24px));   /* sous la barre du haut, même si elle prend deux lignes */
   margin-left: 100px;
   position: relative;
   z-index: 1;
@@ -864,9 +864,8 @@ a:hover {
   #nav {
     width: 100%;
     gap: 2px;
-    overflow-x: auto;
+    overflow: visible;
     flex-wrap: nowrap;
-    scrollbar-width: none;
     padding: 4px 0;
   }
   #nav::-webkit-scrollbar { display: none; }
@@ -878,7 +877,7 @@ a:hover {
   #topbar-right { gap: 8px; }
 
   .splide {
-    margin-top: 140px;
+    margin-top: calc(var(--topbar-h, 110px) + 24px);
     margin-left: 50%;
     transform: translateX(-50%);
     width: 90vw;
@@ -1072,7 +1071,17 @@ a:hover {
   color: #fff;
   margin-bottom: 10px;
 }
-.og-header .br { color: var(--accent); margin: 0 0.25em; }
+/* crochets 「 」 dessinés en CSS : ils s'affichent partout, quelle que soit la police installée */
+.og-header .br {
+  display: inline-block;
+  width: 0.42em;
+  height: 0.78em;
+  margin: 0 0.5em;
+  border: 0.09em solid var(--accent);
+  vertical-align: -0.02em;
+}
+.og-header .br-l { border-right: 0; border-bottom: 0; }
+.og-header .br-r { border-left: 0; border-top: 0; }
 .og-desc {
   font-family: var(--mono);
   font-size: 12px;
@@ -1331,7 +1340,10 @@ html.lite-mode #cursor .cur-col path { transition: stroke 0.22s ease, stroke-wid
 .gate-lang { display: flex; gap: 8px; justify-content: center; }
 .gate-lang-btn { font-size: 13px; padding: 0.4em 0.9em; }
 .gate-lang-btn[aria-pressed="true"] { border-color: #fff; color: #fff; }
-#nav { overflow-x: auto; scrollbar-width: none; }
+#nav { overflow: visible; }   /* plus de défilement horizontal : la barre est ajustée par fitNav() dans script.js */
+#nav.nav-tight { gap: 0; }
+#nav.nav-tight .top-link { padding: 0.3em 0.45em; letter-spacing: 0.3px; }
+#nav.nav-wrap { flex-wrap: wrap; row-gap: 2px; }
 :lang(ja) .top-link { letter-spacing: 0; }   /* pas d'espacement forcé entre les caractères japonais : barre moins chargée */
 #nav::-webkit-scrollbar { display: none; }
 :lang(ja) .og-skills-level { flex-basis: 11em; }

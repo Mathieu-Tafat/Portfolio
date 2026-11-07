@@ -71,16 +71,16 @@ window.I18N = {
     en: {
       "Profil": {
         title: "Profile",
-        navLabel: "Profile & Contact",
+        navLabel: "About",
         text: "2D and 3D graphic designer, graduated in 2025 with a professional bachelor's degree (Licence Professionnelle) in Graphic Design. I work across a wide range of fields, from visual identity to editorial design, motion design, 3D animation and video games. I enjoy exploring new techniques and learning the tools that suit each project.\n\nCulture, cinema and video games feed my work, but I also enjoy discovering new universes and stepping out of my habits.\n\nI'm open to projects and collaborations: feel free to get in touch."
       },
-      "Service Communication Université Rennes 2": { title: "Rennes 2 University Communications Office", navLabel: "Communications Office", desc: "Adobe suite" },
+      "Service Communication Université Rennes 2": { title: "Rennes 2 University Communications Office", navLabel: "Communications", desc: "Adobe suite" },
       "Jeux-vidéo": { title: "Video games", navLabel: "Video games", desc: "Construct 2, Unity" },
       "Edition": { title: "Editorial design", navLabel: "Editorial design", desc: "Elbow grease, Adobe suite" },
       "Animation 2D": { title: "2D animation", navLabel: "2D animation", desc: "Adobe suite" },
       "Animations 3D": { title: "3D animation", navLabel: "3D animation", desc: "Blender, Adobe suite" },
       "Illustrations": { title: "Illustrations", navLabel: "Illustrations", desc: "Oil, watercolor and illustrations" },
-      "Music covers": { title: "Music covers", navLabel: "Music covers", desc: "Digital illustration, 3D, photography" }
+      "Pochette musicale": { title: "Music covers", navLabel: "Music covers", desc: "Digital illustration, 3D, photography" }
     },
     ja: {
       "Profil": {
@@ -94,7 +94,7 @@ window.I18N = {
       "Animation 2D": { title: "2Dアニメーション", navLabel: "2Dアニメーション", desc: "Adobeスイート" },
       "Animations 3D": { title: "3Dアニメーション", navLabel: "3Dアニメーション", desc: "Blender、Adobeスイート" },
       "Illustrations": { title: "イラストレーション", navLabel: "イラスト", desc: "油彩、水彩、イラスト" },
-      "Music covers": { title: "ミュージック・カバーアート", navLabel: "カバーアート", desc: "デジタルイラスト、3D、写真" }
+      "Pochette musicale": { title: "ミュージック・カバーアート", navLabel: "カバーアート", desc: "デジタルイラスト、3D、写真" }
     }
   },
 

@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Tailles aléatoires des slides au lancement (desktop) : facteur d'échelle min / max,
   // et part maximale de l'écran que toutes les slides ensemble peuvent occuper (pour que tout reste aéré).
-  const SLIDE_SCALE_MIN = 0.5;
+  const SLIDE_SCALE_MIN = 0.6;
   const SLIDE_SCALE_MAX = 0.8;
-  const SLIDE_TOTAL_MAX = 0.30;   // 0.30 = toutes les slides réunies prennent au plus 30 % de la surface utile
+  const SLIDE_TOTAL_MAX = 0.42;   // 0.42 = toutes les slides réunies prennent au plus 42 % de la surface utile
 
   // Cibles qui se baladent (img/cible.png) : un clic les fait tomber, d'autres clics les relancent
   const TARGET_IMG         = 'img/cible.png';
@@ -157,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.documentElement.lang = lang;
   let visitorName = '';
   let gateRender = null;
+  let navReady = false;                   // la barre du haut est construite (voir fitNav)
   let perfLevel = 0;                      // 0 = tout activé ; monte tout seul si le site rame (voir garde-fou)
   let iconOnlyActive = false;             // initialisé plus bas depuis ICON_ONLY_ACTIVE
 
@@ -173,8 +174,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const tr = lang === 'fr' ? null : ((I18N.cats || {})[lang] || {})[sl.title];
     return tr ? Object.assign({}, sl, tr) : sl;
   }
+  const itemsLC = {};   // index des traductions par chemin en minuscules : .png / .PNG ne cassent plus rien
+  function itemTr(src) {
+    const tbl = (I18N.items || {})[lang];
+    if (!tbl) return null;
+    if (!itemsLC[lang]) { itemsLC[lang] = {}; Object.keys(tbl).forEach(k => { itemsLC[lang][k.toLowerCase()] = tbl[k]; }); }
+    return itemsLC[lang][src.toLowerCase()] || null;
+  }
   function LI(item) {
-    const tr = lang === 'fr' ? null : ((I18N.items || {})[lang] || {})[item.src];
+    const tr = lang === 'fr' ? null : itemTr(item.src);
     return { caption: (tr && tr.caption) || item.caption, text: (tr && tr.text !== undefined) ? tr.text : item.text };
   }
   // RGAA 8.7 : un mot ou titre dans une autre langue que la page est signalé par un attribut lang
@@ -191,6 +199,21 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const rand = (a, b) => a + Math.random() * (b - a);
+
+  // GitHub (comme la plupart des serveurs) distingue .png de .PNG, pas Windows : si une image ou une vidéo est
+  // introuvable, on la recharge une fois avec l'extension en majuscules / minuscules.
+  window.addEventListener('error', function(e) {
+    const el = e.target;
+    if (!el || !el.tagName || (el.tagName !== 'IMG' && el.tagName !== 'VIDEO') || el._caseRetry) return;
+    const src = el.getAttribute('src');
+    const m = src && src.match(/\.([A-Za-z0-9]+)(\?.*)?$/);
+    if (!m) return;
+    el._caseRetry = true;
+    const ext = m[1], alt = ext === ext.toLowerCase() ? ext.toUpperCase() : ext.toLowerCase();
+    el.addEventListener('load', function() { if (typeof layoutMasonry === 'function') layoutMasonry(); }, { once: true });
+    el.addEventListener('loadedmetadata', function() { if (typeof layoutMasonry === 'function') layoutMasonry(); }, { once: true });
+    el.setAttribute('src', src.slice(0, src.length - m[0].length) + '.' + alt + (m[2] || ''));
+  }, true);
 
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -341,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const usable = Math.max(1, window.innerWidth - 32) * Math.max(1, window.innerHeight - 96 - 70);
     const total  = sc.reduce((acc, v) => acc + (W * v) * (H * v), 0);
     const limit  = usable * SLIDE_TOTAL_MAX;
-    if (total > limit) { const f = Math.sqrt(limit / total); sc = sc.map(v => v * f); }
+    if (total > limit) { const f = Math.sqrt(limit / total); sc = sc.map(v => Math.max(v * f, SLIDE_SCALE_MIN * 0.9)); }   // jamais sous 90 % du minimum
     els.forEach((el, i) => el.style.setProperty('--s', sc[i].toFixed(3)));
   }
 
@@ -470,14 +493,14 @@ document.addEventListener('DOMContentLoaded', function () {
   const SLIDE_DATA = [
     {
       title: "Profil",
-      navLabel: "Profil & Contact",
+      navLabel: "À propos",
       jp: "プロフィール",
       profile: true,
       text: "Graphiste 2D et 3D, diplômé en 2025 d'une Licence Professionnelle en Design Graphique. Je m'intéresse à des domaines variés, de l'identité visuelle à l'édition, en passant par le motion design, l'animation 3D et le jeu vidéo. J'aime explorer de nouvelles techniques et apprendre à utiliser les outils adaptés à chaque projet.\n\nLa culture, le cinéma et le jeu vidéo nourrissent mon travail, mais j'apprécie aussi de découvrir de nouveaux univers et de sortir de mes habitudes.\n\nJe suis ouvert aux projets et aux collaborations : n'hésitez pas à me contacter."
     },
     {
       title: "Service Communication Université Rennes 2",
-      navLabel: "Service communication",
+      navLabel: "Communication",
       jp: "レンヌ2",
       desc: "Suite Adobe",
       images: [
@@ -713,12 +736,12 @@ document.addEventListener('DOMContentLoaded', function () {
       desc: "Huile, aquarelle et illustrations",
       images: [
          {
-          src: "img/avatar.PNG",
+          src: "img/avatar.png",
           caption: "I See You, Son",
           text: "Illustration digitale à partir d'une scène du film Avatar 3 : De feu et de cendre"
         },
         {
-          src: "img/darthvader.PNG",
+          src: "img/darthvader.png",
           caption: "Anakin",
           text: "Illustration digitale à partir d'une scène de la série Star Wars : Obi-Wan"
         },
@@ -741,8 +764,8 @@ document.addEventListener('DOMContentLoaded', function () {
       ]
     },
     {
-      title: "Music covers",
-      navLabel: "Music covers",
+      title: "Pochette musicale",
+      navLabel: "Pochette musicale",
       jp: "カバーアート",
       desc: "Illustration digitale, 3D, photographie",
       images: [
@@ -886,7 +909,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // =====================
   // QUESTION : COMMENT VOUS APPELEZ-VOUS ?
   // =====================
-  function updatePseudo() { pseudoEl.textContent = visitorName || t('visitor'); }
+  function updatePseudo() { pseudoEl.textContent = visitorName || t('visitor'); fitNav(); }   // un prénom long réduit la place de la barre
 
   function revealSite() {
     [splideElIntro, topbarIntro, bgBar, tickerEl, targetsEl].forEach(el => {
@@ -1251,7 +1274,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .join('');
 
     overlayContent.innerHTML = `
-      <h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>${esc(data.title)}<span class="br">」</span></h2>
+      <h2 class="og-header" id="og-title" tabindex="-1"><span class="br br-l" aria-hidden="true"></span>${esc(data.title)}<span class="br br-r" aria-hidden="true"></span></h2>
       <div class="og-profile">
         <div class="og-profile-text">
           ${paragraphs}
@@ -1356,7 +1379,7 @@ document.addEventListener('DOMContentLoaded', function () {
     currentData  = data;
     gridFocusIdx = 0;
 
-    let html = `<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>${esc(L(data).title)}<span class="br">」</span></h2>`;
+    let html = `<h2 class="og-header" id="og-title" tabindex="-1"><span class="br br-l" aria-hidden="true"></span>${esc(L(data).title)}<span class="br br-r" aria-hidden="true"></span></h2>`;
     if (L(data).desc) html += `<div class="og-desc">${esc(L(data).desc)}</div>`;
     html += `<div class="og-grid" id="og-grid">`;
     data.images.forEach((img, i) => {
@@ -1611,7 +1634,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Plan du site : deuxième système de navigation (RGAA 12.1)
   function buildSitemap() {
     currentData = null;
-    let html = '<h2 class="og-header" id="og-title" tabindex="-1"><span class="br">「</span>' + esc(t('sitemap')) + '<span class="br">」</span></h2>' +
+    let html = '<h2 class="og-header" id="og-title" tabindex="-1"><span class="br br-l" aria-hidden="true"></span>' + esc(t('sitemap')) + '<span class="br br-r" aria-hidden="true"></span></h2>' +
                '<div class="og-profile"><div class="og-profile-text"><ul class="og-sitemap">';
     SLIDE_DATA.forEach((d, i) => {
       html += '<li><button type="button" class="og-sitelink" data-cat="' + i + '">' + esc(L(d).title) + '</button>';
@@ -1689,6 +1712,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!on) loadIconVideos();
     updateLiteBtn();
     syncIconVideos();
+    fitNav();
     if (on) window.scrollTo(0, 0);
   }
   liteBtn.addEventListener('click', function() { if (gateOpen || overlayOpen) return; setLiteMode(!liteMode, true); });
@@ -1712,6 +1736,27 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     if (!liteMode) navEl.appendChild(liteBtn);   // en version accessible, le bouton est dans le bandeau du haut
   }
+
+  // La barre du haut doit tenir d'un coup, sans défilement horizontal : on réduit d'abord la taille du texte
+  // (jusqu'à 11 px, même taille pour les liens, le prénom et l'heure), puis l'espace entre les liens,
+  // et en dernier recours les liens passent à la ligne.
+  function fitNav() {
+    if (!navReady) return;
+    const root = document.documentElement;
+    root.style.removeProperty('--bar-font');
+    navEl.classList.remove('nav-tight', 'nav-wrap');
+    if (!liteMode) {
+      let size = parseFloat(getComputedStyle(root).getPropertyValue('--bar-font')) || 16;
+      const fits = () => navEl.scrollWidth <= navEl.clientWidth + 1;
+      while (!fits() && size > 11) { size -= 0.5; root.style.setProperty('--bar-font', size + 'px'); }
+      if (!fits()) navEl.classList.add('nav-tight');
+      if (!fits()) navEl.classList.add('nav-wrap');
+    }
+    root.style.setProperty('--topbar-h', Math.ceil(topbarIntro.getBoundingClientRect().height) + 'px');
+  }
+  let fitTimer = null;
+  window.addEventListener('resize', function() { clearTimeout(fitTimer); fitTimer = setTimeout(fitNav, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNav);
 
   // Sélecteur de langue (FR / EN / 日本語)
   const langBox = document.getElementById('lang');
@@ -1762,8 +1807,10 @@ document.addEventListener('DOMContentLoaded', function () {
     project.querySelector('#project-next').setAttribute('aria-label', t('next'));
     langBox.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false'));
     if (gateRender) gateRender();
+    fitNav();
   }
 
+  navReady = true;
   setLiteMode(liteMode, false);
   applyLanguage();
 
