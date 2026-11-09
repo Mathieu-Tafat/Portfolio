@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         {
           src: "img/affiche/rocky.png",
-          medias: ["img/affiche/rocky.png", "img/affiche/rocky2.jpeg"],
+          medias: ["img/affiche/rocky.png", "img/affiche/rocky2.jpg"],
           caption: "LALLAPALOOZA",
           text: "Affiche liée au manga Hajime no Ippo, sur le combat entre Makunouchi et Sendo, « LALLAPALOOZA ». Je l'ai réalisée en référence à l'affiche de Rocky 2, présentée en deuxième image."
         },
