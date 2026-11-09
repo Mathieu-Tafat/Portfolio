@@ -77,6 +77,7 @@ window.I18N = {
       "Service Communication Université Rennes 2": { title: "Rennes 2 University Communications Office", navLabel: "Communications", desc: "Adobe suite" },
       "Jeux-vidéo": { title: "Video games", navLabel: "Video games", desc: "Construct 2, Unity" },
       "Edition": { title: "Editorial design", navLabel: "Editorial design", desc: "Elbow grease, Adobe suite" },
+      "Affiches": { title: "Posters", navLabel: "Posters" },
       "Animation 2D": { title: "2D animation", navLabel: "2D animation", desc: "Adobe suite" },
       "Animations 3D": { title: "3D animation", navLabel: "3D animation", desc: "Blender, Adobe suite" },
       "Illustrations": { title: "Illustrations", navLabel: "Illustrations", desc: "Oil, watercolor and illustrations" },
@@ -91,6 +92,7 @@ window.I18N = {
       "Service Communication Université Rennes 2": { title: "レンヌ第2大学 広報課", navLabel: "広報課", desc: "Adobeスイート" },
       "Jeux-vidéo": { title: "ビデオゲーム", navLabel: "ビデオゲーム", desc: "Construct 2、Unity" },
       "Edition": { title: "エディトリアルデザイン", navLabel: "エディトリアル", desc: "手仕事の根気、Adobeスイート" },
+      "Affiches": { title: "ポスター", navLabel: "ポスター" },
       "Animation 2D": { title: "2Dアニメーション", navLabel: "2Dアニメーション", desc: "Adobeスイート" },
       "Animations 3D": { title: "3Dアニメーション", navLabel: "3Dアニメーション", desc: "Blender、Adobeスイート" },
       "Illustrations": { title: "イラストレーション", navLabel: "イラスト", desc: "油彩、水彩、イラスト" },
@@ -101,6 +103,22 @@ window.I18N = {
   items: {
     en: {
       /* ---------- Service Communication Université Rennes 2 ---------- */
+      "img/affiche/enfanfare.jpg": {
+        text: "3D poster made for the film En fanfare (The Marching Band) by Emmanuel Courcol."
+      },
+      "img/affiche/gojira.png": {
+        caption: "Godzilla (PS3)",
+        text: "Poster linked to the Godzilla game on PS3, with my review written on it. It was part of a project of several posters paired with reviews, and this one is the most successful."
+      },
+      "img/affiche/robots.png": {
+        text: "Poster linked to the animated film Robots (2005)."
+      },
+      "img/affiche/rocky.png": {
+        text: "Poster linked to the manga Hajime no Ippo, about the fight between Makunouchi and Sendo, “LALLAPALOOZA”. I made it as a reference to the Rocky 2 poster, shown as the second image."
+      },
+      "img/affiche/desiredoue.png": {
+        text: "Poster of a PSG player, Désiré Doué, with a reference to Axel Blaze from Inazuma Eleven."
+      },
       "img/stagerennes2/recherche/recherche.png": {
         caption: "Research Day 2025",
         text: "After several years without an edition, Research Day was coming back under the theme “Research in Society”. The brief was to create an identity that makes research more accessible without using the usual scientific codes. I worked on a typographic ligature linking the words, and on a blue background animated by multicolored waves, to evoke the exchanges between research and society. I also set a principle for future editions: renew the typographic work every year while keeping a recognizable identity. I produced the adaptations across different media: posters, social media, slideshow and brochure."
@@ -270,6 +288,22 @@ window.I18N = {
 
     ja: {
       /* ---------- Service Communication Université Rennes 2 ---------- */
+      "img/affiche/enfanfare.jpg": {
+        text: "Emmanuel Courcol監督の映画『En fanfare』のために制作した3Dポスターです。"
+      },
+      "img/affiche/gojira.png": {
+        caption: "ゴジラ(PS3)",
+        text: "PS3のゲーム『ゴジラ』に関連したポスターで、私のレビューを載せています。レビュー付きポスターを複数作るプロジェクトの1枚で、これがいちばんうまくいった作品です。"
+      },
+      "img/affiche/robots.png": {
+        text: "アニメーション映画『ロボッツ』(2005年)に関連したポスターです。"
+      },
+      "img/affiche/rocky.png": {
+        text: "漫画『はじめの一歩』の、幕之内と千堂の一戦「LALLAPALOOZA」に関連したポスターです。『ロッキー2』のポスターへのオマージュとして制作しました。2枚目の画像がそのポスターです。"
+      },
+      "img/affiche/desiredoue.png": {
+        text: "PSGの選手、Désiré Douéのポスターで、『イナズマイレブン』のアクセル・ブレイズ(日本名:豪炎寺修也)へのオマージュを込めています。"
+      },
       "img/stagerennes2/recherche/recherche.png": {
         caption: "研究の日 2025",
         text: "数年間開催されていなかった「研究の日」が、「社会の中の研究」をテーマに復活しました。ブリーフは、一般的な科学のコードに頼らず、研究をより身近に感じられるアイデンティティを提案することでした。言葉をつなぐタイポグラフィのリガチャーと、多色の波が揺らめく青い背景をつくり、研究と社会の交流を表現しました。また、次回以降の開催に向けて、毎年タイポグラフィを刷新しながらも、認識しやすいアイデンティティを保つという方針を定めました。ポスター、SNS、スライド、パンフレットなど、さまざまな媒体への展開も担当しました。"

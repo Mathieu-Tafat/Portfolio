@@ -619,14 +619,47 @@ document.addEventListener('DOMContentLoaded', function () {
           text: "Fanzine réalisé en binôme autour du thème « Reggaeton & Fin du Monde », avec des contraintes de photocopie et de collage. Nos approches étaient différentes mais complémentaires : je développais les idées autour de la fin du monde, tandis que mon binôme apportait davantage de références au reggaeton. Le résultat cherche un équilibre entre ces deux univers. Ce projet a surtout été une expérience de collaboration, qui m'a appris à confronter des idées différentes, à partager mes doutes et à construire une proposition commune."
         },
         {
-          src: "img/edition/1173.png",
-          caption: "117³ - Exposition",
-          text: "Affiche et supports de communication réalisés dans le cadre d'un workshop de Licence 2 Arts Plastiques consacré à la curation et à l'exposition collective des travaux des étudiant·es. Chargé de l'affiche après avoir exprimé mon intérêt pour le graphisme, j'ai travaillé avec le groupe pour construire une proposition commune. Le titre 117³ faisait référence au temps passé dans notre atelier durant une semaine, et j'ai choisi de représenter ce nombre par une photographie de la porte de l'atelier, vidée de son contenu. Le délai très court et la diversité des avis ont imposé de faire des choix pour aboutir à une composition cohérente. J'ai également réalisé des supports de promotion, notamment un flyer et des visuels pour les réseaux sociaux."
-        },
-        {
           src: "img/edition/flipbook/flipe.mp4",
           caption: "E - Flipbook",
           text: "Flipbook explorant l'évolution de la lettre « E » à travers différentes grandes catégories typographiques. Le projet m'a amené à concevoir un objet éditorial à la fois robuste et suffisamment souple pour permettre une manipulation répétée. La principale contrainte était de garantir le bon fonctionnement du feuilletage et la lisibilité des transformations. Le flipbook a été exposé au Cabinet du livre d'artiste de Rennes 2."
+        }
+      ]
+    },
+    {
+      title: "Affiches",
+      navLabel: "Affiches",
+      jp: "ポスター",
+      images: [
+        {
+          src: "img/affiche/enfanfare.jpg",
+          caption: "En fanfare",
+          text: "Affiche en 3D réalisée pour le film En fanfare d'Emmanuel Courcol."
+        },
+        {
+          src: "img/affiche/gojira.png",
+          caption: "Godzilla (PS3)",
+          text: "Affiche liée au jeu Godzilla sur PS3, avec ma review écrite dessus. Elle faisait partie d'un projet de plusieurs affiches accompagnées de reviews : c'est la plus réussie."
+        },
+        {
+          src: "img/affiche/robots.png",
+          caption: "Robots",
+          text: "Affiche liée au film d'animation Robots (2005)."
+        },
+        {
+          src: "img/affiche/rocky.png",
+          medias: ["img/affiche/rocky.png", "img/affiche/rocky2.jpeg"],
+          caption: "LALLAPALOOZA",
+          text: "Affiche liée au manga Hajime no Ippo, sur le combat entre Makunouchi et Sendo, « LALLAPALOOZA ». Je l'ai réalisée en référence à l'affiche de Rocky 2, présentée en deuxième image."
+        },
+        {
+          src: "img/affiche/desiredoue.png",
+          caption: "Désiré Doué",
+          text: "Affiche d'un joueur du PSG, Désiré Doué, avec une référence à Axel Blaze d'Inazuma Eleven."
+        },
+        {
+          src: "img/edition/1173.png",
+          caption: "117³ - Exposition",
+          text: "Affiche et supports de communication réalisés dans le cadre d'un workshop de Licence 2 Arts Plastiques consacré à la curation et à l'exposition collective des travaux des étudiant·es. Chargé de l'affiche après avoir exprimé mon intérêt pour le graphisme, j'ai travaillé avec le groupe pour construire une proposition commune. Le titre 117³ faisait référence au temps passé dans notre atelier durant une semaine, et j'ai choisi de représenter ce nombre par une photographie de la porte de l'atelier, vidée de son contenu. Le délai très court et la diversité des avis ont imposé de faire des choix pour aboutir à une composition cohérente. J'ai également réalisé des supports de promotion, notamment un flyer et des visuels pour les réseaux sociaux."
         }
       ]
     },
